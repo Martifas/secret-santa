@@ -10,6 +10,8 @@ export type Generated<T> =
     ? ColumnType<S, I | undefined, U>
     : ColumnType<T, T | undefined, T>
 
+export type Numeric = ColumnType<string, number | string, number | string>
+
 export type Timestamp = ColumnType<Date, Date | string, Date | string>
 
 export interface Event {
@@ -36,7 +38,33 @@ export interface User {
   username: string
 }
 
+export interface UserEvent {
+  createdAt: Generated<Timestamp>
+  eventId: number
+  id: Generated<number>
+  role: string
+  santaForUserId: number | null
+  userId: number
+  wishlistId: number | null
+}
+
+export interface Wishlist {
+  createdAt: Generated<Timestamp>
+  description: string | null
+  eventId: number
+  id: Generated<number>
+  isPurchased: Generated<boolean>
+  itemName: string
+  price: Numeric | null
+  priority: number | null
+  updatedAt: Generated<Timestamp>
+  url: string | null
+  userId: number
+}
+
 export interface DB {
   event: Event
   user: User
+  userEvent: UserEvent
+  wishlist: Wishlist
 }
