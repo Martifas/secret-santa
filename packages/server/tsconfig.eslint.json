@@ -1,0 +1,21 @@
+{
+  "extends": "@tsconfig/node20/tsconfig.json",
+  "exclude": ["**/*.js", "dist"],
+  "include": [
+    "**/*.ts",
+    "**/*.cjs",
+    "**/*.mjs",
+    ".eslintrc.cjs",
+    "vitest.config.ts"
+  ],
+  "compilerOptions": {
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "paths": {
+      "@server/*": ["./src/*"],
+      "@tests/*": ["./tests/*"]
+    }
+  }
+}
