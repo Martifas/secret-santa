@@ -12,6 +12,18 @@ export type Generated<T> =
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>
 
+export interface Event {
+  budgetLimit: number
+  createdAt: Generated<Timestamp>
+  createdBy: number
+  description: string
+  eventDate: Timestamp
+  id: Generated<number>
+  name: string
+  status: string
+  updatedAt: Generated<Timestamp>
+}
+
 export interface User {
   avatarUrl: string | null
   createdAt: Generated<Timestamp>
@@ -25,5 +37,6 @@ export interface User {
 }
 
 export interface DB {
+  event: Event
   user: User
 }
