@@ -10,6 +10,18 @@ export type Generated<T> =
     ? ColumnType<S, I | undefined, U>
     : ColumnType<T, T | undefined, T>
 
+export type Json = JsonValue
+
+export type JsonArray = JsonValue[]
+
+export type JsonObject = {
+  [x: string]: JsonValue | undefined
+}
+
+export type JsonPrimitive = boolean | number | string | null
+
+export type JsonValue = JsonArray | JsonObject | JsonPrimitive
+
 export type Numeric = ColumnType<string, number | string, number | string>
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>
@@ -24,6 +36,23 @@ export interface Event {
   name: string
   status: string
   updatedAt: Generated<Timestamp>
+}
+
+export interface EventInvitations {
+  createdAt: Generated<Timestamp>
+  email: string
+  eventId: number
+  expiresAt: Timestamp
+  id: Generated<number>
+  status: string
+  token: string
+}
+
+export interface EventRule {
+  eventId: number
+  id: Generated<number>
+  ruleData: Json
+  ruleType: string
 }
 
 export interface User {
@@ -64,6 +93,8 @@ export interface Wishlist {
 
 export interface DB {
   event: Event
+  eventInvitations: EventInvitations
+  eventRule: EventRule
   user: User
   userEvent: UserEvent
   wishlist: Wishlist
