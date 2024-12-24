@@ -15,10 +15,12 @@
   "description": "",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
+    "@types/chance": "^1.1.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",
     "@types/pg": "^8.11.10",
+    "chance": "^1.1.12",
     "eslint": "^8.57.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^18.0.0",
