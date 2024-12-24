@@ -3,7 +3,10 @@ import type { Insertable } from 'kysely'
 import type {
   Event,
   EventInvitations,
+  EventRule,
+  Json,
   User,
+  UserEvent,
   Wishlist,
 } from '@server/database/types'
 
@@ -16,6 +19,38 @@ const randomId = () =>
 const now = new Date()
 const EVENT_STATUS = ['draft', 'published', 'cancelled', 'completed']
 const INVITATION_STATUS = ['sent', 'not sent', 'cancelled', 'confirmed']
+const ROLES = ['administrator', 'participant']
+const RULE_TYPES = ['budget', 'date', 'participant', 'wishlist']
+
+const generateRuleData = (ruleType: string): Json => {
+  switch (ruleType) {
+    case 'budget':
+      return {
+        minAmount: random.integer({ min: 10, max: 100 }),
+        maxAmount: random.integer({ min: 101, max: 1000 }),
+        currency: 'USD',
+      }
+    case 'date':
+      return {
+        deadlineDate: random.date().toISOString(),
+        reminderDays: random.integer({ min: 1, max: 7 }),
+      }
+    case 'participant':
+      return {
+        minParticipants: random.integer({ min: 3, max: 5 }),
+        maxParticipants: random.integer({ min: 6, max: 20 }),
+        allowExternalUsers: random.bool(),
+      }
+    case 'wishlist':
+      return {
+        minItems: random.integer({ min: 1, max: 3 }),
+        maxItems: random.integer({ min: 4, max: 10 }),
+        requireUrls: random.bool(),
+      }
+    default:
+      return {}
+  }
+}
 
 /**
  * Generates a fake event with some default test data.
@@ -94,3 +129,36 @@ export const fakeUser = <T extends Partial<Insertable<User>>>(overrides: T) =>
       random.integer({ min: 100, max: 999 }),
     ...overrides,
   }) satisfies Insertable<User>
+
+/**
+ * Generates a fake user event with some default test data.
+ * @param overrides any properties that should be different from default fake data.
+ */
+export const fakeUserEvent = <T extends Partial<Insertable<UserEvent>>>(
+  overrides: T
+) =>
+  ({
+    userId: randomId(),
+    eventId: randomId(),
+    role: random.pickone(ROLES),
+    wishlistId: randomId(),
+    santaForUserId: randomId(),
+    ...overrides,
+  }) satisfies Insertable<UserEvent>
+
+/**
+ * Generates a fake user event with some default test data.
+ * @param overrides any properties that should be different from default fake data.
+ */
+export const fakeEventRule = <T extends Partial<Insertable<EventRule>>>(
+  overrides: T
+) => {
+  const ruleType = random.pickone(RULE_TYPES) // Define ruleType first
+
+  return {
+    eventId: randomId(),
+    ruleType,
+    ruleData: generateRuleData(ruleType),
+    ...overrides,
+  } satisfies Insertable<EventRule>
+}
