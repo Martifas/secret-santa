@@ -15,7 +15,8 @@
     "types": ["vitest/globals"],
     "paths": {
       "@server/*": ["./src/*"],
-      "@tests/*": ["./tests/*"]
+      "@tests/*": ["./tests/*"],
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src/**/*", "tests/**/*"],
