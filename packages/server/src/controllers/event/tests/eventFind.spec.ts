@@ -26,13 +26,11 @@ const { find } = createCaller(authRepoContext(repos))
 
 describe('find', () => {
   it('should return an event', async () => {
-    // ARRANGE (Given)
+
     const id = 1
 
-    // ACT (When)
     const eventFound = await find({ id })
 
-    // ASSERT (Then)
     expect(eventFound).toMatchObject({
       id,
       name: 'Christmas Party',
