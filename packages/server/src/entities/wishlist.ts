@@ -1,4 +1,6 @@
 import { z } from 'zod'
+import type { Selectable } from 'kysely'
+import type { Wishlist } from '@server/database'
 import { idSchema } from './shared'
 
 export const wishlistSchema = z.object({
@@ -15,15 +17,18 @@ export const wishlistSchema = z.object({
   updatedAt: z.date(),
 })
 
-export type Wishlist = z.infer<typeof wishlistSchema>
+export const wishlistKeys = Object.keys(wishlistSchema.shape) as (keyof Wishlist)[]
 
-// For creating new wishlist items (without id and timestamps)
-export const createWishlistSchema = wishlistSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-})
+export type WishlistForMember = Pick<
+  Selectable<Wishlist>,
+  (typeof wishlistKeys)[number]
+>
 
-export type CreateWishlist = z.infer<typeof createWishlistSchema>
-
-// TO DO: finish
+export const wishlistKeysForTesting = [
+  'itemName',
+  'description',
+  'url',
+  'price',
+  'priority',
+  'isPurchased',
+] as const

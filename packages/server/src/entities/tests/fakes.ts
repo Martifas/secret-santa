@@ -78,7 +78,7 @@ export const fakeEvent = <T extends Partial<Insertable<Event>>>(
  * @param overrides any properties that should be different from default fake data.
  */
 export const fakeWishlist = <T extends Partial<Insertable<Wishlist>>>(
-  overrides: T
+  overrides: T = {} as T
 ) =>
   ({
     description: random.paragraph(),
