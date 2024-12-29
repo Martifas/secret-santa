@@ -51,3 +51,5 @@ export function eventRepository(db: Database) {
     },
   }
 }
+
+export type EventRepository = ReturnType<typeof eventRepository>

@@ -9,6 +9,7 @@ import type {
   UserEvent,
   Wishlist,
 } from '@server/database/types'
+import type { AuthUser } from '../user'
 
 const randomId = () =>
   random.integer({
@@ -56,7 +57,9 @@ const generateRuleData = (ruleType: string): Json => {
  * Generates a fake event with some default test data.
  * @param overrides any properties that should be different from default fake data.
  */
-export const fakeEvent = <T extends Partial<Insertable<Event>>>(overrides: T = {} as T) =>
+export const fakeEvent = <T extends Partial<Insertable<Event>>>(
+  overrides: T = {} as T
+) =>
   ({
     budgetLimit: random.integer({ min: 10, max: 1000 }),
     createdBy: randomId(),
@@ -114,7 +117,9 @@ export const fakeEventInvitation = <
  * Generates a fake user with some default test data.
  * @param overrides any properties that should be different from default fake data.
  */
-export const fakeUser = <T extends Partial<Insertable<User>>>(overrides: T = {} as T) =>
+export const fakeUser = <T extends Partial<Insertable<User>>>(
+  overrides: T = {} as T
+) =>
   ({
     avatarUrl: random.url(),
     email: random.email(),
@@ -129,6 +134,14 @@ export const fakeUser = <T extends Partial<Insertable<User>>>(overrides: T = {} 
       random.integer({ min: 100, max: 999 }),
     ...overrides,
   }) satisfies Insertable<User>
+
+export const fakeAuthUser = <T extends Partial<AuthUser>>(
+  overrides: T = {} as T
+): AuthUser => ({
+  id: randomId(),
+  email: random.email(),
+  ...overrides,
+})
 
 /**
  * Generates a fake user event with some default test data.
