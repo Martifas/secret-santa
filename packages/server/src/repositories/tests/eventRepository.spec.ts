@@ -16,6 +16,24 @@ const [eventOne] = await insertAll(db, 'event', [
 const fakeEventDefault = (event: Parameters<typeof fakeEvent>[0] = {}) =>
   fakeEvent({ createdBy: userOne.id, ...event })
 
+describe('find', () => {
+  it('should return an event by id', async () => {
+    const foundEvent = await repository.find(eventOne.id)
+
+    expect(pick(foundEvent, eventKeysForTesting)).toEqual(
+      pick(eventOne, eventKeysForTesting)
+    )
+    expect(foundEvent.id).toBe(eventOne.id)
+    expect(foundEvent.createdBy).toBe(eventOne.createdBy)
+  })
+
+  it('should return null for non-existent event', async () => {
+    const foundEvent = await repository.find(99999)
+
+    expect(foundEvent).toBeNull()
+  })
+})
+
 describe('create', () => {
   it('should create a new event', async () => {
     const event = fakeEventDefault()
@@ -33,7 +51,6 @@ describe('create', () => {
 
 describe('update', () => {
   it('should update event attributes', async () => {
-
     const updates = {
       name: 'Updated Secret Santa',
       description: 'A very cozy xmas evening with gifts',
@@ -55,12 +72,13 @@ describe('update', () => {
 
 describe('remove', () => {
   it('should remove event', async () => {
-
     const removedEvent = await repository.remove(eventOne.id)
 
-    expect(pick(removedEvent, eventKeysForTesting)).toEqual(pick(eventOne, eventKeysForTesting))
+    expect(pick(removedEvent, eventKeysForTesting)).toEqual(
+      pick(eventOne, eventKeysForTesting)
+    )
 
-    const result = await selectAll(db,'event')
+    const result = await selectAll(db, 'event')
 
     expect(result).toHaveLength(0)
   })
