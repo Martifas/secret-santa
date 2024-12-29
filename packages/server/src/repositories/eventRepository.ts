@@ -27,5 +27,13 @@ export function eventRepository(db: Database) {
         .returning(eventKeysForMembers)
         .executeTakeFirstOrThrow()
     },
+
+    async remove(id: number): Promise<EventForMember> {
+        return db
+          .deleteFrom('event')
+          .where('id', '=', id)
+          .returning(eventKeysForMembers)
+          .executeTakeFirstOrThrow()
+      }
   }
 }

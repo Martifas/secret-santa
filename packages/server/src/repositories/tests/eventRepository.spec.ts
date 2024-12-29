@@ -8,11 +8,10 @@ import { eventRepository } from '../eventRepository'
 
 const db = await wrapInRollbacks(createTestDatabase())
 const repository = eventRepository(db)
-const [userOne] = await insertAll(db, 'user', [fakeUser(), fakeUser()])
-// const [eventOne, eventTwo] = await insertAll(db, 'event', [
-//   fakeEvent({ createdBy: userOne.id }),
-//   fakeEvent({ createdBy: userOne.id }),
-// ])
+const [userOne] = await insertAll(db, 'user', [fakeUser()])
+const [eventOne] = await insertAll(db, 'event', [
+  fakeEvent({ createdBy: userOne.id }),
+])
 
 const fakeEventDefault = (event: Parameters<typeof fakeEvent>[0] = {}) =>
   fakeEvent({ createdBy: userOne.id, ...event })
@@ -34,9 +33,6 @@ describe('create', () => {
 
 describe('update', () => {
   it('should update event attributes', async () => {
-    const [event] = await insertAll(db, 'event', [
-      fakeEvent({ createdBy: userOne.id }),
-    ])
 
     const updates = {
       name: 'Updated Secret Santa',
@@ -46,24 +42,23 @@ describe('update', () => {
       status: 'published',
     }
 
-    const updatedEvent = await repository.update(event.id, updates)
+    const updatedEvent = await repository.update(eventOne.id, updates)
 
     expect(pick(updatedEvent, eventKeysForTesting)).toEqual(
       pick(updates, eventKeysForTesting)
     )
-    expect(updatedEvent.id).toBe(event.id)
-    expect(updatedEvent.createdBy).toBe(event.createdBy)
+    expect(updatedEvent.id).toBe(eventOne.id)
+    expect(updatedEvent.createdBy).toBe(eventOne.createdBy)
     expect(updatedEvent.updatedAt).toBeInstanceOf(Date)
   })
 })
 
 describe('remove', () => {
   it('should remove event', async () => {
-    const [event] = await insertAll(db, 'event', [fakeEventDefault()])
 
-    const removedEvent = await repository.remove(event.id)
+    const removedEvent = await repository.remove(eventOne.id)
 
-    expect(removedEvent).toEqual(pick(event, eventKeysForTesting))
+    expect(pick(removedEvent, eventKeysForTesting)).toEqual(pick(eventOne, eventKeysForTesting))
 
     const result = await selectAll(db,'event')
 
