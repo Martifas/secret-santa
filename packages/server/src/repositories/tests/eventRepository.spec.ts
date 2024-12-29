@@ -1,6 +1,6 @@
 import { createTestDatabase } from '@tests/utils/database'
 import { wrapInRollbacks } from '@tests/utils/transactions'
-import { insertAll } from '@tests/utils/record'
+import { insertAll, selectAll } from '@tests/utils/record'
 import { fakeEvent, fakeUser } from '@server/entities/tests/fakes'
 import { pick } from 'lodash-es'
 import { eventKeysForTesting } from '@server/entities/event'
@@ -48,10 +48,25 @@ describe('update', () => {
 
     const updatedEvent = await repository.update(event.id, updates)
 
-
-    expect(pick(updatedEvent, eventKeysForTesting)).toEqual(pick(updates, eventKeysForTesting))
+    expect(pick(updatedEvent, eventKeysForTesting)).toEqual(
+      pick(updates, eventKeysForTesting)
+    )
     expect(updatedEvent.id).toBe(event.id)
     expect(updatedEvent.createdBy).toBe(event.createdBy)
     expect(updatedEvent.updatedAt).toBeInstanceOf(Date)
+  })
+})
+
+describe('remove', () => {
+  it('should remove event', async () => {
+    const [event] = await insertAll(db, 'event', [fakeEventDefault()])
+
+    const removedEvent = await repository.remove(event.id)
+
+    expect(removedEvent).toEqual(pick(event, eventKeysForTesting))
+
+    const result = await selectAll(db,'event')
+
+    expect(result).toHaveLength(0)
   })
 })
