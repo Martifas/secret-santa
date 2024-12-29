@@ -32,29 +32,26 @@ describe('create', () => {
   })
 })
 
-describe('update event', async () => {
+describe('update', () => {
   it('should update event attributes', async () => {
-    const event = insertAll(db, 'event', [fakeEvent({ createdBy: userOne.id })])
+    const [event] = await insertAll(db, 'event', [
+      fakeEvent({ createdBy: userOne.id }),
+    ])
 
-    const updates = { description: 'A very cozy xmas evening with gifts' }
+    const updates = {
+      name: 'Updated Secret Santa',
+      description: 'A very cozy xmas evening with gifts',
+      budgetLimit: 150,
+      eventDate: new Date('2024-12-24'),
+      status: 'published',
+    }
 
     const updatedEvent = await repository.update(event.id, updates)
 
-    expect(
-      pick(
-        updatedEvent,
-        eventKeysForTesting.filter((key) => key !== 'id')
-      )
-    ).toEqual({
-      ...pick(
-        event,
-        eventKeysForTesting.filter((key) => key !== 'id')
-      ),
-      ...updates,
-      createdBy: event.createdBy,
-    })
+
+    expect(pick(updatedEvent, eventKeysForTesting)).toEqual(pick(updates, eventKeysForTesting))
     expect(updatedEvent.id).toBe(event.id)
-    expect(updatedEvent.createdAt).toEqual(event.createdAt)
+    expect(updatedEvent.createdBy).toBe(event.createdBy)
     expect(updatedEvent.updatedAt).toBeInstanceOf(Date)
   })
 })

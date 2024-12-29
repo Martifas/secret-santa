@@ -27,8 +27,8 @@ export type EventForMember = Pick<
 export const eventKeysForTesting = [
   'name',
   'description',
-  'createdBy',
   'eventDate',
   'budgetLimit',
   'status',
 ] as const
+
