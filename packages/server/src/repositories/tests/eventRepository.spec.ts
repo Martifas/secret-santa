@@ -35,7 +35,6 @@ describe('find all', () => {
   })
 
   it('should return empty array when no events exist', async () => {
-
     await db.deleteFrom('event').execute()
 
     const events = await repository.findAll()
@@ -86,9 +85,7 @@ describe('update', () => {
       eventDate: new Date('2024-12-24'),
       status: 'published',
     }
-
     const updatedEvent = await repository.update(eventOne.id, updates)
-
     expect(pick(updatedEvent, eventKeysForTesting)).toEqual(
       pick(updates, eventKeysForTesting)
     )
@@ -96,18 +93,28 @@ describe('update', () => {
     expect(updatedEvent.createdBy).toBe(eventOne.createdBy)
     expect(updatedEvent.updatedAt).toBeInstanceOf(Date)
   })
+
+  it('should throw error when updating non-existent event', async () => {
+    const updates = {
+      name: 'Updated Secret Santa',
+    }
+    await expect(repository.update(99999, updates)).rejects.toThrowError(
+      /no result/i
+    )
+  })
 })
 
 describe('remove', () => {
   it('should remove event', async () => {
     const removedEvent = await repository.remove(eventOne.id)
-
     expect(pick(removedEvent, eventKeysForTesting)).toEqual(
       pick(eventOne, eventKeysForTesting)
     )
-
     const result = await selectAll(db, 'event')
-
     expect(result).toHaveLength(0)
+  })
+
+  it('should throw error when removing non-existent event', async () => {
+    await expect(repository.remove(99999)).rejects.toThrowError(/no result/i)
   })
 })
