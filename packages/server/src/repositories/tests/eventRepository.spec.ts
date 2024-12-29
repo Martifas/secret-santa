@@ -8,13 +8,41 @@ import { eventRepository } from '../eventRepository'
 
 const db = await wrapInRollbacks(createTestDatabase())
 const repository = eventRepository(db)
-const [userOne] = await insertAll(db, 'user', [fakeUser()])
+const [userOne] = await insertAll(db, 'user', fakeUser())
 const [eventOne] = await insertAll(db, 'event', [
   fakeEvent({ createdBy: userOne.id }),
 ])
 
 const fakeEventDefault = (event: Parameters<typeof fakeEvent>[0] = {}) =>
   fakeEvent({ createdBy: userOne.id, ...event })
+
+describe('find all', () => {
+  it('should return all events', async () => {
+    const [userTwo] = await insertAll(db, 'user', [fakeUser()])
+    const [eventTwo] = await insertAll(db, 'event', [
+      fakeEvent({ createdBy: userTwo.id }),
+    ])
+
+    const events = await repository.findAll()
+
+    expect(events).toHaveLength(2)
+    expect(events).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining(pick(eventOne, eventKeysForTesting)),
+        expect.objectContaining(pick(eventTwo, eventKeysForTesting)),
+      ])
+    )
+  })
+
+  it('should return empty array when no events exist', async () => {
+
+    await db.deleteFrom('event').execute()
+
+    const events = await repository.findAll()
+
+    expect(events).toEqual([])
+  })
+})
 
 describe('find', () => {
   it('should return an event by id', async () => {
