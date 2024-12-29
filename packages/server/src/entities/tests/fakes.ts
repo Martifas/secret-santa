@@ -56,7 +56,7 @@ const generateRuleData = (ruleType: string): Json => {
  * Generates a fake event with some default test data.
  * @param overrides any properties that should be different from default fake data.
  */
-export const fakeEvent = <T extends Partial<Insertable<Event>>>(overrides: T) =>
+export const fakeEvent = <T extends Partial<Insertable<Event>>>(overrides: T = {} as T) =>
   ({
     budgetLimit: random.integer({ min: 10, max: 1000 }),
     createdBy: randomId(),
@@ -114,7 +114,7 @@ export const fakeEventInvitation = <
  * Generates a fake user with some default test data.
  * @param overrides any properties that should be different from default fake data.
  */
-export const fakeUser = <T extends Partial<Insertable<User>>>(overrides: T) =>
+export const fakeUser = <T extends Partial<Insertable<User>>>(overrides: T = {} as T) =>
   ({
     avatarUrl: random.url(),
     email: random.email(),

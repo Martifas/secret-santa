@@ -23,3 +23,12 @@ export type EventForMember = Pick<
   Selectable<Event>,
   (typeof eventKeysForMembers)[number]
 >
+
+export const eventKeysForTesting = [
+  'name',
+  'description',
+  'createdBy',
+  'eventDate',
+  'budgetLimit',
+  'status',
+] as const
