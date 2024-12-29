@@ -20,16 +20,16 @@ describe('find', () => {
   it('should return an event by id', async () => {
     const foundEvent = await repository.find(eventOne.id)
 
+    expect(foundEvent).not.toBeNull()
+    if (!foundEvent) throw new Error('Event should exist')
+
     expect(pick(foundEvent, eventKeysForTesting)).toEqual(
       pick(eventOne, eventKeysForTesting)
     )
-    expect(foundEvent.id).toBe(eventOne.id)
-    expect(foundEvent.createdBy).toBe(eventOne.createdBy)
   })
 
   it('should return null for non-existent event', async () => {
     const foundEvent = await repository.find(99999)
-
     expect(foundEvent).toBeNull()
   })
 })
