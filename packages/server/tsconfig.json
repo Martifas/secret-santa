@@ -9,8 +9,7 @@
     "target": "ES2023",
     "moduleResolution": "Node",
     "strict": true,
-    "verbatimModuleSyntax": true,
-    "exactOptionalPropertyTypes": true,
+    "verbatimModuleSyntax": true, 
     "types": ["vitest/globals"],
     "paths": {
       "@server/*": ["./src/*"],
