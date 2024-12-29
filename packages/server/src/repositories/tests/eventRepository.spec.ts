@@ -31,3 +31,30 @@ describe('create', () => {
     })
   })
 })
+
+describe('update event', async () => {
+  it('should update event attributes', async () => {
+    const event = insertAll(db, 'event', [fakeEvent({ createdBy: userOne.id })])
+
+    const updates = { description: 'A very cozy xmas evening with gifts' }
+
+    const updatedEvent = await repository.update(event.id, updates)
+
+    expect(
+      pick(
+        updatedEvent,
+        eventKeysForTesting.filter((key) => key !== 'id')
+      )
+    ).toEqual({
+      ...pick(
+        event,
+        eventKeysForTesting.filter((key) => key !== 'id')
+      ),
+      ...updates,
+      createdBy: event.createdBy,
+    })
+    expect(updatedEvent.id).toBe(event.id)
+    expect(updatedEvent.createdAt).toEqual(event.createdAt)
+    expect(updatedEvent.updatedAt).toBeInstanceOf(Date)
+  })
+})
