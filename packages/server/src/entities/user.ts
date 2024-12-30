@@ -15,11 +15,23 @@ export const userSchema = z.object({
   lastLogin: z.date().default(() => new Date()),
 })
 
-export const userKeysAll = Object.keys(userSchema.shape) as (keyof User)[]
+export const userKeysForMembers = Object.keys(userSchema.shape) as (keyof User)[]
 
-export const userKeysPublic = ['id', 'firstName', 'lastName'] as const
+export type UserForMember = Pick<
+  Selectable<User>,
+  (typeof userKeysForMembers )[number]
+>
 
-export type UserPublic = Pick<Selectable<User>, (typeof userKeysPublic)[number]>
+export const userKeysForTesting = [
+  'username',
+  'email',
+  'password',
+  'firstName',
+  'lastName',
+  'avatarUrl',
+] as const
+
+
 
 export const authUserSchema = userSchema.pick({ id: true })
 export type AuthUser = z.infer<typeof authUserSchema>

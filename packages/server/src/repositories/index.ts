@@ -1,11 +1,13 @@
 import type { Database } from "@server/database"
 import { eventRepository } from "./eventRepository"
 import { wishlistRepository } from "./wishlistRepository"
+import { invitationRepository } from "./invitationRepository"
+import { ruleRepository } from "./ruleRepository"
+import { userEventRepository } from "./userEventRepository"
 
 export type RepositoryFactory = <T>(db: Database) => T
 
-// index of all repositories for provideRepos
-const repositories = { eventRepository, wishlistRepository }
+const repositories = { eventRepository, wishlistRepository, invitationRepository, ruleRepository, userEventRepository }
 
 export type RepositoriesFactories = typeof repositories
 export type Repositories = {
