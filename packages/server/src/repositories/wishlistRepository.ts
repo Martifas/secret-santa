@@ -51,3 +51,5 @@ export function wishlistRepository(db: Database) {
     },
   }
 }
+
+export type WishlistRepository = ReturnType<typeof wishlistRepository>

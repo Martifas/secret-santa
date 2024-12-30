@@ -103,6 +103,7 @@ export const fakeEventInvitation = <
 ) =>
   ({
     email: random.email(),
+    userId: randomId(),
     eventId: randomId(),
     expiresAt: random.date({
       min: now,

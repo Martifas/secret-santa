@@ -22,8 +22,6 @@ export type JsonPrimitive = boolean | number | string | null
 
 export type JsonValue = JsonArray | JsonObject | JsonPrimitive
 
-export type Numeric = ColumnType<string, number | string, number | string>
-
 export type Timestamp = ColumnType<Date, Date | string, Date | string>
 
 export interface Event {
@@ -46,6 +44,8 @@ export interface EventInvitations {
   id: Generated<number>
   status: string
   token: string
+  updatedAt: Generated<Timestamp>
+  userId: number
 }
 
 export interface EventRule {
@@ -84,7 +84,7 @@ export interface Wishlist {
   id: Generated<number>
   isPurchased: Generated<boolean>
   itemName: string
-  price: Numeric | null
+  price: number | null
   priority: number | null
   updatedAt: Generated<Timestamp>
   url: string | null
