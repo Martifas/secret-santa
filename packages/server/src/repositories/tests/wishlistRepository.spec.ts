@@ -1,6 +1,6 @@
 import { fakeEvent, fakeUser, fakeWishlist } from '@server/entities/tests/fakes'
 import { createTestDatabase } from '@tests/utils/database'
-import { insertAll } from '@tests/utils/record'
+import { insertAll, selectAll } from '@tests/utils/record'
 import { wrapInRollbacks } from '@tests/utils/transactions'
 import { pick } from 'lodash-es'
 import { wishlistKeysForTesting } from '@server/entities/wishlist'
@@ -76,5 +76,20 @@ describe('update', () => {
     await expect(repository.update(99999, updates)).rejects.toThrowError(
       /no result/i
     )
+  })
+})
+
+describe('remove', () => {
+  it('should remove wishlist', async () => {
+    const removedWishlist = await repository.remove(wishlistOne.id)
+    expect(pick(removedWishlist, wishlistKeysForTesting)).toEqual(
+      pick(wishlistOne, wishlistKeysForTesting)
+    )
+    const result = await selectAll(db, 'wishlist')
+    expect(result).toHaveLength(0)
+  })
+
+  it('should throw error when removing non-existent wishlist event', async () => {
+    await expect(repository.remove(99999)).rejects.toThrowError(/no result/i)
   })
 })
