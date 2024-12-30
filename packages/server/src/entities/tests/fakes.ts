@@ -149,7 +149,7 @@ export const fakeAuthUser = <T extends Partial<AuthUser>>(
  * @param overrides any properties that should be different from default fake data.
  */
 export const fakeUserEvent = <T extends Partial<Insertable<UserEvent>>>(
-  overrides: T
+  overrides: T = {} as T
 ) =>
   ({
     userId: randomId(),

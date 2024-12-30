@@ -14,6 +14,9 @@ export async function up(db: Kysely<any>) {
     .addColumn('created_at', 'timestamptz', (c) =>
       c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )
+    .addColumn('updated_at', 'timestamptz', (c) =>
+      c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
+    )
     .addUniqueConstraint('unique_user_event', ['user_id', 'event_id'])
     .execute()
 }

@@ -1,4 +1,6 @@
 import { z } from 'zod'
+import type { UserEvent } from '@server/database/types'
+import type { Selectable } from 'kysely'
 import { idSchema } from './shared'
 
 export const userEventSchema = z.object({
@@ -9,16 +11,18 @@ export const userEventSchema = z.object({
   wishlistId: idSchema,
   santaForUserId: idSchema,
   createdAt: z.date(),
+  updatedAt: z.date(),
 })
 
-export type UserEvent = z.infer<typeof userEventSchema>
+export const userEventKeysForMembers = Object.keys(
+  userEventSchema.shape
+) as (keyof UserEvent)[]
 
-// For creating new wishlist items (without id and timestamps)
-export const createUserEventSchema = userEventSchema.omit({
-  id: true,
-  createdAt: true,
-})
+export type UserEventForMember = Pick<
+  Selectable<UserEvent>,
+  (typeof userEventKeysForMembers)[number]
+>
 
-export type CreateUserEvent = z.infer<typeof createUserEventSchema>
-
-// TO DO: finish
+export const userEventKeysForTesting = [
+  'role'
+] as const

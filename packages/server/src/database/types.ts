@@ -73,6 +73,7 @@ export interface UserEvent {
   id: Generated<number>
   role: string
   santaForUserId: number | null
+  updatedAt: Generated<Timestamp>
   userId: number
   wishlistId: number | null
 }
