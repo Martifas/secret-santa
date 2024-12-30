@@ -58,19 +58,20 @@ describe('update', () => {
       price: 50,
       isPurchased: false,
       priority: 1,
+      url: null,
     }
     const updatedWishlist = await repository.update(wishlistOne.id, updates)
     expect(pick(updatedWishlist, wishlistKeysForTesting)).toEqual(
       pick(updates, wishlistKeysForTesting)
     )
-    expect(updatedWishlist.id).toBe(eventOne.id)
+    expect(updatedWishlist.id).toBe(wishlistOne.id)
     expect(updatedWishlist.userId).toBe(wishlistOne.userId)
     expect(updatedWishlist.updatedAt).toBeInstanceOf(Date)
   })
 
   it('should throw error when updating non-existent wishlist', async () => {
     const updates = {
-      name: 'Mountain Bike',
+      itemName: 'Mountain Bike',
     }
     await expect(repository.update(99999, updates)).rejects.toThrowError(
       /no result/i
