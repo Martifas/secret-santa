@@ -1,6 +1,6 @@
 import { createTestDatabase } from "@tests/utils/database";
 import { wrapInRollbacks } from "@tests/utils/transactions";
-import { insertAll } from "@tests/utils/record";
+import { insertAll, selectAll } from "@tests/utils/record";
 import { fakeEvent, fakeEventInvitation, fakeUser } from "@server/entities/tests/fakes";
 import { invitationKeysForTesting } from "@server/entities/eventInvitation";
 import { pick } from "lodash-es";
@@ -58,5 +58,62 @@ describe('find all', () => {
     const invitations = await repository.findAll()
 
     expect(invitations).toEqual([])
+  })
+})
+
+describe('create', () => {
+  it('should create a new invitation', async () => {
+    const invitation = fakeInvitationDefault()
+
+    const createdInvitation = await repository.create(invitation)
+
+    expect(createdInvitation).toMatchObject({
+      ...pick(invitation, invitationKeysForTesting),
+      id: expect.any(Number),
+      createdAt: expect.any(Date),
+      updatedAt: expect.any(Date),
+    })
+  })
+})
+
+describe('update', () => {
+  it('should update invitation attributes', async () => {
+    const updates = {
+      email: 'barsukas@miskas.lt',
+      status: 'confirmed',
+      expiresAt: new Date('2025-12-24'),
+      token: "superRandomToken"
+    }
+    const updatedInvitation = await repository.update(invitationOne.id, updates)
+    expect(pick(updatedInvitation, invitationKeysForTesting)).toEqual(
+      pick(updates, invitationKeysForTesting)
+    )
+    expect(updatedInvitation.id).toBe(invitationOne.id)
+    expect(updatedInvitation.userId).toBe(invitationOne.userId)
+    expect(updatedInvitation.updatedAt).toBeInstanceOf(Date)
+  })
+
+  it('should throw error when updating non-existent invitation', async () => {
+    const updates = {
+      email: 'vilask@miskas.lt',
+    }
+    await expect(repository.update(99999, updates)).rejects.toThrowError(
+      /no result/i
+    )
+  })
+})
+
+describe('remove', () => {
+  it('should remove invitation', async () => {
+    const removedInvitation = await repository.remove(invitationOne.id)
+    expect(pick(removedInvitation, invitationKeysForTesting)).toEqual(
+      pick(invitationOne, invitationKeysForTesting)
+    )
+    const result = await selectAll(db, 'eventInvitations')
+    expect(result).toHaveLength(0)
+  })
+
+  it('should throw error when removing non-existent invivation', async () => {
+    await expect(repository.remove(99999)).rejects.toThrowError(/no result/i)
   })
 })

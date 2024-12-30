@@ -99,7 +99,7 @@ export const fakeWishlist = <T extends Partial<Insertable<Wishlist>>>(
 export const fakeEventInvitation = <
   T extends Partial<Insertable<EventInvitations>>,
 >(
-  overrides: T
+  overrides: T ={} as T
 ) =>
   ({
     email: random.email(),
@@ -165,7 +165,7 @@ export const fakeUserEvent = <T extends Partial<Insertable<UserEvent>>>(
  * @param overrides any properties that should be different from default fake data.
  */
 export const fakeEventRule = <T extends Partial<Insertable<EventRule>>>(
-  overrides: T
+  overrides: T = {} as T
 ) => {
   const ruleType = random.pickone(RULE_TYPES) // Define ruleType first
 

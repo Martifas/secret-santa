@@ -1,5 +1,8 @@
 import { z } from 'zod'
+import type { EventRule } from '@server/database/types'
+import type { Selectable } from 'kysely'
 import { idSchema } from './shared'
+
 
 export const eventRuleSchema = z.object({
   id: idSchema,
@@ -8,13 +11,16 @@ export const eventRuleSchema = z.object({
   ruleData: z.record(z.string(), z.unknown()),
 })
 
-export type EventRule = z.infer<typeof eventRuleSchema>
+export const ruleKeysForMembers = Object.keys(
+  eventRuleSchema.shape
+) as (keyof EventRule)[]
 
-// For creating new wishlist items (without id and timestamps)
-export const createEventRuleSchema = eventRuleSchema.omit({
-  id: true,
-})
+export type RuleForMember = Pick<
+  Selectable<EventRule>,
+  (typeof ruleKeysForMembers)[number]
+>
 
-export type CreateEventRule = z.infer<typeof createEventRuleSchema>
-
-// TO DO: finish
+export const ruleKeysForTesting = [
+  'ruleData',
+  'ruleType',
+] as const
