@@ -48,7 +48,7 @@ describe('find', () => {
     const foundEvent = await repository.find(eventOne.id)
 
     expect(foundEvent).not.toBeNull()
-    if (!foundEvent) throw new Error('Event should exist')
+    if (!foundEvent) throw new Error('No event found')
 
     expect(pick(foundEvent, eventKeysForTesting)).toEqual(
       pick(eventOne, eventKeysForTesting)

@@ -20,7 +20,7 @@ describe('find by event and user id', () => {
   it('should return a wishlist for a specific event and user', async () => {
     const foundWishlist = await repository.findByEventAndUserId(eventOne.id, userOne.id)
     expect(foundWishlist).not.toBeNull()
-    if (!foundWishlist) throw new Error('Wishlist should exist')
+    if (!foundWishlist) throw new Error('No wishlist found')
     
     expect(pick(foundWishlist, wishlistKeysForTesting)).toEqual(
       pick(wishlistOne, wishlistKeysForTesting)
