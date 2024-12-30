@@ -85,7 +85,7 @@ export const fakeWishlist = <T extends Partial<Insertable<Wishlist>>>(
     eventId: randomId(),
     isPurchased: false,
     itemName: random.word(),
-    price: random.integer(),
+    price: random.floating({ min: 1, max: 10000, fixed: 2 }),
     priority: random.integer({ min: 1, max: 5 }),
     url: random.url(),
     userId: randomId(),

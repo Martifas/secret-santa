@@ -1,6 +1,7 @@
-import type { Database } from '@server/database'
-import { wishlistKeys } from '@server/entities/wishlist'
+import type { Database, Wishlist } from '@server/database'
+import { wishlistKeys, type WishlistForMember } from '@server/entities/wishlist'
 import type { WishlistRowSelect } from '@server/types/wishlist'
+import type { Insertable } from 'kysely'
 
 export function wishlistRepository(db: Database) {
   return {
@@ -15,6 +16,14 @@ export function wishlistRepository(db: Database) {
         .where('userId', '=', userId)
         .executeTakeFirst()
       return result ?? null
+    },
+
+    async create(wishlist: Insertable<Wishlist>): Promise<WishlistForMember> {
+      return db
+        .insertInto('wishlist')
+        .values(wishlist)
+        .returning(wishlistKeys)
+        .executeTakeFirstOrThrow()
     },
   }
 }

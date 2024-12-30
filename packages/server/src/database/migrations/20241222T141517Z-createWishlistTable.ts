@@ -11,7 +11,7 @@ export async function up(db: Kysely<any>) {
     .addColumn('item_name', 'text', (c) => c.notNull())
     .addColumn('description', 'text')
     .addColumn('url', 'text')
-    .addColumn('price', 'decimal')
+    .addColumn('price', 'real')
     .addColumn('priority', 'integer')
     .addColumn('is_purchased', 'boolean', (c) => c.defaultTo(false).notNull())
     .addColumn('created_at', 'timestamptz', (c) =>

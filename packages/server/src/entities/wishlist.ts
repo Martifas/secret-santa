@@ -10,7 +10,7 @@ export const wishlistSchema = z.object({
   itemName: z.string().min(1),
   description: z.string().nullable().optional(),
   url: z.string().url().nullable().optional(),
-  price: z.number().positive().nullable().optional(),
+  price: z.number().int().positive().nullable().optional(),
   priority: z.number().int().min(1).max(5).nullable().optional(),
   isPurchased: z.boolean().default(false),
   createdAt: z.date(),
