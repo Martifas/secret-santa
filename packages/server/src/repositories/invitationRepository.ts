@@ -16,5 +16,8 @@ export function invitationRepository(db: Database) {
         .executeTakeFirst()
       return result ?? null
     },
+     async findAll(): Promise<InvitationRowSelect[]> {
+          return db.selectFrom('eventInvitations').select(invitationKeys).execute()
+        },
   }
 }

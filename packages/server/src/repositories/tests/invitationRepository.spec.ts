@@ -32,3 +32,31 @@ describe('find by event and user id', () => {
     )
   })
 })
+
+describe('find all', () => {
+  it('should return all invitation for the event', async () => {
+    const [userTwo] = await insertAll(db, 'user', [fakeUser()])
+    const [eventTwo] = await insertAll(db, 'event', [
+      fakeEvent({ createdBy: userTwo.id }),
+    ])
+    const [invitationTwo] = await insertAll(db, 'eventInvitations', [fakeEventInvitation({eventId: eventTwo.id, userId: userTwo.id})]) 
+
+    const invitations = await repository.findAll()
+
+    expect(invitations).toHaveLength(2)
+    expect(invitations).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining(pick(invitationOne, invitationKeysForTesting)),
+        expect.objectContaining(pick(invitationTwo, invitationKeysForTesting)),
+      ])
+    )
+  })
+
+  it('should return empty array when no events exist', async () => {
+    await db.deleteFrom('eventInvitations').execute()
+
+    const invitations = await repository.findAll()
+
+    expect(invitations).toEqual([])
+  })
+})
