@@ -1,6 +1,12 @@
 import type { Database, EventInvitations } from '@server/database'
-import { invitationKeysForMembers, type InvitationForMember } from '@server/entities/eventInvitation'
-import type { InvitationRowSelect, InvitationRowUpdate } from '@server/types/invitation'
+import {
+  invitationKeysForMembers,
+  type InvitationForMember,
+} from '@server/entities/eventInvitation'
+import type {
+  InvitationRowSelect,
+  InvitationRowUpdate,
+} from '@server/types/invitation'
 import type { Insertable } from 'kysely'
 
 export function invitationRepository(db: Database) {
@@ -17,10 +23,16 @@ export function invitationRepository(db: Database) {
         .executeTakeFirst()
       return result ?? null
     },
-    async findAll(): Promise<InvitationRowSelect[]> {
-      return db.selectFrom('eventInvitations').select(invitationKeysForMembers).execute()
+    async findAllForUser(userId: number): Promise<InvitationRowSelect[]> {
+      return db
+        .selectFrom('eventInvitations')
+        .select(invitationKeysForMembers)
+        .where('userId', '=', userId)
+        .execute()
     },
-    async create(invitation: Insertable<EventInvitations>): Promise<InvitationForMember> {
+    async create(
+      invitation: Insertable<EventInvitations>
+    ): Promise<InvitationForMember> {
       return db
         .insertInto('eventInvitations')
         .values(invitation)
@@ -28,7 +40,10 @@ export function invitationRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async update(id: number, updates: InvitationRowUpdate): Promise<InvitationForMember> {
+    async update(
+      id: number,
+      updates: InvitationRowUpdate
+    ): Promise<InvitationForMember> {
       return db
         .updateTable('eventInvitations')
         .set({

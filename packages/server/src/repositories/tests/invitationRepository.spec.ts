@@ -1,11 +1,14 @@
-import { createTestDatabase } from "@tests/utils/database";
-import { wrapInRollbacks } from "@tests/utils/transactions";
-import { insertAll, selectAll } from "@tests/utils/record";
-import { fakeEvent, fakeEventInvitation, fakeUser } from "@server/entities/tests/fakes";
-import { invitationKeysForTesting } from "@server/entities/eventInvitation";
-import { pick } from "lodash-es";
-import { invitationRepository } from "../invitationRepository";
-
+import { createTestDatabase } from '@tests/utils/database'
+import { wrapInRollbacks } from '@tests/utils/transactions'
+import { insertAll, selectAll } from '@tests/utils/record'
+import {
+  fakeEvent,
+  fakeEventInvitation,
+  fakeUser,
+} from '@server/entities/tests/fakes'
+import { invitationKeysForTesting } from '@server/entities/eventInvitation'
+import { pick } from 'lodash-es'
+import { invitationRepository } from '../invitationRepository'
 
 const db = await wrapInRollbacks(createTestDatabase())
 const repository = invitationRepository(db)
@@ -13,10 +16,18 @@ const [userOne] = await insertAll(db, 'user', fakeUser())
 const [eventOne] = await insertAll(db, 'event', [
   fakeEvent({ createdBy: userOne.id }),
 ])
-const [invitationOne] = await insertAll(db, 'eventInvitations', [fakeEventInvitation({eventId: eventOne.id, userId: userOne.id})]) 
+const [invitationOne] = await insertAll(db, 'eventInvitations', [
+  fakeEventInvitation({ eventId: eventOne.id, userId: userOne.id }),
+])
 
-const fakeInvitationDefault = (invitation: Parameters<typeof fakeEventInvitation>[0] = {}) =>
-  fakeEventInvitation({ userId: userOne.id, eventId: eventOne.id, ...invitation })
+const fakeInvitationDefault = (
+  invitation: Parameters<typeof fakeEventInvitation>[0] = {}
+) =>
+  fakeEventInvitation({
+    userId: userOne.id,
+    eventId: eventOne.id,
+    ...invitation,
+  })
 
 describe('find by event and user id', () => {
   it('should return an invitation for a specific event and user', async () => {
@@ -33,29 +44,28 @@ describe('find by event and user id', () => {
   })
 })
 
-describe('find all', () => {
-  it('should return all invitation for the event', async () => {
+describe('find all for user', () => {
+  it('should return all invitations for the user', async () => {
     const [userTwo] = await insertAll(db, 'user', [fakeUser()])
     const [eventTwo] = await insertAll(db, 'event', [
       fakeEvent({ createdBy: userTwo.id }),
     ])
-    const [invitationTwo] = await insertAll(db, 'eventInvitations', [fakeEventInvitation({eventId: eventTwo.id, userId: userTwo.id})]) 
+    const [invitationTwo] = await insertAll(db, 'eventInvitations', [
+      fakeEventInvitation({ eventId: eventTwo.id, userId: userTwo.id }),
+    ])
 
-    const invitations = await repository.findAll()
+    const invitations = await repository.findAllForUser(userTwo.id)
 
-    expect(invitations).toHaveLength(2)
-    expect(invitations).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining(pick(invitationOne, invitationKeysForTesting)),
-        expect.objectContaining(pick(invitationTwo, invitationKeysForTesting)),
-      ])
-    )
+    expect(invitations).toHaveLength(1)
+    expect(invitations).toEqual([
+      expect.objectContaining(pick(invitationTwo, invitationKeysForTesting)),
+    ])
   })
 
   it('should return empty array when no events exist', async () => {
     await db.deleteFrom('eventInvitations').execute()
 
-    const invitations = await repository.findAll()
+    const invitations = await repository.findAllForUser(userOne.id)
 
     expect(invitations).toEqual([])
   })
@@ -82,7 +92,7 @@ describe('update', () => {
       email: 'barsukas@miskas.lt',
       status: 'confirmed',
       expiresAt: new Date('2025-12-24'),
-      token: "superRandomToken"
+      token: 'superRandomToken',
     }
     const updatedInvitation = await repository.update(invitationOne.id, updates)
     expect(pick(updatedInvitation, invitationKeysForTesting)).toEqual(

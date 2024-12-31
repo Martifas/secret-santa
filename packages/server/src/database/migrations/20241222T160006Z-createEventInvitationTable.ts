@@ -22,5 +22,5 @@ export async function up(db: Kysely<any>) {
 }
 
 export async function down(db: Kysely<any>) {
-  await db.schema.dropTable('event_rule').execute()
+  await db.schema.dropTable('event_invitations').execute()
 }
