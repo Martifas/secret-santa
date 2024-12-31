@@ -1,12 +1,14 @@
 import type { EventRepository } from '@server/repositories/eventRepository'
-import { fakeEvent } from '@server/entities/tests/fakes'
+import { fakeEvent, fakeAuthUser } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@tests/utils/context'
 import eventRouter from '..'
 
 describe('create', () => {
-
-  const TEST_USER_ID = 1
+  const TEST_USER = fakeAuthUser({
+    id: 1,
+    auth0Id: 'auth0|test123'
+  })
 
   it('should create a new event', async () => {
     const newEventInput = {
@@ -19,7 +21,7 @@ describe('create', () => {
 
     const expectedEventData = {
       ...newEventInput,
-      createdBy: TEST_USER_ID
+      createdBy: TEST_USER.id
     }
 
     const createdEvent = {
@@ -34,15 +36,16 @@ describe('create', () => {
     const repos = {
       eventRepository: {
         create: async (eventData: any) => {
-          expect(eventData).toEqual(expectedEventData) // Compare against expectedEventData instead
+          expect(eventData).toEqual(expectedEventData)
           return createdEvent
         },
       } satisfies Partial<EventRepository>,
     }
 
-    const testContext = authRepoContext(repos, { id: TEST_USER_ID })
+    const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(eventRouter)
     const { create } = createCaller(testContext)
+
     const result = await create(newEventInput)
 
     expect(result).toMatchObject({
@@ -52,13 +55,12 @@ describe('create', () => {
       budgetLimit: 50,
       status: 'draft',
       eventDate: expect.any(Date),
-      createdBy: TEST_USER_ID,
+      createdBy: TEST_USER.id,
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date),
     })
   })
 
-  // Error test case remains the same but remove createdBy from input
   it('should propagate repository errors', async () => {
     const newEventInput = {
       name: 'Christmas Party',
@@ -69,7 +71,6 @@ describe('create', () => {
     }
 
     const repositoryError = new Error('Failed to create event')
-
     const repos = {
       eventRepository: {
         create: async () => {
@@ -79,7 +80,7 @@ describe('create', () => {
     }
 
     const createCaller = createCallerFactory(eventRouter)
-    const { create } = createCaller(authRepoContext(repos))
+    const { create } = createCaller(authRepoContext(repos, TEST_USER))
     await expect(create(newEventInput)).rejects.toThrow(repositoryError)
   })
 })

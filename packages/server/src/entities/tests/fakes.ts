@@ -126,13 +126,7 @@ export const fakeUser = <T extends Partial<Insertable<User>>>(
     email: random.email(),
     firstName: random.first(),
     lastName: random.last(),
-    password: random.string({
-      length: 12,
-      pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-    }),
-    username:
-      random.word({ length: 8 }).toLowerCase() +
-      random.integer({ min: 100, max: 999 }),
+    auth0Id: `auth0|${random.guid().replace(/-/g, '')}`,
     ...overrides,
   }) satisfies Insertable<User>
 
@@ -140,6 +134,7 @@ export const fakeAuthUser = <T extends Partial<AuthUser>>(
   overrides: T = {} as T
 ): AuthUser => ({
   id: randomId(),
+  auth0Id: `auth0|${random.guid().replace(/-/g, '')}`,
   email: random.email(),
   ...overrides,
 })

@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { assertError } from '@server/utils/errors'
 import { TRPCError } from '@trpc/server'
 import { idSchema } from '@server/entities/shared'
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
+import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
 
 export default authenticatedProcedure
   .use(
@@ -16,12 +16,14 @@ export default authenticatedProcedure
   .input(
     z.object({
       id: idSchema,
-      updates: eventSchema.omit({
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        createdBy: true
-      }).partial()
+      updates: eventSchema
+        .omit({
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          createdBy: true,
+        })
+        .partial(),
     })
   )
   .mutation(

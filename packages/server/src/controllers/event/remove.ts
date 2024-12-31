@@ -1,8 +1,8 @@
 import { eventSchema, type EventForMember } from '@server/entities/event'
 import provideRepos from '@server/trpc/provideRepos'
 import { eventRepository } from '@server/repositories/eventRepository'
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import { TRPCError } from '@trpc/server'
+import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
 
 export default authenticatedProcedure
   .use(

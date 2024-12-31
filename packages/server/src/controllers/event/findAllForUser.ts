@@ -1,7 +1,8 @@
 import provideRepos from "@server/trpc/provideRepos"
 import { eventRepository } from '@server/repositories/eventRepository'
 import type { EventRowSelect } from "@server/types/event"
-import { authenticatedProcedure } from "@server/trpc/authenticatedProcedure"
+import { authenticatedProcedure } from "@server/auth/aunthenticatedProcedure"
+
 
 export default authenticatedProcedure
   .use(

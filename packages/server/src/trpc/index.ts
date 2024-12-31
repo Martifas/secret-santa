@@ -7,19 +7,12 @@ import { ZodError } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 import type { Repositories } from '@server/repositories'
 
+// The Context type looks good - AuthUser type matches what we'll get from Auth0
 export type Context = {
   db: Database
-
-  // Express types. These are optional as
-  // vast majority of requests do not need them.
-  // Then it is a bit easier to test procedures.
   req?: Request
   res?: Response
-
-  // We can also add our own custom context properties.
-  authUser?: AuthUser
-
-  // For providing repos in a slightly easier to test way
+  authUser?: AuthUser  // This matches our Auth0 parseTokenPayload return type
   repos?: Partial<Repositories>
 }
 
@@ -29,10 +22,8 @@ const t = initTRPC.context<Context>().create({
   transformer: SuperJSON,
   errorFormatter(opts) {
     const { shape, error } = opts
-
     if (error.cause instanceof ZodError) {
       const validationError = fromZodError(error.cause)
-
       return {
         ...shape,
         data: {
@@ -40,7 +31,6 @@ const t = initTRPC.context<Context>().create({
         },
       }
     }
-
     return shape
   },
 })
