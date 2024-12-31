@@ -6,7 +6,7 @@ import eventRouter from '..'
 
 const repos = {
   eventRepository: {
-    findAll: async () => [
+    findAllForUser: async () => [
       {
         ...fakeEvent({
           id: 1,
@@ -36,12 +36,12 @@ const repos = {
 }
 
 const createCaller = createCallerFactory(eventRouter)
-const { findAll } = createCaller(authRepoContext(repos))
+const { findAllForUser } = createCaller(authRepoContext(repos))
 
 describe('findAll', () => {
   it('should return all events', async () => {
     // ACT (When)
-    const events = await findAll()
+    const events = await findAllForUser()
 
     // ASSERT (Then)
     expect(events).toHaveLength(2)

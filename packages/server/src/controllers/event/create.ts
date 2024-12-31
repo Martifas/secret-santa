@@ -1,9 +1,9 @@
 import { eventSchema, type EventForMember } from '@server/entities/event'
 import provideRepos from '@server/trpc/provideRepos'
 import { eventRepository } from '@server/repositories/eventRepository'
-import { publicProcedure } from '@server/trpc'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
-export default publicProcedure
+export default authenticatedProcedure
   .use(
     provideRepos({
       eventRepository,
@@ -12,6 +12,7 @@ export default publicProcedure
   .input(
     eventSchema.omit({
       id: true,
+      createdBy: true,
       createdAt: true,
       updatedAt: true
     })
@@ -19,9 +20,12 @@ export default publicProcedure
   .mutation(
     async ({
       input,
-      ctx: { repos },
+      ctx: { repos, authUser },
     }): Promise<EventForMember> => {
-      const event = await repos.eventRepository.create(input)
+      const event = await repos.eventRepository.create({
+        ...input,
+        createdBy: authUser.id,
+      })
       return event
     }
   )

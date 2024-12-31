@@ -2,41 +2,40 @@ import type { EventRepository } from '@server/repositories/eventRepository'
 import { fakeEvent } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@tests/utils/context'
+import { TRPCError } from '@trpc/server'
 import eventRouter from '..'
 
 describe('remove', () => {
-  it('should remove an event', async () => {
-    // ARRANGE (Given)
+  const TEST_USER_ID = 1
+
+  it('should remove an event when user is the creator', async () => {
     const id = 1
-    const removedEvent = {
-      ...fakeEvent({
-        id,
-        name: 'Christmas Party',
-        description: 'Annual office party',
-        budgetLimit: 50,
-        status: 'draft',
-        eventDate: new Date('2024-12-25'),
-      }),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
+    const event = fakeEvent({
+      id,
+      createdBy: TEST_USER_ID,
+      name: 'Christmas Party',
+      description: 'Annual office party',
+      budgetLimit: 50,
+      status: 'draft',
+      eventDate: new Date('2024-12-25'),
+    })
 
     const repos = {
       eventRepository: {
+        find: async () => ({ ...event, createdAt: new Date(), updatedAt: new Date() }),
         remove: async (eventId: number) => {
           expect(eventId).toBe(id)
-          return removedEvent
+          return { ...event, createdAt: new Date(), updatedAt: new Date() }
         }
       } satisfies Partial<EventRepository>,
     }
 
+    const testContext = authRepoContext(repos, { id: TEST_USER_ID })
     const createCaller = createCallerFactory(eventRouter)
-    const { remove } = createCaller(authRepoContext(repos))
+    const { remove } = createCaller(testContext)
 
-    // ACT (When)
     const result = await remove({ id })
 
-    // ASSERT (Then)
     expect(result).toMatchObject({
       id,
       name: 'Christmas Party',
@@ -47,5 +46,54 @@ describe('remove', () => {
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date)
     })
+  })
+
+  it('should throw error when event not found', async () => {
+    const repos = {
+      eventRepository: {
+        find: async () => null,
+      } satisfies Partial<EventRepository>,
+    }
+
+    const testContext = authRepoContext(repos, { id: TEST_USER_ID })
+    const createCaller = createCallerFactory(eventRouter)
+    const { remove } = createCaller(testContext)
+
+    await expect(remove({ id: 1 })).rejects.toThrow(
+      new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Event not found',
+      })
+    )
+  })
+
+  it('should throw error when user is not the creator', async () => {
+    const id = 1
+    const event = fakeEvent({
+      id,
+      createdBy: 999,
+      name: 'Christmas Party',
+      description: 'Annual office party',
+      budgetLimit: 50,
+      status: 'draft',
+      eventDate: new Date('2024-12-25'),
+    })
+
+    const repos = {
+      eventRepository: {
+        find: async () => ({ ...event, createdAt: new Date(), updatedAt: new Date() }),
+      } satisfies Partial<EventRepository>,
+    }
+
+    const testContext = authRepoContext(repos, { id: TEST_USER_ID })
+    const createCaller = createCallerFactory(eventRouter)
+    const { remove } = createCaller(testContext)
+
+    await expect(remove({ id })).rejects.toThrow(
+      new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'Not authorized to delete this event',
+      })
+    )
   })
 })

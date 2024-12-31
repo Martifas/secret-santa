@@ -11,7 +11,7 @@ export function eventRepository(db: Database) {
     async findAll(): Promise<EventRowSelect[]> {
       return db.selectFrom('event').select(eventKeysForMembers).execute()
     },
-    
+
     async find(id: number): Promise<EventRowSelect | null> {
       const result = await db
         .selectFrom('event')
@@ -48,6 +48,41 @@ export function eventRepository(db: Database) {
         .where('id', '=', id)
         .returning(eventKeysForMembers)
         .executeTakeFirstOrThrow()
+    },
+
+    async isMember(eventId: number, userId: number): Promise<boolean> {
+      const result = await db
+        .selectFrom('userEvent')
+        .select('id')
+        .where('eventId', '=', eventId)
+        .where('userId', '=', userId)
+        .executeTakeFirst()
+
+      return result !== undefined
+    },
+    async findAllForUser(userId: number): Promise<EventRowSelect[]> {
+      return db
+        .selectFrom('event')
+        .leftJoin('userEvent', 'event.id', 'userEvent.eventId')
+        .select([
+          'event.id',
+          'event.name',
+          'event.description',
+          'event.createdBy',
+          'event.eventDate',
+          'event.budgetLimit',
+          'event.status',
+          'event.createdAt',
+          'event.updatedAt',
+        ])
+        .distinct()
+        .where((eb) =>
+          eb.or([
+            eb('event.createdBy', '=', userId),
+            eb('userEvent.userId', '=', userId),
+          ])
+        )
+        .execute()
     },
   }
 }

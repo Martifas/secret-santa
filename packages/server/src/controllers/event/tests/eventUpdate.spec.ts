@@ -6,10 +6,12 @@ import { TRPCError } from '@trpc/server'
 import eventRouter from '..'
 
 describe('update', () => {
+  const TEST_USER_ID = 1
   const id = 1
   const baseEvent = {
     ...fakeEvent({
       id,
+      createdBy: TEST_USER_ID,
       name: 'Christmas Party',
       description: 'Annual office party',
       budgetLimit: 50,
@@ -20,13 +22,11 @@ describe('update', () => {
     updatedAt: new Date()
   }
 
-  it('should update an event with partial data', async () => {
- 
+  it('should update an event with partial data when user is creator', async () => {
     const updates = {
       name: 'New Year Party',
       budgetLimit: 100
     }
-
     const updatedEvent = {
       ...baseEvent,
       ...updates,
@@ -35,6 +35,7 @@ describe('update', () => {
 
     const repos = {
       eventRepository: {
+        find: async () => baseEvent,
         update: async (eventId: number, eventUpdates: any) => {
           expect(eventId).toBe(id)
           expect(eventUpdates).toEqual(updates)
@@ -43,8 +44,9 @@ describe('update', () => {
       } satisfies Partial<EventRepository>,
     }
 
+    const testContext = authRepoContext(repos, { id: TEST_USER_ID })
     const createCaller = createCallerFactory(eventRouter)
-    const { update } = createCaller(authRepoContext(repos))
+    const { update } = createCaller(testContext)
 
     const result = await update({ id, updates })
 
@@ -61,20 +63,17 @@ describe('update', () => {
   })
 
   it('should throw NOT_FOUND when event does not exist', async () => {
-
     const updates = { name: 'New Year Party' }
     
     const repos = {
       eventRepository: {
-        update: async () => {
-          throw new Error('no result found')
-        }
+        find: async () => null,
       } satisfies Partial<EventRepository>,
     }
 
+    const testContext = authRepoContext(repos, { id: TEST_USER_ID })
     const createCaller = createCallerFactory(eventRouter)
-    const { update } = createCaller(authRepoContext(repos))
-
+    const { update } = createCaller(testContext)
 
     await expect(update({ id, updates })).rejects.toThrow(
       new TRPCError({
@@ -84,21 +83,47 @@ describe('update', () => {
     )
   })
 
-  it('should propagate unknown errors', async () => {
+  it('should throw FORBIDDEN when user is not the creator', async () => {
+    const updates = { name: 'New Year Party' }
+    const eventByAnotherUser = {
+      ...baseEvent,
+      createdBy: TEST_USER_ID + 1,
+    }
+    
+    const repos = {
+      eventRepository: {
+        find: async () => eventByAnotherUser,
+      } satisfies Partial<EventRepository>,
+    }
 
+    const testContext = authRepoContext(repos, { id: TEST_USER_ID })
+    const createCaller = createCallerFactory(eventRouter)
+    const { update } = createCaller(testContext)
+
+    await expect(update({ id, updates })).rejects.toThrow(
+      new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'Not authorized to update this event',
+      })
+    )
+  })
+
+  it('should propagate unknown errors', async () => {
     const updates = { name: 'New Year Party' }
     const unknownError = new Error('Database connection failed')
     
     const repos = {
       eventRepository: {
+        find: async () => baseEvent,
         update: async () => {
           throw unknownError
         }
       } satisfies Partial<EventRepository>,
     }
 
+    const testContext = authRepoContext(repos, { id: TEST_USER_ID })
     const createCaller = createCallerFactory(eventRouter)
-    const { update } = createCaller(authRepoContext(repos))
+    const { update } = createCaller(testContext)
 
     await expect(update({ id, updates })).rejects.toThrow(unknownError)
   })

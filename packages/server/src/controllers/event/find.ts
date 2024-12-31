@@ -1,10 +1,12 @@
 import { eventSchema } from '@server/entities/event'
 import provideRepos from '@server/trpc/provideRepos'
 import { eventRepository } from '@server/repositories/eventRepository'
-import { publicProcedure } from '@server/trpc'
 import type { EventRowSelect } from '@server/types/event'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
-export default publicProcedure
+import { TRPCError } from '@trpc/server'
+
+export default authenticatedProcedure
   .use(
     provideRepos({
       eventRepository,
@@ -19,8 +21,14 @@ export default publicProcedure
     async ({
       input: { id },
       ctx: { repos },
-    }): Promise<EventRowSelect | null> => {
+    }): Promise<EventRowSelect> => {
       const event = await repos.eventRepository.find(id)
+      if (!event) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: `Event with id ${id} not found`,
+        })
+      }
       return event
     }
   )
