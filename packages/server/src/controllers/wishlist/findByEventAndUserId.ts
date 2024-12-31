@@ -5,8 +5,8 @@ import {
   wishlistSchema,
   type WishlistForMember,
 } from '@server/entities/wishlist'
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import { TRPCError } from '@trpc/server'
+import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
 
 export default authenticatedProcedure
   .use(

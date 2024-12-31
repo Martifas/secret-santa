@@ -8,9 +8,9 @@ import eventRouter from '..'
 describe('update', () => {
   const TEST_USER = fakeAuthUser({
     id: 1,
-    auth0Id: 'auth0|test123'
+    auth0Id: 'auth0|test123',
   })
-  
+
   const id = 1
   const baseEvent = {
     ...fakeEvent({
@@ -23,19 +23,19 @@ describe('update', () => {
       eventDate: new Date('2024-12-25'),
     }),
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
   }
 
   it('should update an event with partial data when user is creator', async () => {
     const updates = {
       name: 'New Year Party',
-      budgetLimit: 100
+      budgetLimit: 100,
     }
 
     const updatedEvent = {
       ...baseEvent,
       ...updates,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     }
 
     const repos = {
@@ -45,7 +45,7 @@ describe('update', () => {
           expect(eventId).toBe(id)
           expect(eventUpdates).toEqual(updates)
           return updatedEvent
-        }
+        },
       } satisfies Partial<EventRepository>,
     }
 
@@ -63,13 +63,13 @@ describe('update', () => {
       status: 'draft',
       eventDate: expect.any(Date),
       createdAt: expect.any(Date),
-      updatedAt: expect.any(Date)
+      updatedAt: expect.any(Date),
     })
   })
 
   it('should throw NOT_FOUND when event does not exist', async () => {
     const updates = { name: 'New Year Party' }
-   
+
     const repos = {
       eventRepository: {
         find: async () => null,
@@ -94,7 +94,7 @@ describe('update', () => {
       ...baseEvent,
       createdBy: TEST_USER.id + 1,
     }
-   
+
     const repos = {
       eventRepository: {
         find: async () => eventByAnotherUser,
@@ -116,13 +116,13 @@ describe('update', () => {
   it('should propagate unknown errors', async () => {
     const updates = { name: 'New Year Party' }
     const unknownError = new Error('Database connection failed')
-   
+
     const repos = {
       eventRepository: {
         find: async () => baseEvent,
         update: async () => {
           throw unknownError
-        }
+        },
       } satisfies Partial<EventRepository>,
     }
 

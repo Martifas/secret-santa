@@ -1,7 +1,8 @@
 import provideRepos from '@server/trpc/provideRepos'
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import { wishlistRepository } from '@server/repositories/wishlistRepository'
 import { wishlistSchema, type WishlistForMember } from '@server/entities/wishlist'
+import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
+import { TRPCError } from '@trpc/server'
 
 export default authenticatedProcedure
   .use(
@@ -30,8 +31,24 @@ export default authenticatedProcedure
   .mutation(
     async ({ 
       input: { id, ...updates }, 
-      ctx: { repos } 
-    }): Promise<WishlistForMember> => {
+      ctx: { repos, authUser } 
+    }): Promise<WishlistForMember> =>  {
+      const existingWishlist = await repos.wishlistRepository.findByEventAndUserId(id, authUser.id)
+      
+      if (!existingWishlist) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Wishlist item not found',
+        })
+      }
+  
+      if (existingWishlist.userId !== authUser.id) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Not authorized to update this wishlist item',
+        })
+      }
+  
       const wishlist = await repos.wishlistRepository.update(id, updates)
       return wishlist
     }
