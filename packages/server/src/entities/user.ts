@@ -5,9 +5,8 @@ import { idSchema } from './shared'
 
 export const userSchema = z.object({
   id: idSchema,
-  username: z.string().min(1),
+  auth0Id: z.string().min(1),
   email: z.string().email(),
-  password: z.string().min(8),
   createdAt: z.date(),
   firstName: z.string().min(1).optional().nullable(),
   lastName: z.string().min(1).optional().nullable(),
@@ -17,21 +16,22 @@ export const userSchema = z.object({
 
 export const userKeysForMembers = Object.keys(userSchema.shape) as (keyof User)[]
 
-export type UserForMember = Pick<
+export type UserForMember = Pick <
   Selectable<User>,
-  (typeof userKeysForMembers )[number]
+  (typeof userKeysForMembers)[number]
 >
 
 export const userKeysForTesting = [
   'username',
   'email',
-  'password',
   'firstName',
   'lastName',
   'avatarUrl',
 ] as const
 
+export const authUserSchema = userSchema.pick({ 
+  id: true,
+  auth0Id: true 
+})
 
-
-export const authUserSchema = userSchema.pick({ id: true })
 export type AuthUser = z.infer<typeof authUserSchema>
