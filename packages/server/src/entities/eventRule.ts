@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { EventRule } from '@server/database/types'
+import type { EventRule, JsonValue } from '@server/database/types'
 import type { Selectable } from 'kysely'
 import { idSchema } from './shared'
 
@@ -8,7 +8,7 @@ export const eventRuleSchema = z.object({
   id: idSchema,
   eventId: idSchema,
   ruleType: z.string().min(1),
-  ruleData: z.record(z.string(), z.unknown()),
+  ruleData: z.record(z.unknown()).transform((val) => val as JsonValue),
 })
 
 export const ruleKeysForMembers = Object.keys(
@@ -16,7 +16,7 @@ export const ruleKeysForMembers = Object.keys(
 ) as (keyof EventRule)[]
 
 export type RuleForMember = Pick<
-  Selectable<EventRule>,
+  Selectable<'eventRule'>,
   (typeof ruleKeysForMembers)[number]
 >
 

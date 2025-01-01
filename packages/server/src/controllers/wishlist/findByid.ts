@@ -4,7 +4,7 @@ import {
   wishlistSchema,
   type WishlistForMember,
 } from '@server/entities/wishlist'
-import { eventRepository } from '@server/repositories/eventRepository'
+import { userEventRepository } from '@server/repositories/userEventRepository'
 import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
 import { TRPCError } from '@trpc/server'
 
@@ -12,7 +12,7 @@ export default authenticatedProcedure
   .use(
     provideRepos({
       wishlistRepository,
-      eventRepository,
+      userEventRepository,
     })
   )
   .input(
@@ -35,7 +35,7 @@ export default authenticatedProcedure
         })
       }
 
-      const isEventMember = await repos.eventRepository.isMember(
+      const isEventMember = await repos.userEventRepository.isMember(
         eventId,
         authUser.id
       )

@@ -1,6 +1,6 @@
 import provideRepos from '@server/trpc/provideRepos'
 import { wishlistRepository } from '@server/repositories/wishlistRepository'
-import { eventRepository } from '@server/repositories/eventRepository'
+import { userEventRepository } from '@server/repositories/userEventRepository'
 import {
   wishlistSchema,
   type WishlistForMember,
@@ -12,7 +12,7 @@ export default authenticatedProcedure
   .use(
     provideRepos({
       wishlistRepository,
-      eventRepository,
+      userEventRepository,
     })
   )
   .input(
@@ -26,7 +26,7 @@ export default authenticatedProcedure
       input: { eventId, userId },
       ctx: { repos, authUser },
     }): Promise<WishlistForMember | null> => {
-      const isEventMember = await repos.eventRepository.isMember(
+      const isEventMember = await repos.userEventRepository.isMember(
         eventId,
         authUser.id
       )

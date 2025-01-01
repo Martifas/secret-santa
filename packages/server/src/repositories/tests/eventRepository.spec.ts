@@ -118,37 +118,7 @@ describe('remove', () => {
     await expect(repository.remove(99999)).rejects.toThrowError(/no result/i)
   })
 })
-describe('isMember', () => {
-  it('should return true when user is a member of event', async () => {
-    await insertAll(db, 'userEvent', [
-      {
-        userId: userOne.id,
-        eventId: eventOne.id,
-        role: 'participant',
-      },
-    ])
 
-    const isMember = await repository.isMember(eventOne.id, userOne.id)
-    expect(isMember).toBe(true)
-  })
-
-  it('should return false when user is not a member of event', async () => {
-    const [nonMemberUser] = await insertAll(db, 'user', [fakeUser()])
-
-    const isMember = await repository.isMember(eventOne.id, nonMemberUser.id)
-    expect(isMember).toBe(false)
-  })
-
-  it('should return false for non-existent event', async () => {
-    const isMember = await repository.isMember(99999, userOne.id)
-    expect(isMember).toBe(false)
-  })
-
-  it('should return false for non-existent user', async () => {
-    const isMember = await repository.isMember(eventOne.id, 99999)
-    expect(isMember).toBe(false)
-  })
-})
 
 describe('findAllForUser', () => {
   it('should return events created by user', async () => {

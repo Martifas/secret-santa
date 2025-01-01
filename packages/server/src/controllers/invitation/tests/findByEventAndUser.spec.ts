@@ -1,5 +1,5 @@
 import type { InvitationRepository } from '@server/repositories/invitationRepository'
-import type { EventRepository } from '@server/repositories/eventRepository'
+import type { UserEventRepository } from '@server/repositories/userEventRepository'
 import { fakeEventInvitation, fakeAuthUser } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@tests/utils/context'
@@ -30,9 +30,9 @@ describe('findByEventAndUserId', () => {
 
   it('should return invitation when user is event member', async () => {
     const repos = {
-      eventRepository: {
+      userEventRepository: {
         isMember: async () => true,
-      } satisfies Partial<EventRepository>,
+      } satisfies Partial<UserEventRepository>,
       invitationRepository: {
         findByEventAndUserId: async (event, userId) => {
           expect(event).toBe(eventId)
@@ -66,9 +66,9 @@ describe('findByEventAndUserId', () => {
 
   it('should return null when invitation does not exist', async () => {
     const repos = {
-      eventRepository: {
+      userEventRepository: {
         isMember: async () => true,
-      } satisfies Partial<EventRepository>,
+      } satisfies Partial<UserEventRepository>,
       invitationRepository: {
         findByEventAndUserId: async () => null,
       } satisfies Partial<InvitationRepository>,
@@ -88,9 +88,9 @@ describe('findByEventAndUserId', () => {
 
   it('should throw FORBIDDEN when user is not event member', async () => {
     const repos = {
-      eventRepository: {
+      userEventRepository: {
         isMember: async () => false,
-      } satisfies Partial<EventRepository>,
+      } satisfies Partial<UserEventRepository>,
       invitationRepository: {
         findByEventAndUserId: async () => {
           throw new Error('Should not be called')
@@ -115,11 +115,11 @@ describe('findByEventAndUserId', () => {
   it('should propagate unknown errors from event membership check', async () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
-      eventRepository: {
+      userEventRepository: {
         isMember: async () => {
           throw unknownError
         },
-      } satisfies Partial<EventRepository>,
+      } satisfies Partial<UserEventRepository>,
       invitationRepository: {
         findByEventAndUserId: async () => {
           throw new Error('Should not be called')
@@ -139,9 +139,9 @@ describe('findByEventAndUserId', () => {
   it('should propagate unknown errors from invitation lookup', async () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
-      eventRepository: {
+      userEventRepository: {
         isMember: async () => true,
-      } satisfies Partial<EventRepository>,
+      } satisfies Partial<UserEventRepository>,
       invitationRepository: {
         findByEventAndUserId: async () => {
           throw unknownError

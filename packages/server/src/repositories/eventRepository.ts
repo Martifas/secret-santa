@@ -50,16 +50,6 @@ export function eventRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async isMember(eventId: number, userId: number): Promise<boolean> {
-      const result = await db
-        .selectFrom('userEvent')
-        .select('id')
-        .where('eventId', '=', eventId)
-        .where('userId', '=', userId)
-        .executeTakeFirst()
-
-      return result !== undefined
-    },
     async findAllForUser(userId: number): Promise<EventRowSelect[]> {
       return db
         .selectFrom('event')

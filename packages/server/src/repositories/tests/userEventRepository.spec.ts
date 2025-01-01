@@ -56,6 +56,69 @@ describe('find by event and user id', () => {
   })
 })
 
+describe('isMember', () => {
+  it('should return true when user is a member of event', async () => {
+    const isMember = await repository.isMember(eventOne.id, userOne.id)
+    expect(isMember).toBe(true)
+  })
+
+  it('should return false when user is not a member of event', async () => {
+    const [nonMemberUser] = await insertAll(db, 'user', [fakeUser()])
+
+    const isMember = await repository.isMember(eventOne.id, nonMemberUser.id)
+    expect(isMember).toBe(false)
+  })
+
+  it('should return false for non-existent event', async () => {
+    const isMember = await repository.isMember(99999, userOne.id)
+    expect(isMember).toBe(false)
+  })
+
+  it('should return false for non-existent user', async () => {
+    const isMember = await repository.isMember(eventOne.id, 99999)
+    expect(isMember).toBe(false)
+  })
+})
+describe('isEventAdmin', () => {
+  it('should return true when user is a admin of event', async () => {
+    const [newUser] = await insertAll(db, 'user', fakeUser())
+    const [newEvent] = await insertAll(db, 'event', [
+      fakeEvent({ createdBy: newUser.id }),
+    ])
+
+    await insertAll(db, 'userEvent', [
+      {
+        userId: newUser.id,
+        eventId: newEvent.id,
+        role: 'event_admin',
+      },
+    ])
+
+    const isEventAdmin = await repository.isEventAdmin(newUser.id, newEvent.id)
+    expect(isEventAdmin).toBe(true)
+  })
+
+  it('should return false when user is not an admin of event', async () => {
+    const [nonAdminUser] = await insertAll(db, 'user', [fakeUser()])
+
+    const isEventAdmin = await repository.isEventAdmin(
+      eventOne.id,
+      nonAdminUser.id
+    )
+    expect(isEventAdmin).toBe(false)
+  })
+
+  it('should return false for non-existent event', async () => {
+    const isEventAdmin = await repository.isEventAdmin(99999, userOne.id)
+    expect(isEventAdmin).toBe(false)
+  })
+
+  it('should return false for non-existent user', async () => {
+    const isEventAdmin = await repository.isEventAdmin(eventOne.id, 99999)
+    expect(isEventAdmin).toBe(false)
+  })
+})
+
 describe('create', () => {
   it('should create a new record', async () => {
     const [newUser] = await insertAll(db, 'user', fakeUser())

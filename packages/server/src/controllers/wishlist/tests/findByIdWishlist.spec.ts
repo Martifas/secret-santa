@@ -1,5 +1,5 @@
 import type { WishlistRepository } from '@server/repositories/wishlistRepository'
-import type { EventRepository } from '@server/repositories/eventRepository'
+import type { UserEventRepository } from '@server/repositories/userEventRepository'
 import { fakeWishlist, fakeAuthUser } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@tests/utils/context'
@@ -30,9 +30,9 @@ describe('findById', () => {
       wishlistRepository: {
         findById: async () => baseWishlist,
       } satisfies Partial<WishlistRepository>,
-      eventRepository: {
+      userEventRepository: {
         isMember: async () => true,
-      } satisfies Partial<EventRepository>,
+      } satisfies Partial<UserEventRepository>,
     }
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
@@ -59,9 +59,9 @@ describe('findById', () => {
       wishlistRepository: {
         findById: async () => null,
       } satisfies Partial<WishlistRepository>,
-      eventRepository: {
+      userEventRepository: {
         isMember: async () => true,
-      } satisfies Partial<EventRepository>,
+      } satisfies Partial<UserEventRepository>,
     }
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
@@ -83,9 +83,9 @@ describe('findById', () => {
       wishlistRepository: {
         findById: async () => baseWishlist,
       } satisfies Partial<WishlistRepository>,
-      eventRepository: {
+      userEventRepository: {
         isMember: async () => false,
-      } satisfies Partial<EventRepository>,
+      } satisfies Partial<UserEventRepository>,
     }
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)

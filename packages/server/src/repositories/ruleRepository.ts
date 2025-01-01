@@ -8,18 +8,12 @@ import type { Insertable } from 'kysely'
 
 export function ruleRepository(db: Database) {
   return {
-    async findAll(): Promise<RuleRowSelect[]> {
-      return db.selectFrom('eventRule').select(ruleKeysForMembers).execute()
-    },
-
-    async find(id: number): Promise<RuleRowSelect | null> {
-      const result = await db
+    async findByEventId(eventId: number): Promise<RuleRowSelect[]> {
+      return db
         .selectFrom('eventRule')
         .select(ruleKeysForMembers)
-        .where('id', '=', id)
-        .executeTakeFirst()
-
-      return result ?? null
+        .where('eventId', '=', eventId)
+        .execute()
     },
     async create(rule: Insertable<EventRule>): Promise<RuleForMember> {
       return db

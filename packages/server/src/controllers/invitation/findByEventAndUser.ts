@@ -1,5 +1,5 @@
 import provideRepos from '@server/trpc/provideRepos'
-import { eventRepository } from '@server/repositories/eventRepository'
+import { userEventRepository } from '@server/repositories/userEventRepository'
 import { invitationRepository } from '@server/repositories/invitationRepository'
 import {
   eventInvitationSchema,
@@ -12,7 +12,7 @@ export default authenticatedProcedure
   .use(
     provideRepos({
       invitationRepository,
-      eventRepository,
+      userEventRepository,
     })
   )
   .input(
@@ -26,7 +26,7 @@ export default authenticatedProcedure
       input: { eventId, userId },
       ctx: { repos, authUser },
     }): Promise<InvitationForMember | null> => {
-      const isEventMember = await repos.eventRepository.isMember(
+      const isEventMember = await repos.userEventRepository.isMember(
         eventId,
         authUser.id
       )

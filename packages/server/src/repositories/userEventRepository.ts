@@ -1,9 +1,12 @@
 import type { Database } from '@server/database'
 import { userEventKeysForMembers } from '@server/entities/userEvent'
-import type { UserEventRowSelect, UserEventRowUpdate } from '@server/types/userEvent'
+import type {
+  UserEventRowSelect,
+  UserEventRowUpdate,
+} from '@server/types/userEvent'
 import type { Insertable } from 'kysely'
-import type { UserEvent } from '../database/types';
-import type { UserEventForMember } from '../entities/userEvent';
+import type { UserEvent } from '../database/types'
+import type { UserEventForMember } from '../entities/userEvent'
 
 export function userEventRepository(db: Database) {
   return {
@@ -19,9 +22,7 @@ export function userEventRepository(db: Database) {
         .executeTakeFirst()
       return result ?? null
     },
-    async create(
-      record: Insertable<UserEvent>
-    ): Promise<UserEventForMember> {
+    async create(record: Insertable<UserEvent>): Promise<UserEventForMember> {
       return db
         .insertInto('userEvent')
         .values(record)
@@ -44,6 +45,28 @@ export function userEventRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
+    async isEventAdmin(userId: number, eventId: number): Promise<boolean> {
+      const result = await db
+        .selectFrom('userEvent')
+        .select('id')
+        .where('role', '=', 'event_admin')
+        .where('eventId', '=', eventId)
+        .where('userId', '=', userId)
+        .executeTakeFirst()
+      return result !== undefined
+    },
+
+    async isMember(eventId: number, userId: number,): Promise<boolean> {
+      const result = await db
+        .selectFrom('userEvent')
+        .select('id')
+        .where('eventId', '=', eventId)
+        .where('userId', '=', userId)
+        .executeTakeFirst()
+
+      return result !== undefined
+    },
+
     async remove(id: number): Promise<UserEventForMember> {
       return db
         .deleteFrom('userEvent')
@@ -53,3 +76,5 @@ export function userEventRepository(db: Database) {
     },
   }
 }
+
+export type UserEventRepository = ReturnType<typeof userEventRepository>

@@ -1,5 +1,5 @@
 import type { WishlistRepository } from '@server/repositories/wishlistRepository'
-import type { EventRepository } from '@server/repositories/eventRepository'
+import type { UserEventRepository } from '@server/repositories/userEventRepository'
 import { fakeAuthUser, fakeWishlist } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@tests/utils/context'
@@ -32,9 +32,9 @@ describe('findByEventAndUserId', () => {
 
   it('should return wishlist when user is event member', async () => {
     const repos = {
-      eventRepository: {
+      userEventRepository: {
         isMember: async () => true,
-      } satisfies Partial<EventRepository>,
+      } satisfies Partial<UserEventRepository>,
       wishlistRepository: {
         findByEventAndUserId: async (event, userId) => {
           expect(event).toBe(eventId)
@@ -70,9 +70,9 @@ describe('findByEventAndUserId', () => {
 
   it('should return null when wishlist does not exist', async () => {
     const repos = {
-      eventRepository: {
+      userEventRepository: {
         isMember: async () => true,
-      } satisfies Partial<EventRepository>,
+      } satisfies Partial<UserEventRepository>,
       wishlistRepository: {
         findByEventAndUserId: async () => null,
       } satisfies Partial<WishlistRepository>,
@@ -84,7 +84,7 @@ describe('findByEventAndUserId', () => {
 
     const result = await findByEventAndUserId({ 
       eventId, 
-      userId: targetUserId 
+      userId: targetUserId, 
     })
 
     expect(result).toBeNull()
@@ -92,9 +92,9 @@ describe('findByEventAndUserId', () => {
 
   it('should throw FORBIDDEN when user is not event member', async () => {
     const repos = {
-      eventRepository: {
+      userEventRepository: {
         isMember: async () => false,
-      } satisfies Partial<EventRepository>,
+      } satisfies Partial<UserEventRepository>,
       wishlistRepository: {
         findByEventAndUserId: async () => {
           throw new Error('Should not be called')
@@ -119,11 +119,11 @@ describe('findByEventAndUserId', () => {
   it('should propagate unknown errors from event membership check', async () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
-      eventRepository: {
+      userEventRepository: {
         isMember: async () => {
           throw unknownError
         },
-      } satisfies Partial<EventRepository>,
+      } satisfies Partial<UserEventRepository>,
       wishlistRepository: {
         findByEventAndUserId: async () => {
           throw new Error('Should not be called')
@@ -143,9 +143,9 @@ describe('findByEventAndUserId', () => {
   it('should propagate unknown errors from wishlist lookup', async () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
-      eventRepository: {
+      userEventRepository: {
         isMember: async () => true,
-      } satisfies Partial<EventRepository>,
+      } satisfies Partial<UserEventRepository>,
       wishlistRepository: {
         findByEventAndUserId: async () => {
           throw unknownError

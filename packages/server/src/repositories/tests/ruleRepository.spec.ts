@@ -26,53 +26,22 @@ const [ruleOne] = await insertAll(
 const fakeRuleDefault = (rule: Parameters<typeof fakeEventRule>[0] = {}) =>
   fakeEventRule({ eventId: eventOne.id, ...rule })
 
-describe('find all', () => {
-  it('should return all rules', async () => {
-    const [userTwo] = await insertAll(db, 'user', [fakeUser()])
-    const [eventTwo] = await insertAll(db, 'event', [
-      fakeEvent({ createdBy: userTwo.id }),
-    ])
-    const [ruleTwo] = await insertAll(
-      db,
-      'eventRule',
-      fakeEventRule({ eventId: eventTwo.id })
-    )
 
-    const rules = await repository.findAll()
+describe('find event rules', () => {
+  it('should return all rules by event id', async () => {
+    const foundRules = await repository.findByEventId(eventOne.id)
+    expect(foundRules).toHaveLength(1)
 
-    expect(rules).toHaveLength(2)
-    expect(rules).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining(pick(ruleOne, ruleKeysForTesting)),
-        expect.objectContaining(pick(ruleTwo, ruleKeysForTesting)),
-      ])
-    )
-  })
-
-  it('should return empty array when no events exist', async () => {
-    await db.deleteFrom('eventRule').execute()
-
-    const rules = await repository.findAll()
-
-    expect(rules).toEqual([])
-  })
-})
-
-describe('find', () => {
-  it('should return a rule by id', async () => {
-    const foundRule = await repository.find(ruleOne.id)
-
-    expect(foundRule).not.toBeNull()
-    if (!foundRule) throw new Error('No rule found')
-
+    const foundRule = foundRules[0]
     expect(pick(foundRule, ruleKeysForTesting)).toEqual(
       pick(ruleOne, ruleKeysForTesting)
     )
   })
 
-  it('should return null for non-existent rule', async () => {
-    const foundRule = await repository.find(99999)
-    expect(foundRule).toBeNull()
+  it('should return empty array when no rules exist', async () => {
+    await db.deleteFrom('eventRule').execute()
+    const rules = await repository.findByEventId(eventOne.id)
+    expect(rules).toEqual([])
   })
 })
 
