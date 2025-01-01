@@ -11,6 +11,14 @@ import type { Insertable } from 'kysely'
 
 export function invitationRepository(db: Database) {
   return {
+    async findById(id: number): Promise<InvitationRowSelect | null> {
+      const result = await db
+        .selectFrom('eventInvitations')
+        .select(invitationKeysForMembers)
+        .where('id', '=', id)
+        .executeTakeFirst()
+      return result ?? null
+    },
     async findByEventAndUserId(
       eventId: number,
       userId: number

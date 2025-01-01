@@ -10,6 +10,7 @@ describe('remove', () => {
     id: 1,
     auth0Id: 'auth0|test123',
   })
+
   const id = 1
   const eventId = 100
   const baseWishlist = {
@@ -31,7 +32,7 @@ describe('remove', () => {
   it('should remove a wishlist item when user is creator', async () => {
     const repos = {
       wishlistRepository: {
-        findByEventAndUserId: async () => baseWishlist,
+        findById: async () => baseWishlist,
         remove: async (wishlistId: number) => {
           expect(wishlistId).toBe(id)
           return baseWishlist
@@ -44,6 +45,7 @@ describe('remove', () => {
     const { remove } = createCaller(testContext)
 
     const result = await remove({ id })
+
     expect(result).toMatchObject({
       id,
       userId: TEST_USER.id,
@@ -62,7 +64,7 @@ describe('remove', () => {
   it('should throw NOT_FOUND when wishlist does not exist', async () => {
     const repos = {
       wishlistRepository: {
-        findByEventAndUserId: async () => null,
+        findById: async () => null,
         remove: async () => {
           throw new Error('Should not be called')
         },
@@ -89,7 +91,7 @@ describe('remove', () => {
 
     const repos = {
       wishlistRepository: {
-        findByEventAndUserId: async () => wishlistByAnotherUser,
+        findById: async () => wishlistByAnotherUser,
         remove: async () => {
           throw new Error('Should not be called')
         },
@@ -110,10 +112,9 @@ describe('remove', () => {
 
   it('should propagate unknown errors', async () => {
     const unknownError = new Error('Database connection failed')
-
     const repos = {
       wishlistRepository: {
-        findByEventAndUserId: async () => baseWishlist,
+        findById: async () => baseWishlist,
         remove: async () => {
           throw unknownError
         },

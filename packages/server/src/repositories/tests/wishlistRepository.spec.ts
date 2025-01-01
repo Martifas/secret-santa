@@ -16,9 +16,28 @@ const [wishlistOne] = await insertAll(db, 'wishlist', [
   fakeWishlist({ userId: userOne.id, eventId: eventOne.id }),
 ])
 
-const fakeWishlistDefault = (wishlist: Parameters<typeof fakeWishlist>[0] = {}) =>
-  fakeWishlist({ userId: userOne.id, eventId: eventOne.id, ...wishlist })
+const fakeWishlistDefault = (
+  wishlist: Parameters<typeof fakeWishlist>[0] = {}
+) => fakeWishlist({ userId: userOne.id, eventId: eventOne.id, ...wishlist })
 
+describe('findById', () => {
+  it('should return a wishlist for a specific id', async () => {
+    const foundWishlist = await repository.findById(wishlistOne.id)
+
+    expect(foundWishlist).not.toBeNull()
+    if (!foundWishlist) throw new Error('No wishlist found')
+
+    expect(pick(foundWishlist, wishlistKeysForTesting)).toEqual(
+      pick(wishlistOne, wishlistKeysForTesting)
+    )
+  })
+
+  it('should return null for non-existent id', async () => {
+    const foundWishlist = await repository.findById(99999)
+
+    expect(foundWishlist).toBeNull()
+  })
+})
 describe('find by event and user id', () => {
   it('should return a wishlist for a specific event and user', async () => {
     const foundWishlist = await repository.findByEventAndUserId(
@@ -36,7 +55,6 @@ describe('find by event and user id', () => {
 
 describe('create', () => {
   it('should create a new wishlist', async () => {
-
     const wishlist = fakeWishlistDefault()
 
     const createdWishlist = await repository.create(wishlist)

@@ -29,6 +29,25 @@ const fakeInvitationDefault = (
     ...invitation,
   })
 
+describe('findById', () => {
+  it('should return an invitation for a specific id', async () => {
+    const foundInvitation = await repository.findById(invitationOne.id)
+
+    expect(foundInvitation).not.toBeNull()
+    if (!foundInvitation) throw new Error('No invitation found')
+
+    expect(pick(foundInvitation, invitationKeysForTesting)).toEqual(
+      pick(invitationOne, invitationKeysForTesting)
+    )
+  })
+
+  it('should return null for non-existent id', async () => {
+    const foundInvitation = await repository.findById(99999)
+
+    expect(foundInvitation).toBeNull()
+  })
+})
+
 describe('find by event and user id', () => {
   it('should return an invitation for a specific event and user', async () => {
     const foundInvitation = await repository.findByEventAndUserId(

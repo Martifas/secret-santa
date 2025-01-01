@@ -38,7 +38,7 @@ describe('update', () => {
 
     const repos = {
       wishlistRepository: {
-        findByEventAndUserId: async () => baseWishlist,
+        findById: async () => baseWishlist,
         update: async (wishlistId: number, wishlistUpdates: any) => {
           expect(wishlistId).toBe(id)
           expect(wishlistUpdates).toEqual(updates)
@@ -52,6 +52,7 @@ describe('update', () => {
     const { update } = createCaller(testContext)
 
     const result = await update({ id, ...updates })
+
     expect(result).toMatchObject({
       id,
       itemName: 'Bike',
@@ -69,7 +70,7 @@ describe('update', () => {
     const updates = { price: 140 }
     const repos = {
       wishlistRepository: {
-        findByEventAndUserId: async () => null,
+        findById: async () => null,
       } satisfies Partial<WishlistRepository>,
     }
 
@@ -94,7 +95,7 @@ describe('update', () => {
 
     const repos = {
       wishlistRepository: {
-        findByEventAndUserId: async () => wishlistByAnotherUser,
+        findById: async () => wishlistByAnotherUser,
       } satisfies Partial<WishlistRepository>,
     }
 
@@ -113,10 +114,10 @@ describe('update', () => {
   it('should propagate unknown errors', async () => {
     const updates = { price: 140 }
     const unknownError = new Error('Database connection failed')
-
+    
     const repos = {
       wishlistRepository: {
-        findByEventAndUserId: async () => baseWishlist,
+        findById: async () => baseWishlist,
         update: async () => {
           throw unknownError
         },

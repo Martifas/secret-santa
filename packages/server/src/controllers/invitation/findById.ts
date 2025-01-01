@@ -14,43 +14,31 @@ export default authenticatedProcedure
     })
   )
   .input(
-    eventInvitationSchema
-      .pick({
-        id: true,
-        email: true,
-        token: true,
-        status: true,
-        expiresAt: true,
-      })
-      .partial({
-        email: true,
-        token: true,
-        status: true,
-        expiresAt: true,
-      })
+    eventInvitationSchema.pick({
+      id: true,
+    })
   )
-  .mutation(
+  .query(
     async ({
-      input: { id, ...updates },
+      input: { id },
       ctx: { repos, authUser },
     }): Promise<InvitationForMember> => {
-      const existingInvitation = await repos.invitationRepository.findById(id)
+      const invitation = await repos.invitationRepository.findById(id)
       
-      if (!existingInvitation) {
+      if (!invitation) {
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'Invitation not found',
         })
       }
 
-      if (existingInvitation.userId !== authUser.id) {
+      if (invitation.userId !== authUser.id) {
         throw new TRPCError({
           code: 'FORBIDDEN',
-          message: 'Not authorized to update this invitation item',
+          message: 'Not authorized to view this invitation',
         })
       }
 
-      const invitation = await repos.invitationRepository.update(id, updates)
       return invitation
     }
   )

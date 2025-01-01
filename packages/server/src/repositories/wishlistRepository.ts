@@ -8,6 +8,15 @@ import type { Insertable } from 'kysely'
 
 export function wishlistRepository(db: Database) {
   return {
+    async findById(id: number): Promise<WishlistRowSelect | null> {
+      const result = await db
+        .selectFrom('wishlist')
+        .select(wishlistKeys)
+        .where('id', '=', id)
+        .executeTakeFirst()
+      return result ?? null
+    },
+    
     async findByEventAndUserId(
       eventId: number,
       userId: number
@@ -28,6 +37,7 @@ export function wishlistRepository(db: Database) {
         .returning(wishlistKeys)
         .executeTakeFirstOrThrow()
     },
+
     async update(
       id: number,
       updates: WishlistRowUpdate
@@ -42,6 +52,7 @@ export function wishlistRepository(db: Database) {
         .returning(wishlistKeys)
         .executeTakeFirstOrThrow()
     },
+
     async remove(id: number): Promise<WishlistForMember> {
       return db
         .deleteFrom('wishlist')

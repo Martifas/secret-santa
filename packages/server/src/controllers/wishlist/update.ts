@@ -29,26 +29,26 @@ export default authenticatedProcedure
     })
   )
   .mutation(
-    async ({ 
-      input: { id, ...updates }, 
-      ctx: { repos, authUser } 
-    }): Promise<WishlistForMember> =>  {
-      const existingWishlist = await repos.wishlistRepository.findByEventAndUserId(id, authUser.id)
-      
+    async ({
+      input: { id, ...updates },
+      ctx: { repos, authUser }
+    }): Promise<WishlistForMember> => {
+      const existingWishlist = await repos.wishlistRepository.findById(id)
+     
       if (!existingWishlist) {
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'Wishlist item not found',
         })
       }
-  
+ 
       if (existingWishlist.userId !== authUser.id) {
         throw new TRPCError({
           code: 'FORBIDDEN',
           message: 'Not authorized to update this wishlist item',
         })
       }
-  
+ 
       const wishlist = await repos.wishlistRepository.update(id, updates)
       return wishlist
     }

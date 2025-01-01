@@ -3,6 +3,7 @@ import findByEventAndUserId from './findByEventAndUserId'
 import create from './create'
 import remove from './remove'
 import update from './update'
+import findById from './findByid'
 
 
 export default router({
@@ -10,4 +11,5 @@ export default router({
   create,
   remove,
   update,
+  findById,
   })
