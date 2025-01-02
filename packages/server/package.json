@@ -9,7 +9,7 @@
     "migrate:latest": "tsx ./src/database/migrate/latest",
     "gen:types": "kysely-codegen --camel-case --dialect postgres --out-file src/database/types.ts && prettier --write src/database/types.ts",
     "test": "vitest",
-     "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage"
   },
   "keywords": [],
   "author": "",

@@ -1,14 +1,11 @@
+import config from '@server/config';
 import { auth } from 'express-oauth2-jwt-bearer';
 import jwt from 'jsonwebtoken';
 import jwksRsa from 'jwks-rsa';
 
-const config = {
-  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
-  audience: process.env.AUTH0_AUDIENCE,
-} as const;
 
 const jwksClient = jwksRsa({
-  jwksUri: `${config.issuerBaseURL}/.well-known/jwks.json`,
+  jwksUri: `${config.auth0.issuerBaseURL}/.well-known/jwks.json`,
   cache: true,
   rateLimit: true,
 });
@@ -18,15 +15,17 @@ export async function verifyAuth0Token(token: string) {
   if (!decoded || !decoded.header.kid) {
     throw new Error('Invalid token');
   }
-
   const key = await jwksClient.getSigningKey(decoded.header.kid);
   const signingKey = key.getPublicKey();
-
   return jwt.verify(token, signingKey, {
     algorithms: ['RS256'],
-    audience: config.audience,
-    issuer: config.issuerBaseURL,
+    audience: config.auth0.audience,
+    issuer: config.auth0.issuerBaseURL,
   });
 }
 
-export const auth0Middleware = auth(config);
+export const auth0Middleware = auth({
+  issuerBaseURL: config.auth0.issuerBaseURL,
+  audience: config.auth0.audience,
+  jwksUri: `${config.auth0.issuerBaseURL}/.well-known/jwks.json`
+});
