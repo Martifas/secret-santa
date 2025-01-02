@@ -40,9 +40,9 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { create } = createCaller(testContext)
+    const { createMember } = createCaller(testContext)
 
-    const result = await create(newUserEventInput)
+    const result = await createMember(newUserEventInput)
     expect(result).toMatchObject({
       id: expect.any(Number),
       eventId,
@@ -69,9 +69,9 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { create } = createCaller(testContext)
+    const { createMember } = createCaller(testContext)
 
-    await expect(create(newUserEventInput)).rejects.toThrow(
+    await expect(createMember(newUserEventInput)).rejects.toThrow(
       new TRPCError({
         code: 'BAD_REQUEST',
         message: 'User is already a member of this event',
@@ -92,9 +92,9 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { create } = createCaller(testContext)
+    const { createMember } = createCaller(testContext)
 
-    await expect(create(newUserEventInput)).rejects.toThrow(unknownError)
+    await expect(createMember(newUserEventInput)).rejects.toThrow(unknownError)
   })
 
   it('should propagate unknown errors from findByEventAndUserId check', async () => {
@@ -112,8 +112,8 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { create } = createCaller(testContext)
+    const { createMember } = createCaller(testContext)
 
-    await expect(create(newUserEventInput)).rejects.toThrow(unknownError)
+    await expect(createMember(newUserEventInput)).rejects.toThrow(unknownError)
   })
 })

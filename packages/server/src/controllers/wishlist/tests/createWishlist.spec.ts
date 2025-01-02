@@ -45,9 +45,9 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { create } = createCaller(testContext)
+    const { createWishlist } = createCaller(testContext)
 
-    const result = await create(newWishlistInput)
+    const result = await createWishlist(newWishlistInput)
     expect(result).toMatchObject({
       id: expect.any(Number),
       userId: TEST_USER.id,
@@ -80,9 +80,9 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { create } = createCaller(testContext)
+    const { createWishlist } = createCaller(testContext)
 
-    await expect(create(newWishlistInput)).rejects.toThrow(
+    await expect(createWishlist(newWishlistInput)).rejects.toThrow(
       new TRPCError({
         code: 'CONFLICT',
         message: 'A wishlist item with this name already exists for this event and user',
@@ -104,9 +104,9 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { create } = createCaller(testContext)
+    const { createWishlist } = createCaller(testContext)
 
-    await expect(create(newWishlistInput)).rejects.toThrow(unknownError)
+    await expect(createWishlist(newWishlistInput)).rejects.toThrow(unknownError)
   })
 
   it('should propagate unknown errors from findByEventAndUserId', async () => {
@@ -125,8 +125,8 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { create } = createCaller(testContext)
+    const { createWishlist } = createCaller(testContext)
 
-    await expect(create(newWishlistInput)).rejects.toThrow(unknownError)
+    await expect(createWishlist(newWishlistInput)).rejects.toThrow(unknownError)
   })
 })

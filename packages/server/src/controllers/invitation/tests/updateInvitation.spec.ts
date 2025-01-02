@@ -51,9 +51,9 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { update } = createCaller(testContext)
+    const { updateInvitation } = createCaller(testContext)
 
-    const result = await update({
+    const result = await updateInvitation({
       id,
       ...updates
     })
@@ -81,10 +81,10 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { update } = createCaller(testContext)
+    const { updateInvitation } = createCaller(testContext)
 
     await expect(
-      update({
+      updateInvitation({
         id,
         ...updates
       })
@@ -111,10 +111,10 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { update } = createCaller(testContext)
+    const { updateInvitation } = createCaller(testContext)
 
     await expect(
-      update({
+      updateInvitation({
         id,
         ...updates
       })
@@ -141,10 +141,10 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { update } = createCaller(testContext)
+    const { updateInvitation } = createCaller(testContext)
 
     await expect(
-      update({
+      updateInvitation({
         id,
         ...updates
       })

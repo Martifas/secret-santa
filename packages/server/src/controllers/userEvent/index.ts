@@ -1,16 +1,10 @@
 import { router } from '@server/trpc'
-import create from './create'
-import remove from './remove'
-import isMember from './isMember'
-import isEventAdmin from './isEventAdmin'
-import updateRole from './updateRole'
-import findByEventAndUserId from './findByEventAndUserId'
+import createMember from './createMember'
+import removeMember from './removeMember'
+import updateMemberRole from './updateMemberRole'
 
 export default router({
-    create,
-    remove,
-    isMember,
-    isEventAdmin,
-    updateRole,
-    findByEventAndUserId
+  createMember,
+  removeMember,
+  updateMemberRole,
 })

@@ -51,9 +51,9 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(eventRouter)
-    const { update } = createCaller(testContext)
+    const { updateEvent } = createCaller(testContext)
 
-    const result = await update({ id, updates })
+    const result = await updateEvent({ id, updates })
 
     expect(result).toMatchObject({
       id,
@@ -78,9 +78,9 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(eventRouter)
-    const { update } = createCaller(testContext)
+    const { updateEvent } = createCaller(testContext)
 
-    await expect(update({ id, updates })).rejects.toThrow(
+    await expect(updateEvent({ id, updates })).rejects.toThrow(
       new TRPCError({
         code: 'NOT_FOUND',
         message: 'Event not found',
@@ -103,9 +103,9 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(eventRouter)
-    const { update } = createCaller(testContext)
+    const { updateEvent } = createCaller(testContext)
 
-    await expect(update({ id, updates })).rejects.toThrow(
+    await expect(updateEvent({ id, updates })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
         message: 'Not authorized to update this event',
@@ -128,8 +128,8 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(eventRouter)
-    const { update } = createCaller(testContext)
+    const { updateEvent } = createCaller(testContext)
 
-    await expect(update({ id, updates })).rejects.toThrow(unknownError)
+    await expect(updateEvent({ id, updates })).rejects.toThrow(unknownError)
   })
 })

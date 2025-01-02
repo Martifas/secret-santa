@@ -44,9 +44,9 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(eventRouter)
-    const { create } = createCaller(testContext)
+    const { createEvent } = createCaller(testContext)
 
-    const result = await create(newEventInput)
+    const result = await createEvent(newEventInput)
 
     expect(result).toMatchObject({
       id: expect.any(Number),
@@ -80,7 +80,7 @@ describe('create', () => {
     }
 
     const createCaller = createCallerFactory(eventRouter)
-    const { create } = createCaller(authRepoContext(repos, TEST_USER))
-    await expect(create(newEventInput)).rejects.toThrow(repositoryError)
+    const { createEvent } = createCaller(authRepoContext(repos, TEST_USER))
+    await expect(createEvent(newEventInput)).rejects.toThrow(repositoryError)
   })
 })

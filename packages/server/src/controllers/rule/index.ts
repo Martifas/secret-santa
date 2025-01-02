@@ -1,13 +1,13 @@
 import { router } from '@server/trpc'
-import create from './create'
-import findByEventId from './findByEventId'
-import remove from './remove'
-import update from './update'
+import createRule from './createRule'
+import deleteRule from './deleteRule'
+import getEventRules from './getEventRules'
+import updateRule from './updateRule'
 
 
 export default router({
-  create,
-  findByEventId,
-  remove,
-  update
+ createRule,
+ deleteRule,
+ getEventRules,
+ updateRule
 })

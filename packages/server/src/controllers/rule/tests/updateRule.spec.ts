@@ -48,9 +48,9 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { update } = createCaller(testContext)
+    const { updateRule } = createCaller(testContext)
 
-    const result = await update(updateInput)
+    const result = await updateRule(updateInput)
     expect(result).toEqual(updatedRule)
   })
 
@@ -78,9 +78,9 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { update } = createCaller(testContext)
+    const { updateRule } = createCaller(testContext)
 
-    const result = await update(updateInput)
+    const result = await updateRule(updateInput)
     expect(result).toEqual(updatedRule)
   })
 
@@ -104,9 +104,9 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { update } = createCaller(testContext)
+    const { updateRule } = createCaller(testContext)
 
-    await expect(update(updateInput)).rejects.toThrow(
+    await expect(updateRule(updateInput)).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
         message: 'Not an admin of this event',
@@ -135,9 +135,9 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { update } = createCaller(testContext)
+    const { updateRule } = createCaller(testContext)
 
-    await expect(update(updateInput)).rejects.toThrow(unknownError)
+    await expect(updateRule(updateInput)).rejects.toThrow(unknownError)
   })
 
   it('should propagate unknown errors from isEventAdmin check', async () => {
@@ -163,9 +163,9 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { update } = createCaller(testContext)
+    const { updateRule } = createCaller(testContext)
 
-    await expect(update(updateInput)).rejects.toThrow(unknownError)
+    await expect(updateRule(updateInput)).rejects.toThrow(unknownError)
   })
 
   it('should throw when rule does not exist', async () => {
@@ -189,8 +189,8 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { update } = createCaller(testContext)
+    const { updateRule } = createCaller(testContext)
 
-    await expect(update(updateInput)).rejects.toThrow(notFoundError)
+    await expect(updateRule(updateInput)).rejects.toThrow(notFoundError)
   })
 })

@@ -35,9 +35,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(eventRouter)
-    const { remove } = createCaller(testContext)
+    const { removeEvent } = createCaller(testContext)
     
-    const result = await remove({ id })
+    const result = await removeEvent({ id })
     
     expect(result).toMatchObject({
       id,
@@ -60,9 +60,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(eventRouter)
-    const { remove } = createCaller(testContext)
+    const { removeEvent } = createCaller(testContext)
     
-    await expect(remove({ id: 1 })).rejects.toThrow(
+    await expect(removeEvent({ id: 1 })).rejects.toThrow(
       new TRPCError({
         code: 'NOT_FOUND',
         message: 'Event not found',
@@ -92,9 +92,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(eventRouter)
-    const { remove } = createCaller(testContext)
+    const { removeEvent } = createCaller(testContext)
     
-    await expect(remove({ id })).rejects.toThrow(
+    await expect(removeEvent({ id })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
         message: 'Not authorized to delete this event',

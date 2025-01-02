@@ -51,9 +51,9 @@ describe('updateRole', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { updateRole } = createCaller(testContext)
+    const { updateMemberRole } = createCaller(testContext)
 
-    const result = await updateRole(updateInput)
+    const result = await updateMemberRole(updateInput)
     expect(result).toEqual(updatedUserEvent)
   })
 
@@ -70,9 +70,9 @@ describe('updateRole', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { updateRole } = createCaller(testContext)
+    const { updateMemberRole } = createCaller(testContext)
 
-    await expect(updateRole(updateInput)).rejects.toThrow(
+    await expect(updateMemberRole(updateInput)).rejects.toThrow(
       new TRPCError({
         code: 'NOT_FOUND',
         message: 'User event membership not found',
@@ -93,9 +93,9 @@ describe('updateRole', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { updateRole } = createCaller(testContext)
+    const { updateMemberRole } = createCaller(testContext)
 
-    await expect(updateRole(updateInput)).rejects.toThrow(
+    await expect(updateMemberRole(updateInput)).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
         message: 'Only event admins can update roles',
@@ -119,9 +119,9 @@ describe('updateRole', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { updateRole } = createCaller(testContext)
+    const { updateMemberRole } = createCaller(testContext)
 
-    await expect(updateRole(updateInput)).rejects.toThrow(unknownError)
+    await expect(updateMemberRole(updateInput)).rejects.toThrow(unknownError)
   })
 
   it('should propagate unknown errors from isEventAdmin', async () => {
@@ -140,9 +140,9 @@ describe('updateRole', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { updateRole } = createCaller(testContext)
+    const { updateMemberRole } = createCaller(testContext)
 
-    await expect(updateRole(updateInput)).rejects.toThrow(unknownError)
+    await expect(updateMemberRole(updateInput)).rejects.toThrow(unknownError)
   })
 
   it('should propagate unknown errors from updateRole', async () => {
@@ -159,8 +159,8 @@ describe('updateRole', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { updateRole } = createCaller(testContext)
+    const { updateMemberRole } = createCaller(testContext)
 
-    await expect(updateRole(updateInput)).rejects.toThrow(unknownError)
+    await expect(updateMemberRole(updateInput)).rejects.toThrow(unknownError)
   })
 })

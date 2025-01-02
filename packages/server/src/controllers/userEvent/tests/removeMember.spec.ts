@@ -39,9 +39,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { remove } = createCaller(testContext)
+    const { removeMember } = createCaller(testContext)
 
-    const result = await remove({ id: userEventId })
+    const result = await removeMember({ id: userEventId })
     expect(result).toEqual(existingUserEvent)
   })
 
@@ -64,9 +64,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { remove } = createCaller(testContext)
+    const { removeMember } = createCaller(testContext)
 
-    const result = await remove({ id: userEventId })
+    const result = await removeMember({ id: userEventId })
     expect(result).toEqual(otherUserEvent)
   })
 
@@ -83,9 +83,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { remove } = createCaller(testContext)
+    const { removeMember } = createCaller(testContext)
 
-    await expect(remove({ id: userEventId })).rejects.toThrow(
+    await expect(removeMember({ id: userEventId })).rejects.toThrow(
       new TRPCError({
         code: 'NOT_FOUND',
         message: 'User event membership not found',
@@ -111,9 +111,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { remove } = createCaller(testContext)
+    const { removeMember } = createCaller(testContext)
 
-    await expect(remove({ id: userEventId })).rejects.toThrow(
+    await expect(removeMember({ id: userEventId })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
         message: 'Not authorized to remove this membership',
@@ -137,9 +137,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { remove } = createCaller(testContext)
+    const { removeMember } = createCaller(testContext)
 
-    await expect(remove({ id: userEventId })).rejects.toThrow(unknownError)
+    await expect(removeMember({ id: userEventId })).rejects.toThrow(unknownError)
   })
 
   it('should propagate unknown errors from isEventAdmin', async () => {
@@ -158,9 +158,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { remove } = createCaller(testContext)
+    const { removeMember } = createCaller(testContext)
 
-    await expect(remove({ id: userEventId })).rejects.toThrow(unknownError)
+    await expect(removeMember({ id: userEventId })).rejects.toThrow(unknownError)
   })
 
   it('should propagate unknown errors from remove', async () => {
@@ -177,8 +177,8 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
-    const { remove } = createCaller(testContext)
+    const { removeMember } = createCaller(testContext)
 
-    await expect(remove({ id: userEventId })).rejects.toThrow(unknownError)
+    await expect(removeMember({ id: userEventId })).rejects.toThrow(unknownError)
   })
 })

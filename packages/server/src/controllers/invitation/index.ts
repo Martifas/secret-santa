@@ -1,16 +1,17 @@
 import { router } from '@server/trpc'
-import findByEventAndUserId from './findByEventAndUser'
-import create from './create'
-import update from './update'
-import remove from './remove'
-import findAllForUser from './findAllForUser'
-import findById from './findById'
+import createInvitation from './createInvitation'
+import updateInvitation from './updateInvitation'
+import getUserInvitations from './getUserInvitations'
+import getInvitation from './getInvitation'
+import checkInvitation from './checkInvitation'
+import deleteInvitation from './deleteInvitation'
+
 
 export default router({
-  create,
-  remove,
-  update,
-  findAllForUser,
-  findByEventAndUserId,
-  findById
+  createInvitation,
+  deleteInvitation,
+  updateInvitation,
+  getUserInvitations,
+  getInvitation,
+  checkInvitation,
 })

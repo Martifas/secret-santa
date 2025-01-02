@@ -40,9 +40,9 @@ describe('create', () => {
     }
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { create } = createCaller(testContext)
+    const { createInvitation } = createCaller(testContext)
 
-    const result = await create(newInvitationInput)
+    const result = await createInvitation(newInvitationInput)
     expect(result).toMatchObject({
       id: expect.any(Number),
       userId: TEST_USER.id,
@@ -71,9 +71,9 @@ describe('create', () => {
     }
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { create } = createCaller(testContext)
+    const { createInvitation } = createCaller(testContext)
 
-    await expect(create(newInvitationInput)).rejects.toThrow(
+    await expect(createInvitation(newInvitationInput)).rejects.toThrow(
       new TRPCError({
         code: 'CONFLICT',
         message: 'An invitation with this name already exists for this event and user',
@@ -93,9 +93,9 @@ describe('create', () => {
     }
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { create } = createCaller(testContext)
+    const { createInvitation } = createCaller(testContext)
 
-    await expect(create(newInvitationInput)).rejects.toThrow(unknownError)
+    await expect(createInvitation(newInvitationInput)).rejects.toThrow(unknownError)
   })
 
   it('should propagate unknown errors from findByEventAndUserId', async () => {
@@ -112,8 +112,8 @@ describe('create', () => {
     }
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { create } = createCaller(testContext)
+    const { createInvitation } = createCaller(testContext)
 
-    await expect(create(newInvitationInput)).rejects.toThrow(unknownError)
+    await expect(createInvitation(newInvitationInput)).rejects.toThrow(unknownError)
   })
 })

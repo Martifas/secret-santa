@@ -1,15 +1,14 @@
 import { router } from '@server/trpc'
-import findByEventAndUserId from './findByEventAndUserId'
-import create from './create'
-import remove from './remove'
-import update from './update'
-import findById from './findByid'
+import getWishlist from './getWishlist'
+import createWishlist from './createWishlist'
+import updateWishlist from './updateWishlist'
+import deleteWishlist from './deleteWishlist'
+
 
 
 export default router({
-  findByEventAndUserId,
-  create,
-  remove,
-  update,
-  findById,
+  getWishlist,
+  createWishlist,
+  updateWishlist,
+  deleteWishlist,
   })

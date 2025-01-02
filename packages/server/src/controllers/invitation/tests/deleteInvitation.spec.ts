@@ -43,9 +43,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { remove } = createCaller(testContext)
+    const { deleteInvitation } = createCaller(testContext)
 
-    const result = await remove({ id })
+    const result = await deleteInvitation({ id })
 
     expect(result).toMatchObject({
       id,
@@ -69,9 +69,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { remove } = createCaller(testContext)
+    const { deleteInvitation } = createCaller(testContext)
 
-    await expect(remove({ id: 1 })).rejects.toThrow(
+    await expect(deleteInvitation({ id: 1 })).rejects.toThrow(
       new TRPCError({
         code: 'NOT_FOUND',
         message: 'Invitation not found'
@@ -100,9 +100,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { remove } = createCaller(testContext)
+    const { deleteInvitation } = createCaller(testContext)
 
-    await expect(remove({ id })).rejects.toThrow(
+    await expect(deleteInvitation({ id })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
         message: 'Not authorized to remove this invitation'

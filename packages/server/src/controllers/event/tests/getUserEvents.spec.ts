@@ -36,14 +36,14 @@ const repos = {
 }
 
 const createCaller = createCallerFactory(eventRouter)
-const { findAllForUser } = createCaller(authRepoContext(repos))
+const { getUserEvents } = createCaller(authRepoContext(repos))
 
 describe('findAll', () => {
   it('should return all events', async () => {
-    // ACT (When)
-    const events = await findAllForUser()
+ 
+    const events = await getUserEvents()
 
-    // ASSERT (Then)
+
     expect(events).toHaveLength(2)
     expect(events).toMatchObject([
       {

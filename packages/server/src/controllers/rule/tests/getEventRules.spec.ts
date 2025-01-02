@@ -6,32 +6,38 @@ import { authRepoContext } from '@tests/utils/context'
 import { TRPCError } from '@trpc/server'
 import ruleRouter from '..'
 
-describe('remove', () => {
+describe('findByEventId', () => {
   const TEST_USER = fakeAuthUser({
     id: 1,
     auth0Id: 'auth0|test123',
   })
   
-  const ruleId = 1
   const eventId = 100
-  const removeInput = {
-    id: ruleId,
+  const queryInput = {
     eventId,
   }
   
-  const existingRule = {
-    id: ruleId,
-    eventId,
-    ruleType: 'testRule',
-    ruleData: { config: 'value' },
-  }
+  const existingRules = [
+    {
+      id: 1,
+      eventId,
+      ruleType: 'testRule1',
+      ruleData: { config: 'value1' },
+    },
+    {
+      id: 2,
+      eventId,
+      ruleType: 'testRule2',
+      ruleData: { config: 'value2' },
+    },
+  ]
 
-  it('should remove rule when user is event admin', async () => {
+  it('should return rules when user is event admin', async () => {
     const repos = {
       ruleRepository: {
-        remove: async (id) => {
-          expect(id).toBe(ruleId)
-          return existingRule
+        findByEventId: async (id) => {
+          expect(id).toBe(eventId)
+          return existingRules
         },
       } satisfies Partial<RuleRepository>,
       userEventRepository: {
@@ -41,16 +47,16 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { remove } = createCaller(testContext)
+    const { getEventRules } = createCaller(testContext)
 
-    const result = await remove(removeInput)
-    expect(result).toEqual(existingRule)
+    const result = await getEventRules(queryInput)
+    expect(result).toEqual(existingRules)
   })
 
   it('should throw FORBIDDEN when user is not event admin', async () => {
     const repos = {
       ruleRepository: {
-        remove: async () => {
+        findByEventId: async () => {
           throw new Error('Should not be called')
         },
       } satisfies Partial<RuleRepository>,
@@ -61,9 +67,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { remove } = createCaller(testContext)
+    const { getEventRules } = createCaller(testContext)
 
-    await expect(remove(removeInput)).rejects.toThrow(
+    await expect(getEventRules(queryInput)).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
         message: 'Not an admin of this event',
@@ -71,11 +77,11 @@ describe('remove', () => {
     )
   })
 
-  it('should propagate unknown errors from remove', async () => {
+  it('should propagate unknown errors from findByEventId', async () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
       ruleRepository: {
-        remove: async () => {
+        findByEventId: async () => {
           throw unknownError
         },
       } satisfies Partial<RuleRepository>,
@@ -86,16 +92,16 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { remove } = createCaller(testContext)
+    const { getEventRules } = createCaller(testContext)
 
-    await expect(remove(removeInput)).rejects.toThrow(unknownError)
+    await expect(getEventRules(queryInput)).rejects.toThrow(unknownError)
   })
 
   it('should propagate unknown errors from isEventAdmin check', async () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
       ruleRepository: {
-        remove: async () => {
+        findByEventId: async () => {
           throw new Error('Should not be called')
         },
       } satisfies Partial<RuleRepository>,
@@ -108,18 +114,15 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { remove } = createCaller(testContext)
+    const { getEventRules } = createCaller(testContext)
 
-    await expect(remove(removeInput)).rejects.toThrow(unknownError)
+    await expect(getEventRules(queryInput)).rejects.toThrow(unknownError)
   })
 
-  it('should throw when rule does not exist', async () => {
-    const notFoundError = new Error('Rule not found')
+  it('should return empty array when no rules exist', async () => {
     const repos = {
       ruleRepository: {
-        remove: async () => {
-          throw notFoundError
-        },
+        findByEventId: async () => [],
       } satisfies Partial<RuleRepository>,
       userEventRepository: {
         isEventAdmin: async () => true,
@@ -128,8 +131,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { remove } = createCaller(testContext)
+    const { getEventRules } = createCaller(testContext)
 
-    await expect(remove(removeInput)).rejects.toThrow(notFoundError)
+    const result = await getEventRules(queryInput)
+    expect(result).toEqual([])
   })
 })

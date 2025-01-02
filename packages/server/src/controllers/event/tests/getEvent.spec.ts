@@ -22,14 +22,14 @@ const repos = {
 }
 
 const createCaller = createCallerFactory(eventRouter)
-const { find } = createCaller(authRepoContext(repos))
+const { getEvent } = createCaller(authRepoContext(repos))
 
 describe('find', () => {
   it('should return an event', async () => {
 
     const id = 1
 
-    const eventFound = await find({ id })
+    const eventFound = await getEvent({ id })
 
     expect(eventFound).toMatchObject({
       id,

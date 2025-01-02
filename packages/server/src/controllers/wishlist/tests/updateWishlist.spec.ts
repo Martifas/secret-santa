@@ -49,9 +49,9 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { update } = createCaller(testContext)
+    const { updateWishlist } = createCaller(testContext)
 
-    const result = await update({ id, ...updates })
+    const result = await updateWishlist({ id, ...updates })
 
     expect(result).toMatchObject({
       id,
@@ -76,9 +76,9 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { update } = createCaller(testContext)
+    const { updateWishlist } = createCaller(testContext)
 
-    await expect(update({ id, ...updates })).rejects.toThrow(
+    await expect(updateWishlist({ id, ...updates })).rejects.toThrow(
       new TRPCError({
         code: 'NOT_FOUND',
         message: 'Wishlist item not found',
@@ -101,9 +101,9 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { update } = createCaller(testContext)
+    const { updateWishlist } = createCaller(testContext)
 
-    await expect(update({ id, ...updates })).rejects.toThrow(
+    await expect(updateWishlist({ id, ...updates })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
         message: 'Not authorized to update this wishlist item',
@@ -126,8 +126,8 @@ describe('update', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { update } = createCaller(testContext)
+    const { updateWishlist } = createCaller(testContext)
 
-    await expect(update({ id, ...updates })).rejects.toThrow(unknownError)
+    await expect(updateWishlist({ id, ...updates })).rejects.toThrow(unknownError)
   })
 })

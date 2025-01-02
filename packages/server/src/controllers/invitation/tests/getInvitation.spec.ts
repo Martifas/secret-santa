@@ -35,9 +35,9 @@ describe('findById', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { findById } = createCaller(testContext)
+    const { getInvitation } = createCaller(testContext)
 
-    const result = await findById({ id })
+    const result = await getInvitation({ id })
 
     expect(result).toMatchObject({
       id,
@@ -61,9 +61,9 @@ describe('findById', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { findById } = createCaller(testContext)
+    const { getInvitation } = createCaller(testContext)
 
-    await expect(findById({ id })).rejects.toThrow(
+    await expect(getInvitation({ id })).rejects.toThrow(
       new TRPCError({
         code: 'NOT_FOUND',
         message: 'Invitation not found',
@@ -85,9 +85,9 @@ describe('findById', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
-    const { findById } = createCaller(testContext)
+    const { getInvitation } = createCaller(testContext)
 
-    await expect(findById({ id })).rejects.toThrow(
+    await expect(getInvitation({ id })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
         message: 'Not authorized to view this invitation',

@@ -39,9 +39,9 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { create } = createCaller(testContext)
+    const { createRule } = createCaller(testContext)
 
-    const result = await create(newRuleInput)
+    const result = await createRule(newRuleInput)
     expect(result).toMatchObject({
       id: expect.any(Number),
       eventId,
@@ -64,9 +64,9 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { create } = createCaller(testContext)
+    const { createRule } = createCaller(testContext)
 
-    await expect(create(newRuleInput)).rejects.toThrow(
+    await expect(createRule(newRuleInput)).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
         message: 'Not an admin of this event',
@@ -89,9 +89,9 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { create } = createCaller(testContext)
+    const { createRule } = createCaller(testContext)
 
-    await expect(create(newRuleInput)).rejects.toThrow(unknownError)
+    await expect(createRule(newRuleInput)).rejects.toThrow(unknownError)
   })
 
   it('should propagate unknown errors from isEventAdmin check', async () => {
@@ -111,8 +111,8 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(ruleRouter)
-    const { create } = createCaller(testContext)
+    const { createRule } = createCaller(testContext)
 
-    await expect(create(newRuleInput)).rejects.toThrow(unknownError)
+    await expect(createRule(newRuleInput)).rejects.toThrow(unknownError)
   })
 })

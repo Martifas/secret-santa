@@ -38,11 +38,11 @@ const repos = {
 }
 
 const createCaller = createCallerFactory(invitationRouter)
-const { findAllForUser } = createCaller(authRepoContext(repos))
+const { getUserInvitations } = createCaller(authRepoContext(repos))
 
 describe('findAll', () => {
   it('should return all invitations', async () => {
-    const invitations = await findAllForUser()
+    const invitations = await getUserInvitations()
 
     expect(invitations).toHaveLength(2)
     expect(invitations).toMatchObject([
