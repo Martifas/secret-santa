@@ -4,10 +4,11 @@ import { wishlistRepository } from "./wishlistRepository"
 import { invitationRepository } from "./invitationRepository"
 import { ruleRepository } from "./ruleRepository"
 import { userEventRepository } from "./userEventRepository"
+import { userRepository } from "./userRepository"
 
 export type RepositoryFactory = <T>(db: Database) => T
 
-const repositories = { eventRepository, wishlistRepository, invitationRepository, ruleRepository, userEventRepository }
+const repositories = { eventRepository, wishlistRepository, invitationRepository, ruleRepository, userEventRepository, userRepository }
 
 export type RepositoriesFactories = typeof repositories
 export type Repositories = {
