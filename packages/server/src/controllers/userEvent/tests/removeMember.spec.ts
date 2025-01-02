@@ -48,7 +48,7 @@ describe('remove', () => {
   it('should remove user event when user is event admin', async () => {
     const otherUserEvent = {
       ...existingUserEvent,
-      userId: TEST_USER.id + 1, // Different user's membership
+      userId: TEST_USER.id + 1,
     }
 
     const repos = {

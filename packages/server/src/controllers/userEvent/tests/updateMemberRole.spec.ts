@@ -17,7 +17,7 @@ describe('updateRole', () => {
   const existingUserEvent = {
     id: userEventId,
     eventId,
-    userId: TEST_USER.id + 1, // Different user's membership
+    userId: TEST_USER.id + 1,
     role: 'member',
     wishlistId: 1,
     santaForUserId: 2,

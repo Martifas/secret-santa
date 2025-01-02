@@ -1,4 +1,3 @@
-// tokenPayload.ts
 import { z } from 'zod';
 import { authUserSchema, type AuthUser } from '../../entities/user';
 

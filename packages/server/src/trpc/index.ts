@@ -7,12 +7,11 @@ import { ZodError } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 import type { Repositories } from '@server/repositories'
 
-// The Context type looks good - AuthUser type matches what we'll get from Auth0
 export type Context = {
   db: Database
   req?: Request
   res?: Response
-  authUser?: AuthUser  // This matches our Auth0 parseTokenPayload return type
+  authUser?: AuthUser
   repos?: Partial<Repositories>
 }
 

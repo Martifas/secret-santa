@@ -27,7 +27,7 @@ export default authenticatedProcedure
           message: 'Event not found',
         })
       }
-      // add for admin too
+
       if (event.createdBy !== authUser.id) { 
         throw new TRPCError({
           code: 'FORBIDDEN',

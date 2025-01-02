@@ -1,4 +1,3 @@
-// src/controllers/user/tests/login.spec.ts
 import type { UserRepository } from '@server/repositories/userRepository'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@tests/utils/context'
@@ -19,7 +18,7 @@ describe('login', () => {
    lastName: null,
    avatarUrl: null,
    createdAt: new Date(),
-   lastLogin: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
+   lastLogin: new Date(Date.now() - 1000 * 60 * 60),
  }
 
  const newLoginTime = new Date()

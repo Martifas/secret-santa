@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server';
 import { publicProcedure } from '@server/trpc/index';
-import { parseTokenPayload, auth0PayloadSchema } from './tokenPayload';  // Import the schema
+import { parseTokenPayload, auth0PayloadSchema } from './tokenPayload';
 import { verifyAuth0Token } from './auth0Client';
 
 export const authenticatedProcedure = publicProcedure.use(async ({ ctx, next }) => {
@@ -31,7 +31,6 @@ export const authenticatedProcedure = publicProcedure.use(async ({ ctx, next }) 
     const auth0User = parseTokenPayload(payload);
     const parsedPayload = auth0PayloadSchema.parse(payload);
 
-    // Sync the user with database
     const user = await ctx.repos.userRepository.findOrCreateFromAuth0(
       auth0User.auth0Id,
       parsedPayload.email ?? '',
