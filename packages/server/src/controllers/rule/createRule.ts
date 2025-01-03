@@ -13,15 +13,14 @@ export default authenticatedProcedure
     })
   )
   .input(
-    eventRuleSchema.omit({
-      id: true,
+    eventRuleSchema.pick({
+      eventId: true,
+      ruleType: true,
+      ruleData: true,
     })
   )
   .mutation(
-    async ({
-      input,
-      ctx: { repos, authUser },
-    }): Promise<RuleForMember> => {
+    async ({ input, ctx: { repos, authUser } }): Promise<RuleForMember> => {
       const isEventAdmin = await repos.userEventRepository.isEventAdmin(
         authUser.id,
         input.eventId
