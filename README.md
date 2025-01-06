@@ -8,7 +8,7 @@ This is the server side of the Secret Santa program, providing the backend infra
   - Track event status and updates
 
 - **User System**
-  - Auth0 integration for secure authentication
+  - JWT authentication for secure user management
   - User profile management with optional avatar support
   - Track user participation across multiple events
 
@@ -39,7 +39,7 @@ Create a `.env` file in the root directory based on `.env.example`:
 DATABASE_URL= # PostgreSQL connection string (e.g., postgresql://user:password@localhost:5432/database)
 ```
 
-## Auth0 Configuration
+## Configuration
 ```bash
 TOKEN_EXPIRES_IN=  #default 7 days
 NODE_ENV= #default 'development'
@@ -92,6 +92,6 @@ npm run coverage
 
 - **Database:** PostgreSQL, Kysely (Type-safe ORM)
 
-- **Authentication & Validation:** Auth0 with express-oauth2-jwt-bearer, Zod for schema validation
+- **Authentication & Validation:** JWT authentication with jsonwebtoken, Zod for schema validation
 
 - **Testing:** Vitest
