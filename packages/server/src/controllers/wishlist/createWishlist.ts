@@ -1,4 +1,4 @@
-import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import {
   wishlistSchema,
   type WishlistForMember,

@@ -1,134 +1,83 @@
-import type { UserRepository } from '@server/repositories/userRepository'
 import { createCallerFactory } from '@server/trpc'
-import { authRepoContext } from '@tests/utils/context'
-import type { UserForMember } from '@server/entities/user'
+import { wrapInRollbacks } from '@server/utils/tests/transactions'
+import { createTestDatabase } from '@server/utils/tests/database'
+import { fakeUser } from '@server/entities/tests/fakes'
+import { insertAll } from '@server/utils/tests/record'
 import userRouter from '..'
 
-describe('login', () => {
- const loginInput = {
-   email: 'test@example.com',
-   auth0Id: 'auth0|test123',
- }
+const createCaller = createCallerFactory(userRouter)
+const db = await wrapInRollbacks(createTestDatabase())
+const PASSWORD_CORRECT = 'password.123'
 
- const existingUser: UserForMember = {
-   id: 1,
-   email: loginInput.email,
-   auth0Id: loginInput.auth0Id,
-   firstName: null, 
-   lastName: null,
-   avatarUrl: null,
-   createdAt: new Date(),
-   lastLogin: new Date(Date.now() - 1000 * 60 * 60),
- }
+const [userSeed] = await insertAll(db, 'user', [
+  fakeUser({
+    email: 'existing@user.com',
+    password: '$2b$10$sD53fzWIQBjXWfSDzuwmMOyY1ZAygLpRZlLxxPhcNG5r9BFWrNaDC',
+  }),
+])
 
- const newLoginTime = new Date()
+const { login } = createCaller({ db } as any)
 
- it('should update lastLogin for existing user', async () => {
-   const repos = {
-     userRepository: {
-       findByAuth0Id: async () => existingUser,
-       updateLastLogin: async (id) => ({
-         ...existingUser,
-         id,
-         lastLogin: newLoginTime,
-       }),
-     } satisfies Partial<UserRepository>,
-   }
+it('returns a token if the password matches', async () => {
+  const { accessToken } = await login({
+    email: userSeed.email,
+    password: PASSWORD_CORRECT,
+  })
 
-   const testContext = authRepoContext(repos)
-   const createCaller = createCallerFactory(userRouter)
-   const { login } = createCaller(testContext)
+  expect(accessToken).toEqual(expect.any(String))
+  expect(accessToken.slice(0, 3)).toEqual('eyJ')
+})
 
-   const result = await login(loginInput)
+it('should throw an error for non-existant user', async () => {
+  await expect(
+    login({
+      email: 'nonexisting@user.com',
+      password: PASSWORD_CORRECT,
+    })
+  ).rejects.toThrow()
+})
 
-   expect(result).toMatchObject({
-     ...existingUser,
-     lastLogin: newLoginTime,
-   })
- })
+it('should throw an error for incorrect password', async () => {
+  await expect(
+    login({
+      email: userSeed.email,
+      password: 'password.123!',
+    })
+  ).rejects.toThrow(/password/i)
+})
 
- it('should create new user if not found', async () => {
-   const newUser: UserForMember = {
-     id: 2,
-     email: loginInput.email,
-     auth0Id: loginInput.auth0Id,
-     firstName: null,
-     lastName: null,
-     avatarUrl: null,
-     createdAt: newLoginTime,
-     lastLogin: newLoginTime,
-   }
+it('throws an error for invalid email', async () => {
+  await expect(
+    login({
+      email: 'not-an-email',
+      password: PASSWORD_CORRECT,
+    })
+  ).rejects.toThrow(/email/)
+})
 
-   const repos = {
-     userRepository: {
-       findByAuth0Id: async () => null,
-       create: async () => newUser,
-     } satisfies Partial<UserRepository>,
-   }
+it('throws an error for a short password', async () => {
+  await expect(
+    login({
+      email: userSeed.email,
+      password: 'short',
+    })
+  ).rejects.toThrow(/password/)
+})
 
-   const testContext = authRepoContext(repos)
-   const createCaller = createCallerFactory(userRouter)
-   const { login } = createCaller(testContext)
+it.skip('allows logging in with different email case', async () => {
+  await expect(
+    login({
+      email: userSeed.email.toUpperCase(),
+      password: PASSWORD_CORRECT,
+    })
+  ).resolves.toEqual(expect.anything())
+})
 
-   const result = await login(loginInput)
-
-   expect(result).toMatchObject({
-     ...newUser,
-     createdAt: expect.any(Date),
-     lastLogin: expect.any(Date),
-   })
- })
-
- it('should propagate unknown errors from findByAuth0Id', async () => {
-   const unknownError = new Error('Database connection failed')
-   const repos = {
-     userRepository: {
-       findByAuth0Id: async () => {
-         throw unknownError
-       },
-     } satisfies Partial<UserRepository>,
-   }
-
-   const testContext = authRepoContext(repos)
-   const createCaller = createCallerFactory(userRouter)
-   const { login } = createCaller(testContext)
-
-   await expect(login(loginInput)).rejects.toThrow(unknownError)
- })
-
- it('should propagate unknown errors from create', async () => {
-   const unknownError = new Error('Database connection failed')
-   const repos = {
-     userRepository: {
-       findByAuth0Id: async () => null,
-       create: async () => {
-         throw unknownError
-       },
-     } satisfies Partial<UserRepository>,
-   }
-
-   const testContext = authRepoContext(repos)
-   const createCaller = createCallerFactory(userRouter)
-   const { login } = createCaller(testContext)
-
-   await expect(login(loginInput)).rejects.toThrow(unknownError)
- })
-
- it('should propagate unknown errors from updateLastLogin', async () => {
-   const unknownError = new Error('Database connection failed')
-   const repos = {
-     userRepository: {
-       findByAuth0Id: async () => existingUser,
-       updateLastLogin: async () => {
-         throw unknownError
-       },
-     } satisfies Partial<UserRepository>,
-   }
-
-   const testContext = authRepoContext(repos)
-   const createCaller = createCallerFactory(userRouter)
-   const { login } = createCaller(testContext)
-
-   await expect(login(loginInput)).rejects.toThrow(unknownError)
- })
+it.skip('allows logging in with surrounding white space', async () => {
+  await expect(
+    login({
+      email: ` \t ${userSeed.email}\t `,
+      password: PASSWORD_CORRECT,
+    })
+  ).resolves.toEqual(expect.anything())
 })

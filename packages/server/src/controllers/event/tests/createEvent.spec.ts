@@ -1,13 +1,12 @@
 import type { EventRepository } from '@server/repositories/eventRepository'
 import { fakeEvent, fakeAuthUser } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
-import { authRepoContext } from '@tests/utils/context'
+import { authRepoContext } from '@server/utils/tests/context'
 import eventRouter from '..'
 
 describe('create', () => {
   const TEST_USER = fakeAuthUser({
     id: 1,
-    auth0Id: 'auth0|test123'
   })
 
   it('should create a new event', async () => {

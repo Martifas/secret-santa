@@ -6,7 +6,8 @@ import {
   type InvitationForMember,
 } from '@server/entities/eventInvitation'
 import { TRPCError } from '@trpc/server'
-import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
+
 
 export default authenticatedProcedure
   .use(

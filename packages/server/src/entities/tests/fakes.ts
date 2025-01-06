@@ -1,4 +1,4 @@
-import { random } from '@tests/utils/random'
+import { random } from '@server/utils/tests/random'
 import type { Insertable } from 'kysely'
 import type {
   Event,
@@ -99,7 +99,7 @@ export const fakeWishlist = <T extends Partial<Insertable<Wishlist>>>(
 export const fakeEventInvitation = <
   T extends Partial<Insertable<EventInvitations>>,
 >(
-  overrides: T ={} as T
+  overrides: T = {} as T
 ) =>
   ({
     email: random.email(),
@@ -122,11 +122,10 @@ export const fakeUser = <T extends Partial<Insertable<User>>>(
   overrides: T = {} as T
 ) =>
   ({
-    avatarUrl: random.url(),
     email: random.email(),
     firstName: random.first(),
     lastName: random.last(),
-    auth0Id: `auth0|${random.guid().replace(/-/g, '')}`,
+    password: 'Password.123!',
     ...overrides,
   }) satisfies Insertable<User>
 
@@ -134,7 +133,6 @@ export const fakeAuthUser = <T extends Partial<AuthUser>>(
   overrides: T = {} as T
 ): AuthUser => ({
   id: randomId(),
-  auth0Id: `auth0|${random.guid().replace(/-/g, '')}`,
   email: random.email(),
   ...overrides,
 })

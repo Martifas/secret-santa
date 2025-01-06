@@ -1,7 +1,7 @@
 import type { InvitationRepository } from '@server/repositories/invitationRepository'
 import { fakeEventInvitation, fakeAuthUser } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
-import { authRepoContext } from '@tests/utils/context'
+import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import invitationRouter from '..'
 

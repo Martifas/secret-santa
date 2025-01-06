@@ -17,6 +17,7 @@
   "description": "",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
+    "@types/bcrypt": "^5.0.2",
     "@types/chance": "^1.1.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
@@ -32,6 +33,7 @@
     "kysely-codegen": "^0.17.0",
     "prettier": "^3.4.2",
     "supertest": "^7.0.0",
+    "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
@@ -39,6 +41,7 @@
   "dependencies": {
     "@trpc/server": "^10.45.2",
     "@types/lodash-es": "^4.17.12",
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "express-oauth2-jwt-bearer": "^1.6.0",

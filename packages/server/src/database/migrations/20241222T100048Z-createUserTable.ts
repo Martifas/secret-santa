@@ -6,7 +6,7 @@ export async function up(db: Kysely<any>) {
     .addColumn('id', 'integer', (c) =>
       c.primaryKey().generatedAlwaysAsIdentity()
     )
-    .addColumn('auth0_id', 'text', (c) => c.unique().notNull())
+    .addColumn('password', 'text', (c) => c.notNull())
     .addColumn('email', 'text', (c) => c.unique().notNull())
     .addColumn('created_at', 'timestamptz', (column) =>
       column.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()

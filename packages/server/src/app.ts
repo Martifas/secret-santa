@@ -12,6 +12,7 @@ import config from './config'
 
 export default function createApp(db: Database) {
   const app = express()
+
   app.use(cors())
   app.use(express.json())
 
@@ -27,12 +28,13 @@ export default function createApp(db: Database) {
         req,
         res,
       }),
+
       router: appRouter,
     })
   )
 
   if (config.env === 'development') {
-    app.get('/api/v1/trpc-panel', (_, res) => { 
+    app.get('/api/v1/trpc-panel', (_, res) => {
       res.send(
         renderTrpcPanel(appRouter, {
           url: `http://localhost:${config.port}/api/v1/trpc`,

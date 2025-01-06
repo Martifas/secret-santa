@@ -1,7 +1,7 @@
-import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
 import provideRepos from '@server/trpc/provideRepos'
 import { type InvitationForMember } from '@server/entities/eventInvitation'
 import { invitationRepository } from '@server/repositories/invitationRepository'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
 export default authenticatedProcedure
   .use(
@@ -10,10 +10,10 @@ export default authenticatedProcedure
     })
   )
   .query(
-    async ({
-      ctx: { repos, authUser },
-    }): Promise<InvitationForMember[]> => {
-      const events = await repos.invitationRepository.findAllForUser(authUser.id)
+    async ({ ctx: { repos, authUser } }): Promise<InvitationForMember[]> => {
+      const events = await repos.invitationRepository.findAllForUser(
+        authUser.id
+      )
       return events
     }
   )

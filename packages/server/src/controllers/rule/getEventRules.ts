@@ -2,7 +2,7 @@ import provideRepos from '@server/trpc/provideRepos'
 import { eventRuleSchema, type RuleForMember } from '@server/entities/eventRule'
 import { ruleRepository } from '@server/repositories/ruleRepository'
 import { userEventRepository } from '@server/repositories/userEventRepository'
-import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import { TRPCError } from '@trpc/server'
 
 export default authenticatedProcedure

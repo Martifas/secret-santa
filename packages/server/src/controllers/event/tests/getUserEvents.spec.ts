@@ -1,7 +1,7 @@
 import type { EventRepository } from '@server/repositories/eventRepository'
 import { fakeEvent } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
-import { authRepoContext } from '@tests/utils/context'
+import { authRepoContext } from '@server/utils/tests/context'
 import eventRouter from '..'
 
 const repos = {

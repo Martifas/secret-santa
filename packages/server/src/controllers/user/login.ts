@@ -1,8 +1,14 @@
+import bcrypt from 'bcrypt'
 import { publicProcedure } from '@server/trpc/index'
 import provideRepos from '@server/trpc/provideRepos'
 import { userRepository } from '@server/repositories/userRepository'
-import { z } from 'zod'
-import { type UserForMember } from '@server/entities/user'
+import { userSchema } from '@server/entities/user'
+import { prepareTokenPayload } from '@server/trpc/tokenPayload'
+import { TRPCError } from '@trpc/server'
+import jsonwebtoken from 'jsonwebtoken'
+import config from '@server/config'
+
+const { expiresIn, tokenKey } = config.auth
 
 export default publicProcedure
   .use(
@@ -11,22 +17,37 @@ export default publicProcedure
     })
   )
   .input(
-    z.object({
-      auth0Id: z.string(),
-      email: z.string().email(),
+    userSchema.pick({
+      email: true,
+      password: true,
     })
   )
-  .mutation(async ({ input, ctx: { repos } }): Promise<UserForMember> => {
-    const existingUser = await repos.userRepository.findByAuth0Id(input.auth0Id)
-    
-    if (existingUser) {
-      return repos.userRepository.updateLastLogin(existingUser.id)
+  .mutation(async ({ input: { email, password }, ctx: { repos } }) => {
+    const user = await repos.userRepository.findByEmail(email)
+
+    if (!user) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'We could not find an account with this email address',
+      })
     }
 
-    return repos.userRepository.create({
-      auth0Id: input.auth0Id,
-      email: input.email,
-      createdAt: new Date(),
-      lastLogin: new Date(),
+    const passwordMatch = await bcrypt.compare(password, user.password)
+
+    if (!passwordMatch) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'Incorrect password. Please try again.',
+      })
+    }
+
+    const payload = prepareTokenPayload(user)
+
+    const accessToken = jsonwebtoken.sign(payload, tokenKey, {
+      expiresIn,
     })
+
+    return {
+      accessToken,
+    }
   })

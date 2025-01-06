@@ -1,7 +1,7 @@
 import { eventSchema, type EventForMember } from '@server/entities/event'
 import provideRepos from '@server/trpc/provideRepos'
 import { eventRepository } from '@server/repositories/eventRepository'
-import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
 export default authenticatedProcedure
   .use(
@@ -22,6 +22,7 @@ export default authenticatedProcedure
       const event = await repos.eventRepository.create({
         ...input,
         createdBy: authUser.id,
+        eventDate: input.eventDate,
       })
       return event
     }

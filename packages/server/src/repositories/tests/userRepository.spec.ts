@@ -1,6 +1,6 @@
-import { createTestDatabase } from '@tests/utils/database'
-import { wrapInRollbacks } from '@tests/utils/transactions'
-import { insertAll } from '@tests/utils/record'
+import { createTestDatabase } from '@server/utils/tests/database'
+import { wrapInRollbacks } from '@server/utils/tests/transactions'
+import { insertAll } from '@server/utils/tests/record'
 import { fakeUser } from '@server/entities/tests/fakes'
 import { pick } from 'lodash-es'
 import { userKeysForTesting } from '@server/entities/user'
@@ -30,8 +30,8 @@ describe('find', () => {
     expect(foundUser).toBeNull()
   })
 
-  it('should find user by auth0Id', async () => {
-    const foundUser = await repository.findByAuth0Id(userOne.auth0Id)
+  it('should find user by id', async () => {
+    const foundUser = await repository.findById(userOne.id)
     expect(foundUser).not.toBeNull()
     if (!foundUser) throw new Error('No user found')
     expect(pick(foundUser, userKeysForTesting)).toEqual(
@@ -39,8 +39,8 @@ describe('find', () => {
     )
   })
 
-  it('should return null for non-existent auth0Id', async () => {
-    const foundUser = await repository.findByAuth0Id('auth0|nonexistent')
+  it('should return null for non-existent id', async () => {
+    const foundUser = await repository.findById(999999)
     expect(foundUser).toBeNull()
   })
 
@@ -67,89 +67,47 @@ describe('create', () => {
   })
 })
 
-describe('findOrCreateFromAuth0', () => {
-  const auth0Id = 'auth0|test123'
-  const email = 'test@example.com'
-  const profile = {
-    firstName: 'John',
-    lastName: 'Doe',
-    avatarUrl: 'https://example.com/avatar.jpg'
-  }
-
-  it('should create new user from Auth0 data', async () => {
-    const user = await repository.findOrCreateFromAuth0(auth0Id, email, profile)
-    
-    expect(user).toMatchObject({
-      auth0Id,
-      email,
-      ...profile,
-      id: expect.any(Number),
-      createdAt: expect.any(Date),
-      lastLogin: expect.any(Date),
-    })
-  })
-
-  it('should return existing user and update lastLogin', async () => {
- 
-    const createdUser = await repository.findOrCreateFromAuth0(auth0Id, email, profile)
-  
-    await new Promise(resolve => {setTimeout(resolve, 1000)})
-    
- 
-    const foundUser = await repository.findOrCreateFromAuth0(auth0Id, email)
-    
-    expect(foundUser.id).toBe(createdUser.id)
-    expect(foundUser.lastLogin.getTime()).toBeGreaterThan(createdUser.lastLogin.getTime())
-  })
-
-  it('should update profile when finding existing user', async () => {
-    await repository.findOrCreateFromAuth0(auth0Id, email, profile)
-     
-    const newProfile = {
-      firstName: 'Jane',
-      lastName: 'Smith',
-      avatarUrl: 'https://example.com/new-avatar.jpg'
-    }
-    
-    const updatedUser = await repository.findOrCreateFromAuth0(auth0Id, email, newProfile)
-    
-    expect(updatedUser).toMatchObject({
-      ...newProfile,
-      auth0Id,
-      email,
-    })
-  })
-})
-
 describe('updateProfile', () => {
   it('should update user profile', async () => {
     const updates = {
       firstName: 'Updated',
       lastName: 'Name',
-      avatarUrl: 'https://example.com/new.jpg'
+      avatarUrl: 'https://example.com/new.jpg',
     }
 
     const updatedUser = await repository.updateProfile(userOne.id, updates)
-    
+
     expect(updatedUser).toMatchObject({
       ...updates,
       id: userOne.id,
       email: userOne.email,
-      auth0Id: userOne.auth0Id,
+    })
+  })
+
+  it('should update user email', async () => {
+    const updates = {
+      email: 'test@email.com',
+    }
+
+    const updatedUser = await repository.updateEmail(userOne.id, updates)
+
+    expect(updatedUser).toMatchObject({
+      ...userOne,
+      ...updates,
     })
   })
 
   it('should allow partial updates', async () => {
     const updates = {
-      firstName: 'Partial'
+      firstName: 'Partial',
     }
 
     const updatedUser = await repository.updateProfile(userOne.id, updates)
-    
+
     expect(updatedUser).toMatchObject({
       ...updates,
       id: userOne.id,
-      lastName: userOne.lastName, 
+      lastName: userOne.lastName,
       avatarUrl: userOne.avatarUrl,
     })
   })

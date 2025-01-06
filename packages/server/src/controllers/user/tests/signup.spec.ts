@@ -1,138 +1,86 @@
-import type { UserRepository } from '@server/repositories/userRepository'
 import { createCallerFactory } from '@server/trpc'
-import { authRepoContext } from '@tests/utils/context'
-import { TRPCError } from '@trpc/server'
-import type { UserForMember } from '@server/entities/user'
+import { createTestDatabase } from '@server/utils/tests/database'
+import { wrapInRollbacks } from '@server/utils/tests/transactions'
+import { fakeUser } from '@server/entities/tests/fakes'
+import { selectAll } from '@server/utils/tests/record'
 import userRouter from '..'
 
-describe('signup', () => {
-  const newUserInput = {
-    email: 'new@example.com',
-    auth0Id: 'auth0|new123',
-    firstName: 'John',
-    lastName: 'Doe',
-    avatarUrl: 'https://example.com/avatar.jpg',
-  }
+const db = await wrapInRollbacks(createTestDatabase())
+const createCaller = createCallerFactory(userRouter)
+const { signup } = createCaller({ db })
 
-  const createdUser: UserForMember = {
-    id: 1,
-    email: newUserInput.email,
-    auth0Id: newUserInput.auth0Id,
-    firstName: newUserInput.firstName,
-    lastName: newUserInput.lastName,
-    avatarUrl: newUserInput.avatarUrl,
-    createdAt: new Date(),
-    lastLogin: new Date(),
-  }
+it('should save a user', async () => {
+  const user = fakeUser()
+  const response = await signup(user)
 
-  it('should create a new user when email is not in use', async () => {
-    const repos = {
-      userRepository: {
-        create: async (input): Promise<UserForMember> => {
-          expect(input).toMatchObject(newUserInput)
-          return createdUser
-        },
-        findByEmail: async () => null,
-      } satisfies Partial<UserRepository>,
-    }
+  const [userCreated] = await selectAll(db, 'user', (eb) =>
+    eb('email', '=', user.email)
+  )
 
-    const testContext = authRepoContext(repos)
-    const createCaller = createCallerFactory(userRouter)
-    const { signup } = createCaller(testContext)
-
-    const result = await signup(newUserInput)
-
-    expect(result).toMatchObject({
-      id: expect.any(Number),
-      email: newUserInput.email,
-      auth0Id: newUserInput.auth0Id,
-      firstName: newUserInput.firstName,
-      lastName: newUserInput.lastName,
-      avatarUrl: newUserInput.avatarUrl,
-      createdAt: expect.any(Date),
-      lastLogin: expect.any(Date),
-    })
+  expect(userCreated).toMatchObject({
+    id: expect.any(Number),
+    ...user,
+    password: expect.not.stringContaining(user.password),
   })
 
-  it('should allow partial input with only required fields', async () => {
-    const minimalInput = {
-      email: 'minimal@example.com',
-      auth0Id: 'auth0|minimal123',
-    }
+  expect(userCreated.password).toHaveLength(60)
 
-    const minimalCreatedUser: UserForMember = {
-      id: 2,
-      email: minimalInput.email,
-      auth0Id: minimalInput.auth0Id,
-      firstName: null,
-      lastName: null,
-      avatarUrl: null,
-      createdAt: new Date(),
-      lastLogin: new Date(),
-    }
-
-    const repos = {
-      userRepository: {
-        create: async (): Promise<UserForMember> => minimalCreatedUser,
-        findByEmail: async () => null,
-      } satisfies Partial<UserRepository>,
-    }
-
-    const testContext = authRepoContext(repos)
-    const createCaller = createCallerFactory(userRouter)
-    const { signup } = createCaller(testContext)
-
-    const result = await signup(minimalInput)
-
-    expect(result).toMatchObject({
-      id: expect.any(Number),
-      email: minimalInput.email,
-      auth0Id: minimalInput.auth0Id,
-      firstName: null,
-      lastName: null,
-      avatarUrl: null,
-      createdAt: expect.any(Date),
-      lastLogin: expect.any(Date),
-    })
+  expect(response).toEqual({
+    id: userCreated.id,
   })
+})
 
-  it('should throw BAD_REQUEST when email is already in use', async () => {
-    const repos = {
-      userRepository: {
-        create: async (): Promise<UserForMember> => {
-          throw new Error('Should not be called')
-        },
-        findByEmail: async () => createdUser,
-      } satisfies Partial<UserRepository>,
-    }
-
-    const testContext = authRepoContext(repos)
-    const createCaller = createCallerFactory(userRouter)
-    const { signup } = createCaller(testContext)
-
-    await expect(signup(newUserInput)).rejects.toThrow(
-      new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'User with this email already exists',
+it('should require a valid email', async () => {
+  await expect(
+    signup(
+      fakeUser({
+        email: 'user-email-invalid',
       })
     )
+  ).rejects.toThrow(/email/i)
+})
+
+it('should require a password with at least 8 characters', async () => {
+  await expect(
+    signup(
+      fakeUser({
+        password: 'pas.123',
+      })
+    )
+  ).rejects.toThrow(/password/i)
+})
+
+it('throws an error for invalid email', async () => {
+  await expect(
+    signup(
+      fakeUser({
+        email: 'not-an-email',
+      })
+    )
+  ).rejects.toThrow(/email/)
+})
+
+it('stores lowercased email', async () => {
+  const user = fakeUser()
+
+  await signup({
+    ...user,
+    email: user.email.toUpperCase(),
   })
 
-  it('should propagate unknown errors', async () => {
-    const unknownError = new Error('Database connection failed')
-    const repos = {
-      userRepository: {
-        create: async (): Promise<UserForMember> => {
-          throw unknownError
-        },
-        findByEmail: async () => null,
-      } satisfies Partial<UserRepository>,
-    }
+  const userSaved = await selectAll(db, 'user', (eb) =>
+    eb('email', '=', user.email)
+  )
 
-    const testContext = authRepoContext(repos)
-    const createCaller = createCallerFactory(userRouter)
-    const { signup } = createCaller(testContext)
+  expect(userSaved).toHaveLength(1)
+})
 
-    await expect(signup(newUserInput)).rejects.toThrow(unknownError)
-  })
+it('throws an error for duplicate email', async () => {
+  const email = 'duplicate@example.com'
+
+  await signup(fakeUser({ email }))
+
+  await expect(signup(fakeUser({ email }))).rejects.toThrow(
+    /email already exists/i
+  )
 })

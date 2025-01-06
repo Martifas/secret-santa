@@ -2,7 +2,7 @@ import type { WishlistRepository } from '@server/repositories/wishlistRepository
 import type { UserEventRepository } from '@server/repositories/userEventRepository'
 import { fakeAuthUser, fakeWishlist } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
-import { authRepoContext } from '@tests/utils/context'
+import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import wishlistRouter from '..'
 

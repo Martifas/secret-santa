@@ -1,7 +1,7 @@
 import provideRepos from '@server/trpc/provideRepos'
 import { wishlistRepository } from '@server/repositories/wishlistRepository'
 import { wishlistSchema, type WishlistForMember } from '@server/entities/wishlist'
-import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import { TRPCError } from '@trpc/server'
 
 export default authenticatedProcedure

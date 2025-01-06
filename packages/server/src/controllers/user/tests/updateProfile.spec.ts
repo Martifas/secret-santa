@@ -1,7 +1,7 @@
 import { fakeAuthUser } from '@server/entities/tests/fakes'
 import type { UserRepository } from '@server/repositories/userRepository'
 import { createCallerFactory } from '@server/trpc'
-import { authRepoContext } from '@tests/utils/context'
+import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import type { UserForMember } from '@server/entities/user'
 import userRouter from '..'
@@ -9,12 +9,12 @@ import userRouter from '..'
 describe('updateProfile', () => {
   const TEST_USER = fakeAuthUser({
     id: 1,
-    auth0Id: 'auth0|test123',
+    password: 'Password123',
   })
 
   const existingUser: UserForMember = {
     id: TEST_USER.id,
-    auth0Id: TEST_USER.auth0Id,
+    password: 'Password147',
     email: 'test@example.com',
     firstName: 'Old First',
     lastName: 'Old Last',
@@ -37,7 +37,7 @@ describe('updateProfile', () => {
 
     const repos = {
       userRepository: {
-        findByAuth0Id: async () => existingUser,
+        findById: async () => existingUser,
         updateProfile: async (id, updates) => {
           expect(id).toBe(existingUser.id)
           expect(updates).toEqual(updateInput)
@@ -67,7 +67,7 @@ describe('updateProfile', () => {
 
     const repos = {
       userRepository: {
-        findByAuth0Id: async () => existingUser,
+        findById: async () => existingUser,
         updateProfile: async (id, updates) => {
           expect(updates).toEqual(partialUpdate)
           return partiallyUpdatedUser
@@ -87,7 +87,7 @@ describe('updateProfile', () => {
   it('should throw NOT_FOUND when user does not exist', async () => {
     const repos = {
       userRepository: {
-        findByAuth0Id: async () => null,
+        findById: async () => null,
         updateProfile: async () => {
           throw new Error('Should not be called')
         },
@@ -110,7 +110,7 @@ describe('updateProfile', () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
       userRepository: {
-        findByAuth0Id: async () => {
+        findById: async () => {
           throw unknownError
         },
       } satisfies Partial<UserRepository>,
@@ -127,7 +127,7 @@ describe('updateProfile', () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
       userRepository: {
-        findByAuth0Id: async () => existingUser,
+        findById: async () => existingUser,
         updateProfile: async () => {
           throw unknownError
         },

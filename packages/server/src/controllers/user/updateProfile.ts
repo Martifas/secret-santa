@@ -1,8 +1,8 @@
-import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
 import provideRepos from '@server/trpc/provideRepos'
 import { userRepository } from '@server/repositories/userRepository'
 import { userSchema, type UserForMember } from '@server/entities/user'
 import { TRPCError } from '@trpc/server'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
 export default authenticatedProcedure
   .use(
@@ -11,18 +11,17 @@ export default authenticatedProcedure
     })
   )
   .input(
-    userSchema.pick({
-      firstName: true,
-      lastName: true,
-      avatarUrl: true,
-    }).partial()
+    userSchema
+      .pick({
+        firstName: true,
+        lastName: true,
+        avatarUrl: true,
+      })
+      .partial()
   )
   .mutation(
-    async ({
-      input,
-      ctx: { repos, authUser },
-    }): Promise<UserForMember> => {
-      const user = await repos.userRepository.findByAuth0Id(authUser.auth0Id)
+    async ({ input, ctx: { repos, authUser } }): Promise<UserForMember> => {
+      const user = await repos.userRepository.findById(authUser.id)
       if (!user) {
         throw new TRPCError({
           code: 'NOT_FOUND',

@@ -4,9 +4,9 @@ import {
   fakeUserEvent,
   fakeWishlist,
 } from '@server/entities/tests/fakes'
-import { createTestDatabase } from '@tests/utils/database'
-import { insertAll, selectAll } from '@tests/utils/record'
-import { wrapInRollbacks } from '@tests/utils/transactions'
+import { createTestDatabase } from '@server/utils/tests/database'
+import { insertAll, selectAll } from '@server/utils/tests/record'
+import { wrapInRollbacks } from '@server/utils/tests/transactions'
 import { pick } from 'lodash-es'
 import { userEventKeysForTesting } from '../../entities/userEvent'
 import { userEventRepository } from '../userEventRepository'

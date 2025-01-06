@@ -4,8 +4,8 @@ import {
   eventInvitationSchema,
   type InvitationForMember,
 } from '@server/entities/eventInvitation'
-import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
 import { TRPCError } from '@trpc/server'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
 export default authenticatedProcedure
   .use(
@@ -35,7 +35,7 @@ export default authenticatedProcedure
       ctx: { repos, authUser },
     }): Promise<InvitationForMember> => {
       const existingInvitation = await repos.invitationRepository.findById(id)
-      
+
       if (!existingInvitation) {
         throw new TRPCError({
           code: 'NOT_FOUND',

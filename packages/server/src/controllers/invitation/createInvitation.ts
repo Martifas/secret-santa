@@ -1,8 +1,11 @@
-import { authenticatedProcedure } from '@server/auth/aunthenticatedProcedure'
 import provideRepos from '@server/trpc/provideRepos'
-import { eventInvitationSchema, type InvitationForMember } from '@server/entities/eventInvitation'
+import {
+  eventInvitationSchema,
+  type InvitationForMember,
+} from '@server/entities/eventInvitation'
 import { invitationRepository } from '@server/repositories/invitationRepository'
 import { TRPCError } from '@trpc/server'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
 export default authenticatedProcedure
   .use(

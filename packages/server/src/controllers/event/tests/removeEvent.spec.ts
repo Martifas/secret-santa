@@ -1,7 +1,7 @@
 import type { EventRepository } from '@server/repositories/eventRepository'
 import { fakeEvent, fakeAuthUser } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
-import { authRepoContext } from '@tests/utils/context'
+import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import eventRouter from '..'
 
