@@ -63,21 +63,3 @@ it('throws an error for a short password', async () => {
     })
   ).rejects.toThrow(/password/)
 })
-
-it.skip('allows logging in with different email case', async () => {
-  await expect(
-    login({
-      email: userSeed.email.toUpperCase(),
-      password: PASSWORD_CORRECT,
-    })
-  ).resolves.toEqual(expect.anything())
-})
-
-it.skip('allows logging in with surrounding white space', async () => {
-  await expect(
-    login({
-      email: ` \t ${userSeed.email}\t `,
-      password: PASSWORD_CORRECT,
-    })
-  ).resolves.toEqual(expect.anything())
-})
