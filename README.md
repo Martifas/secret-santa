@@ -41,11 +41,9 @@ DATABASE_URL= # PostgreSQL connection string (e.g., postgresql://user:password@l
 
 ## Auth0 Configuration
 ```bash
-AUTH0_DOMAIN= # Your Auth0 domain (e.g., dev-xyz.auth0.com)
-AUTH0_ISSUER_BASE_URL= # Auth0 issuer base URL (e.g., https://dev-xyz.auth0.com/)
-AUTH0_CLIENT_ID= # Your Auth0 application client ID
-AUTH0_CLIENT_SECRET= # Your Auth0 application client secret
-AUTH0_AUDIENCE= # API identifier in Auth0
+TOKEN_EXPIRES_IN=  #default 7 days
+NODE_ENV= #default 'development'
+TOKEN_KEY= #create secure one with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
 ## Server Configuration
