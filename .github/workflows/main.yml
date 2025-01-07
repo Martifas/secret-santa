@@ -4,9 +4,9 @@ on: push
 
 jobs:
   test:
-    runs-on: ubuntu-22.latest
+    runs-on: ubuntu-latest
     env:
-      DATABASE_URL: postgres://test:testg@localhost:5432/testdb
+      DATABASE_URL: postgres://test:test@localhost:5432/testdb
     services:
       postgres:
         image: postgres:16.1-alpine
