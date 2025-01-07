@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">97.77% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>44/44</span>
+                <span class='fraction'>44/45</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>3/4</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">97.77% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>44/44</span>
+                <span class='fraction'>44/45</span>
             </div>
         
             
@@ -109,7 +109,15 @@
 <a name='L44'></a><a href='#L44'>44</a>
 <a name='L45'></a><a href='#L45'>45</a>
 <a name='L46'></a><a href='#L46'>46</a>
-<a name='L47'></a><a href='#L47'>47</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -130,36 +138,41 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import { publicProcedure } from '@server/trpc/index'
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { publicProcedure } from '@server/trpc/index'
 import provideRepos from '@server/trpc/provideRepos'
 import { userRepository } from '@server/repositories/userRepository'
-import { userSchema, type UserForMember } from '@server/entities/user'
+import { userSchema } from '@server/entities/user'
 import { TRPCError } from '@trpc/server'
+import { hash } from 'bcrypt'
+import config from '@server/config'
+import { assertError } from '@server/utils/errors'
 &nbsp;
 export default publicProcedure
   .use(
@@ -170,45 +183,47 @@ export default publicProcedure
   .input(
     userSchema.pick({
       email: true,
+      password: true,
       firstName: true,
       lastName: true,
-      auth0Id: true,
-      avatarUrl: true,
-    }).partial({
-      firstName: true,
-      lastName: true,
-      avatarUrl: true,
     })
   )
-  .mutation(
-    async ({
-      input,
-      ctx: { repos },
-    }): Promise&lt;UserForMember&gt; =&gt; {
-      const existingUser = await repos.userRepository.findByEmail(input.email)
-      if (existingUser) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'User with this email already exists',
-        })
-      }
+  .mutation(async ({ input: user, ctx: { repos } }) =&gt; {
+    const passwordHash = await hash(user.password, config.auth.passwordCost)
 &nbsp;
-      const user = await repos.userRepository.create({
-        ...input,
-        createdAt: new Date(),
-        lastLogin: new Date(),
+    const userCreated = await repos.userRepository
+      .create({
+        ...user,
+        email: user.email.toLowerCase(),
+        password: passwordHash,
       })
 &nbsp;
-      return user
+      .catch((error: unknown) =&gt; {
+        assertError(error)
+&nbsp;
+        if (error.message.includes('duplicate key')) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'User with this email already exists',
+            cause: error,
+          })
+<span class="branch-0 cbranch-no" title="branch not covered" >        }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        throw error</span>
+      })
+&nbsp;
+    return {
+      id: userCreated.id,
     }
-  )</pre></td></tr></table></pre>
+  })
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-02T13:01:50.295Z
+                at 2025-01-06T22:12:07.555Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
