@@ -7,17 +7,17 @@ import eventRouter from '..'
 const repos = {
   eventRepository: {
     find: async (id: number) => ({
-        ...fakeEvent({
-          id,
-          name: 'Christmas Party',
-          description: 'Annual office party',
-          budgetLimit: 50,
-          status: 'draft',
-          eventDate: new Date('2024-12-25'),
-        }),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })
+      ...fakeEvent({
+        id,
+        name: 'Christmas Party',
+        description: 'Annual office party',
+        budgetLimit: 50,
+        status: 'draft',
+        eventDate: new Date('2024-12-25'),
+      }),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }),
   } satisfies Partial<EventRepository>,
 }
 
@@ -26,7 +26,6 @@ const { getEvent } = createCaller(authRepoContext(repos))
 
 describe('find', () => {
   it('should return an event', async () => {
-
     const id = 1
 
     const eventFound = await getEvent({ id })
@@ -39,7 +38,7 @@ describe('find', () => {
       status: 'draft',
       eventDate: expect.any(Date),
       createdAt: expect.any(Date),
-      updatedAt: expect.any(Date)
+      updatedAt: expect.any(Date),
     })
   })
 })

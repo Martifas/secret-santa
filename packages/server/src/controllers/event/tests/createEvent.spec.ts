@@ -20,7 +20,7 @@ describe('create', () => {
 
     const expectedEventData = {
       ...newEventInput,
-      createdBy: TEST_USER.id
+      createdBy: TEST_USER.id,
     }
 
     const createdEvent = {

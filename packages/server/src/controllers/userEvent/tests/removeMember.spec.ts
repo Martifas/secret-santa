@@ -139,7 +139,9 @@ describe('remove', () => {
     const createCaller = createCallerFactory(userEventRouter)
     const { removeMember } = createCaller(testContext)
 
-    await expect(removeMember({ id: userEventId })).rejects.toThrow(unknownError)
+    await expect(removeMember({ id: userEventId })).rejects.toThrow(
+      unknownError
+    )
   })
 
   it('should propagate unknown errors from isEventAdmin', async () => {
@@ -160,7 +162,9 @@ describe('remove', () => {
     const createCaller = createCallerFactory(userEventRouter)
     const { removeMember } = createCaller(testContext)
 
-    await expect(removeMember({ id: userEventId })).rejects.toThrow(unknownError)
+    await expect(removeMember({ id: userEventId })).rejects.toThrow(
+      unknownError
+    )
   })
 
   it('should propagate unknown errors from remove', async () => {
@@ -179,6 +183,8 @@ describe('remove', () => {
     const createCaller = createCallerFactory(userEventRouter)
     const { removeMember } = createCaller(testContext)
 
-    await expect(removeMember({ id: userEventId })).rejects.toThrow(unknownError)
+    await expect(removeMember({ id: userEventId })).rejects.toThrow(
+      unknownError
+    )
   })
 })

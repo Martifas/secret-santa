@@ -17,7 +17,9 @@ export const wishlistSchema = z.object({
   updatedAt: z.date(),
 })
 
-export const wishlistKeys = Object.keys(wishlistSchema.shape) as (keyof Wishlist)[]
+export const wishlistKeys = Object.keys(
+  wishlistSchema.shape
+) as (keyof Wishlist)[]
 
 export type WishlistForMember = Pick<
   Selectable<Wishlist>,

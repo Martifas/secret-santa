@@ -6,7 +6,6 @@ import getInvitation from './getInvitation'
 import checkInvitation from './checkInvitation'
 import deleteInvitation from './deleteInvitation'
 
-
 export default router({
   createInvitation,
   deleteInvitation,

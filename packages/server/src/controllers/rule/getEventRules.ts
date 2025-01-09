@@ -18,10 +18,7 @@ export default authenticatedProcedure
     })
   )
   .query(
-    async ({
-      input,
-      ctx: { repos, authUser },
-    }): Promise<RuleForMember[]> => {
+    async ({ input, ctx: { repos, authUser } }): Promise<RuleForMember[]> => {
       const isEventAdmin = await repos.userEventRepository.isEventAdmin(
         authUser.id,
         input.eventId

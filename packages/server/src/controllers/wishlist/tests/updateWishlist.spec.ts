@@ -114,7 +114,7 @@ describe('update', () => {
   it('should propagate unknown errors', async () => {
     const updates = { price: 140 }
     const unknownError = new Error('Database connection failed')
-    
+
     const repos = {
       wishlistRepository: {
         findById: async () => baseWishlist,
@@ -128,6 +128,8 @@ describe('update', () => {
     const createCaller = createCallerFactory(wishlistRouter)
     const { updateWishlist } = createCaller(testContext)
 
-    await expect(updateWishlist({ id, ...updates })).rejects.toThrow(unknownError)
+    await expect(updateWishlist({ id, ...updates })).rejects.toThrow(
+      unknownError
+    )
   })
 })

@@ -15,17 +15,18 @@ export const eventInvitationSchema = z.object({
   updatedAt: z.date(),
 })
 
-export const invitationKeysForMembers = Object.keys(eventInvitationSchema.shape) as (keyof EventInvitations)[]
+export const invitationKeysForMembers = Object.keys(
+  eventInvitationSchema.shape
+) as (keyof EventInvitations)[]
 
 export type InvitationForMember = Pick<
   Selectable<EventInvitations>,
-  (typeof invitationKeysForMembers )[number]
+  (typeof invitationKeysForMembers)[number]
 >
 
 export const invitationKeysForTesting = [
   'email',
   'token',
   'status',
-  'expiresAt'
+  'expiresAt',
 ] as const
-

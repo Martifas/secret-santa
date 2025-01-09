@@ -11,12 +11,12 @@ describe('findByEventId', () => {
     id: 1,
     auth0Id: 'auth0|test123',
   })
-  
+
   const eventId = 100
   const queryInput = {
     eventId,
   }
-  
+
   const existingRules = [
     {
       id: 1,

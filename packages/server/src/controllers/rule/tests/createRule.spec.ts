@@ -11,14 +11,14 @@ describe('create', () => {
     id: 1,
     auth0Id: 'auth0|test123',
   })
-  
+
   const eventId = 100
   const newRuleInput = {
     eventId,
     ruleType: 'testRule',
     ruleData: { someConfig: 'value' },
   }
-  
+
   const createdRule = {
     id: 1,
     ...newRuleInput,

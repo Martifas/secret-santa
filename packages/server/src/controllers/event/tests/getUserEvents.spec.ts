@@ -40,9 +40,7 @@ const { getUserEvents } = createCaller(authRepoContext(repos))
 
 describe('findAll', () => {
   it('should return all events', async () => {
- 
     const events = await getUserEvents()
-
 
     expect(events).toHaveLength(2)
     expect(events).toMatchObject([

@@ -1,0 +1,1 @@
+{"version":3,"file":"20241222T160006Z-createEventInvitationTable.d.ts","sourceRoot":"","sources":["../../../src/database/migrations/20241222T160006Z-createEventInvitationTable.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,MAAM,EAAO,MAAM,QAAQ,CAAA;AAEzC,wBAAsB,EAAE,CAAC,EAAE,EAAE,MAAM,CAAC,GAAG,CAAC,iBAmBvC;AAED,wBAAsB,IAAI,CAAC,EAAE,EAAE,MAAM,CAAC,GAAG,CAAC,iBAEzC"}

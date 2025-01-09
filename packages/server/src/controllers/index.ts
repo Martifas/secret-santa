@@ -12,7 +12,7 @@ export const appRouter = router({
   rule,
   user,
   userEvent,
-  invitation
+  invitation,
 })
 
 export type AppRouter = typeof appRouter

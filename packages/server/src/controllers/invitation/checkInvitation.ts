@@ -8,7 +8,6 @@ import {
 import { TRPCError } from '@trpc/server'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
-
 export default authenticatedProcedure
   .use(
     provideRepos({

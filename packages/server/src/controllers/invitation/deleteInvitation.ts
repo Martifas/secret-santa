@@ -24,7 +24,7 @@ export default authenticatedProcedure
       ctx: { repos, authUser },
     }): Promise<InvitationForMember> => {
       const existingInvitation = await repos.invitationRepository.findById(id)
-      
+
       if (!existingInvitation) {
         throw new TRPCError({
           code: 'NOT_FOUND',

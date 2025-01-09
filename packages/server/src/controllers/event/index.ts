@@ -5,11 +5,10 @@ import updateEvent from './updateEvent'
 import removeEvent from './removeEvent'
 import getUserEvents from './getUserEvents'
 
-
 export default router({
- getEvent,
- createEvent,
- updateEvent,
- removeEvent,
- getUserEvents,
+  getEvent,
+  createEvent,
+  updateEvent,
+  removeEvent,
+  getUserEvents,
 })

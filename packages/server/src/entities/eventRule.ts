@@ -3,7 +3,6 @@ import type { EventRule, JsonValue } from '@server/database/types'
 import type { Selectable } from 'kysely'
 import { idSchema } from './shared'
 
-
 export const eventRuleSchema = z.object({
   id: idSchema,
   eventId: idSchema,
@@ -20,7 +19,4 @@ export type RuleForMember = Pick<
   (typeof ruleKeysForMembers)[number]
 >
 
-export const ruleKeysForTesting = [
-  'ruleData',
-  'ruleType',
-] as const
+export const ruleKeysForTesting = ['ruleData', 'ruleType'] as const

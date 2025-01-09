@@ -1,9 +1,7 @@
-import provideRepos from "@server/trpc/provideRepos"
+import provideRepos from '@server/trpc/provideRepos'
 import { eventRepository } from '@server/repositories/eventRepository'
-import type { EventRowSelect } from "@server/types/event"
-import { authenticatedProcedure } from "@server/trpc/authenticatedProcedure"
-
-
+import type { EventRowSelect } from '@server/types/event'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
 export default authenticatedProcedure
   .use(
@@ -11,11 +9,7 @@ export default authenticatedProcedure
       eventRepository,
     })
   )
-  .query(
-    async ({
-      ctx: { repos, authUser },
-    }): Promise<EventRowSelect[]> => {
-      const events = await repos.eventRepository.findAllForUser(authUser.id)
-      return events
-    }
-  )
+  .query(async ({ ctx: { repos, authUser } }): Promise<EventRowSelect[]> => {
+    const events = await repos.eventRepository.findAllForUser(authUser.id)
+    return events
+  })

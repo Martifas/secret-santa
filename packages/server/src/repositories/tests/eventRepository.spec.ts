@@ -119,7 +119,6 @@ describe('remove', () => {
   })
 })
 
-
 describe('findAllForUser', () => {
   it('should return events created by user', async () => {
     const events = await repository.findAllForUser(userOne.id)

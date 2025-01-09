@@ -22,6 +22,10 @@ function getUserFromToken(token: string) {
 }
 
 export const authenticatedProcedure = publicProcedure.use(({ ctx, next }) => {
+  // ctx.repos?.userEventRepository?.isEventAdmin(eventId: number, userId: number) {
+
+  // } use this instead of checking eventAdmin everytime
+
   if (ctx.authUser) {
     return next({
       ctx: {

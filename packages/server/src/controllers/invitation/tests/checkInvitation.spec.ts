@@ -46,9 +46,9 @@ describe('findByEventAndUserId', () => {
     const createCaller = createCallerFactory(invitationRouter)
     const { checkInvitation } = createCaller(testContext)
 
-    const result = await checkInvitation({ 
-      eventId, 
-      userId: targetUserId 
+    const result = await checkInvitation({
+      eventId,
+      userId: targetUserId,
     })
 
     expect(result).toMatchObject({
@@ -78,9 +78,9 @@ describe('findByEventAndUserId', () => {
     const createCaller = createCallerFactory(invitationRouter)
     const { checkInvitation } = createCaller(testContext)
 
-    const result = await checkInvitation({ 
-      eventId, 
-      userId: targetUserId 
+    const result = await checkInvitation({
+      eventId,
+      userId: targetUserId,
     })
 
     expect(result).toBeNull()

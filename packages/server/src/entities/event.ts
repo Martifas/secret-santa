@@ -8,8 +8,8 @@ export const eventSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   createdBy: idSchema,
-  // eventDate: z.string().transform(str => new Date(str)) for trpc panel
   eventDate: z.date(),
+  // eventDate: z.string().transform((str) => new Date(str)),
   budgetLimit: z.number().int().positive(),
   status: z.string().min(1),
   createdAt: z.date(),

@@ -15,14 +15,11 @@ export default authenticatedProcedure
   .input(
     eventRuleSchema.pick({
       id: true,
-      eventId: true
+      eventId: true,
     })
   )
   .mutation(
-    async ({
-      input,
-      ctx: { repos, authUser },
-    }): Promise<RuleForMember> => {
+    async ({ input, ctx: { repos, authUser } }): Promise<RuleForMember> => {
       const isEventAdmin = await repos.userEventRepository.isEventAdmin(
         authUser.id,
         input.eventId

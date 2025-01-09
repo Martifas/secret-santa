@@ -23,6 +23,4 @@ export type UserEventForMember = Pick<
   (typeof userEventKeysForMembers)[number]
 >
 
-export const userEventKeysForTesting = [
-  'role'
-] as const
+export const userEventKeysForTesting = ['role'] as const

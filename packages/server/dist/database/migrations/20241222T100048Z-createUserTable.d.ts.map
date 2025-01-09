@@ -1,0 +1,1 @@
+{"version":3,"file":"20241222T100048Z-createUserTable.d.ts","sourceRoot":"","sources":["../../../src/database/migrations/20241222T100048Z-createUserTable.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,MAAM,EAAO,MAAM,QAAQ,CAAA;AAEzC,wBAAsB,EAAE,CAAC,EAAE,EAAE,MAAM,CAAC,GAAG,CAAC,iBAkBvC;AAED,wBAAsB,IAAI,CAAC,EAAE,EAAE,MAAM,CAAC,GAAG,CAAC,iBAEzC"}

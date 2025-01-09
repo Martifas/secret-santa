@@ -11,10 +11,10 @@ describe('update', () => {
     id: 1,
     auth0Id: 'auth0|test123',
   })
-  
+
   const ruleId = 1
   const eventId = 100
-  
+
   const updatedRule = {
     id: ruleId,
     eventId,

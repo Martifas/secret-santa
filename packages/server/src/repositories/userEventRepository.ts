@@ -56,7 +56,7 @@ export function userEventRepository(db: Database) {
       return result !== undefined
     },
 
-    async isMember(eventId: number, userId: number,): Promise<boolean> {
+    async isMember(eventId: number, userId: number): Promise<boolean> {
       const result = await db
         .selectFrom('userEvent')
         .select('id')

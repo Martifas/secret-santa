@@ -48,9 +48,9 @@ describe('findByEventAndUserId', () => {
     const createCaller = createCallerFactory(wishlistRouter)
     const { getWishlist } = createCaller(testContext)
 
-    const result = await getWishlist({ 
-      eventId, 
-      userId: targetUserId 
+    const result = await getWishlist({
+      eventId,
+      userId: targetUserId,
     })
 
     expect(result).toMatchObject({
@@ -82,9 +82,9 @@ describe('findByEventAndUserId', () => {
     const createCaller = createCallerFactory(wishlistRouter)
     const { getWishlist } = createCaller(testContext)
 
-    const result = await getWishlist({ 
-      eventId, 
-      userId: targetUserId, 
+    const result = await getWishlist({
+      eventId,
+      userId: targetUserId,
     })
 
     expect(result).toBeNull()

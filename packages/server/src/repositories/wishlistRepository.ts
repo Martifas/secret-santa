@@ -16,7 +16,7 @@ export function wishlistRepository(db: Database) {
         .executeTakeFirst()
       return result ?? null
     },
-    
+
     async findByEventAndUserId(
       eventId: number,
       userId: number

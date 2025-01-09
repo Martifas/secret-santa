@@ -26,7 +26,6 @@ const [ruleOne] = await insertAll(
 const fakeRuleDefault = (rule: Parameters<typeof fakeEventRule>[0] = {}) =>
   fakeEventRule({ eventId: eventOne.id, ...rule })
 
-
 describe('find event rules', () => {
   it('should return all rules by event id', async () => {
     const foundRules = await repository.findByEventId(eventOne.id)

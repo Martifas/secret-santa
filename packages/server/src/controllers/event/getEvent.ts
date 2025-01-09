@@ -18,18 +18,13 @@ export default authenticatedProcedure
       id: true,
     })
   )
-  .query(
-    async ({
-      input: { id },
-      ctx: { repos },
-    }): Promise<EventRowSelect> => {
-      const event = await repos.eventRepository.find(id)
-      if (!event) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: `Event with id ${id} not found`,
-        })
-      }
-      return event
+  .query(async ({ input: { id }, ctx: { repos } }): Promise<EventRowSelect> => {
+    const event = await repos.eventRepository.find(id)
+    if (!event) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: `Event with id ${id} not found`,
+      })
     }
-  )
+    return event
+  })

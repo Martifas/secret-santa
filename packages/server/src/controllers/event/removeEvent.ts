@@ -28,7 +28,7 @@ export default authenticatedProcedure
         })
       }
 
-      if (event.createdBy !== authUser.id) { 
+      if (event.createdBy !== authUser.id) {
         throw new TRPCError({
           code: 'FORBIDDEN',
           message: 'Not authorized to delete this event',

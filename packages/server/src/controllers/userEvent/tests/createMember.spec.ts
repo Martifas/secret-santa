@@ -62,7 +62,7 @@ describe('create', () => {
           throw new Error('Should not be called')
         },
         findByEventAndUserId: async () => ({
-          ...createdUserEvent
+          ...createdUserEvent,
         }),
       } satisfies Partial<UserEventRepository>,
     }

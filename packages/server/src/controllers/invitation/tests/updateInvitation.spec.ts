@@ -55,7 +55,7 @@ describe('update', () => {
 
     const result = await updateInvitation({
       id,
-      ...updates
+      ...updates,
     })
 
     expect(result).toMatchObject({
@@ -86,7 +86,7 @@ describe('update', () => {
     await expect(
       updateInvitation({
         id,
-        ...updates
+        ...updates,
       })
     ).rejects.toThrow(
       new TRPCError({
@@ -116,7 +116,7 @@ describe('update', () => {
     await expect(
       updateInvitation({
         id,
-        ...updates
+        ...updates,
       })
     ).rejects.toThrow(
       new TRPCError({
@@ -146,7 +146,7 @@ describe('update', () => {
     await expect(
       updateInvitation({
         id,
-        ...updates
+        ...updates,
       })
     ).rejects.toThrow(unknownError)
   })

@@ -11,14 +11,14 @@ describe('remove', () => {
     id: 1,
     auth0Id: 'auth0|test123',
   })
-  
+
   const ruleId = 1
   const eventId = 100
   const removeInput = {
     id: ruleId,
     eventId,
   }
-  
+
   const existingRule = {
     id: ruleId,
     eventId,

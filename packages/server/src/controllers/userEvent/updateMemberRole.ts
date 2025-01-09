@@ -1,7 +1,10 @@
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import provideRepos from '@server/trpc/provideRepos'
 import { userEventRepository } from '@server/repositories/userEventRepository'
-import { userEventSchema, type UserEventForMember } from '@server/entities/userEvent'
+import {
+  userEventSchema,
+  type UserEventForMember,
+} from '@server/entities/userEvent'
 import { TRPCError } from '@trpc/server'
 
 export default authenticatedProcedure
@@ -10,17 +13,22 @@ export default authenticatedProcedure
       userEventRepository,
     })
   )
-  .input(userEventSchema.pick({
-    id: true,
-    role: true,
-  }))
+  .input(
+    userEventSchema.pick({
+      id: true,
+      role: true,
+    })
+  )
   .mutation(
-    async ({ input, ctx: { repos, authUser } }): Promise<UserEventForMember> => {
+    async ({
+      input,
+      ctx: { repos, authUser },
+    }): Promise<UserEventForMember> => {
       const userEvent = await repos.userEventRepository.findByEventAndUserId(
         input.id,
         authUser.id
       )
-      
+
       if (!userEvent) {
         throw new TRPCError({
           code: 'NOT_FOUND',

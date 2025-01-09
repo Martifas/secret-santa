@@ -85,7 +85,8 @@ describe('create', () => {
     await expect(createWishlist(newWishlistInput)).rejects.toThrow(
       new TRPCError({
         code: 'CONFLICT',
-        message: 'A wishlist item with this name already exists for this event and user',
+        message:
+          'A wishlist item with this name already exists for this event and user',
       })
     )
   })

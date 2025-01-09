@@ -26,7 +26,10 @@ export default authenticatedProcedure
       })
   )
   .mutation(
-    async ({ input: { id,eventId, ...updates }, ctx: { repos, authUser } }): Promise<RuleForMember> => {
+    async ({
+      input: { id, eventId, ...updates },
+      ctx: { repos, authUser },
+    }): Promise<RuleForMember> => {
       const isEventAdmin = await repos.userEventRepository.isEventAdmin(
         authUser.id,
         eventId

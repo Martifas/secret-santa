@@ -1,6 +1,9 @@
 import provideRepos from '@server/trpc/provideRepos'
 import { wishlistRepository } from '@server/repositories/wishlistRepository'
-import { wishlistSchema, type WishlistForMember } from '@server/entities/wishlist'
+import {
+  wishlistSchema,
+  type WishlistForMember,
+} from '@server/entities/wishlist'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import { TRPCError } from '@trpc/server'
 
@@ -11,44 +14,46 @@ export default authenticatedProcedure
     })
   )
   .input(
-    wishlistSchema.pick({
-      id: true,
-      itemName: true,
-      description: true,
-      url: true,
-      price: true,
-      priority: true,
-      isPurchased: true,
-    }).partial({
-      itemName: true,
-      description: true,
-      url: true,
-      price: true,
-      priority: true,
-      isPurchased: true,
-    })
+    wishlistSchema
+      .pick({
+        id: true,
+        itemName: true,
+        description: true,
+        url: true,
+        price: true,
+        priority: true,
+        isPurchased: true,
+      })
+      .partial({
+        itemName: true,
+        description: true,
+        url: true,
+        price: true,
+        priority: true,
+        isPurchased: true,
+      })
   )
   .mutation(
     async ({
       input: { id, ...updates },
-      ctx: { repos, authUser }
+      ctx: { repos, authUser },
     }): Promise<WishlistForMember> => {
       const existingWishlist = await repos.wishlistRepository.findById(id)
-     
+
       if (!existingWishlist) {
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'Wishlist item not found',
         })
       }
- 
+
       if (existingWishlist.userId !== authUser.id) {
         throw new TRPCError({
           code: 'FORBIDDEN',
           message: 'Not authorized to update this wishlist item',
         })
       }
- 
+
       const wishlist = await repos.wishlistRepository.update(id, updates)
       return wishlist
     }

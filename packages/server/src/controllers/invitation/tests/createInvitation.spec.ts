@@ -76,7 +76,8 @@ describe('create', () => {
     await expect(createInvitation(newInvitationInput)).rejects.toThrow(
       new TRPCError({
         code: 'CONFLICT',
-        message: 'An invitation with this name already exists for this event and user',
+        message:
+          'An invitation with this name already exists for this event and user',
       })
     )
   })
@@ -95,7 +96,9 @@ describe('create', () => {
     const createCaller = createCallerFactory(invitationRouter)
     const { createInvitation } = createCaller(testContext)
 
-    await expect(createInvitation(newInvitationInput)).rejects.toThrow(unknownError)
+    await expect(createInvitation(newInvitationInput)).rejects.toThrow(
+      unknownError
+    )
   })
 
   it('should propagate unknown errors from findByEventAndUserId', async () => {
@@ -114,6 +117,8 @@ describe('create', () => {
     const createCaller = createCallerFactory(invitationRouter)
     const { createInvitation } = createCaller(testContext)
 
-    await expect(createInvitation(newInvitationInput)).rejects.toThrow(unknownError)
+    await expect(createInvitation(newInvitationInput)).rejects.toThrow(
+      unknownError
+    )
   })
 })

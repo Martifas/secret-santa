@@ -1,6 +1,9 @@
 import provideRepos from '@server/trpc/provideRepos'
 import { wishlistRepository } from '@server/repositories/wishlistRepository'
-import { wishlistSchema, type WishlistForMember } from '@server/entities/wishlist'
+import {
+  wishlistSchema,
+  type WishlistForMember,
+} from '@server/entities/wishlist'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import { TRPCError } from '@trpc/server'
 
@@ -16,9 +19,12 @@ export default authenticatedProcedure
     })
   )
   .mutation(
-    async ({ input: { id }, ctx: { repos, authUser } }): Promise<WishlistForMember> => {
+    async ({
+      input: { id },
+      ctx: { repos, authUser },
+    }): Promise<WishlistForMember> => {
       const existingWishlist = await repos.wishlistRepository.findById(id)
-     
+
       if (!existingWishlist) {
         throw new TRPCError({
           code: 'NOT_FOUND',
