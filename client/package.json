@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build": "run-p typecheck build-only",
+    "dev": "vite",
     "build-only": "vite build",
     "typecheck": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "preview": "vite preview",
@@ -18,5 +19,8 @@
     "npm-run-all": "^4.1.5",
     "vite": "^6.0.7",
     "vue-tsc": "^2.2.0"
+  },
+  "dependencies": {
+    "vue-router": "^4.5.0"
   }
 }
