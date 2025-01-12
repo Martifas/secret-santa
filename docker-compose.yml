@@ -13,7 +13,7 @@ services:
   server:
     build:
       context: .
-      dockerfile: ./packages/server/Dockerfile
+      dockerfile: ./server/Dockerfile
     environment:
       DATABASE_URL: postgres://turing:turing@postgres:5432/secret_santa
       PORT: 3000

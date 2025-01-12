@@ -10,7 +10,13 @@
   "author": "",
   "license": "ISC",
   "workspaces": [
-    "packages/server",
-    "packages/client"
-  ]
+    "./server",
+    "./client"
+  ],
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1"
+  },
+  "dependencies": {
+    "vue": "^3.5.13"
+  }
 }
