@@ -4,11 +4,11 @@ import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import eventRouter from '..'
+import type { UserEventRepository } from '@server/repositories/userEventRepository'
 
 describe('remove', () => {
   const TEST_USER = fakeAuthUser({
     id: 1,
-    auth0Id: 'auth0|test123',
   })
 
   it('should remove an event when user is the creator', async () => {
@@ -35,6 +35,9 @@ describe('remove', () => {
           return { ...event, createdAt: new Date(), updatedAt: new Date() }
         },
       } satisfies Partial<EventRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -60,6 +63,9 @@ describe('remove', () => {
       eventRepository: {
         find: async () => null,
       } satisfies Partial<EventRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -96,6 +102,9 @@ describe('remove', () => {
           updatedAt: new Date(),
         }),
       } satisfies Partial<EventRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => false,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -105,7 +114,7 @@ describe('remove', () => {
     await expect(removeEvent({ id })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
-        message: 'Not authorized to delete this event',
+        message: 'Not authorized. Admin access required.',
       })
     )
   })

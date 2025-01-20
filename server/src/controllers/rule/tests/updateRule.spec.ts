@@ -1,4 +1,4 @@
-import { fakeAuthUser } from '@server/entities/tests/fakes'
+import { fakeUser } from '@server/entities/tests/fakes'
 import type { RuleRepository } from '@server/repositories/ruleRepository'
 import type { UserEventRepository } from '@server/repositories/userEventRepository'
 import { createCallerFactory } from '@server/trpc'
@@ -7,9 +7,8 @@ import { TRPCError } from '@trpc/server'
 import ruleRouter from '..'
 
 describe('update', () => {
-  const TEST_USER = fakeAuthUser({
+  const TEST_USER = fakeUser({
     id: 1,
-    auth0Id: 'auth0|test123',
   })
 
   const ruleId = 1
@@ -109,7 +108,7 @@ describe('update', () => {
     await expect(updateRule(updateInput)).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
-        message: 'Not an admin of this event',
+        message: 'Not authorized. Admin access required.',
       })
     )
   })

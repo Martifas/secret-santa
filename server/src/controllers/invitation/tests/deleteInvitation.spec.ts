@@ -1,14 +1,14 @@
 import type { InvitationRepository } from '@server/repositories/invitationRepository'
-import { fakeEventInvitation, fakeAuthUser } from '@server/entities/tests/fakes'
+import { fakeEventInvitation, fakeUser } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import invitationRouter from '..'
+import type { UserEventRepository } from '@server/repositories/userEventRepository'
 
 describe('remove', () => {
-  const TEST_USER = fakeAuthUser({
+  const TEST_USER = fakeUser({
     id: 1,
-    auth0Id: 'auth0|test123',
   })
 
   it('should remove an invitation when user is authorized', async () => {
@@ -39,6 +39,9 @@ describe('remove', () => {
           }
         },
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -65,6 +68,9 @@ describe('remove', () => {
       invitationRepository: {
         findById: async () => null,
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -79,7 +85,7 @@ describe('remove', () => {
     )
   })
 
-  it('should throw error when user is not authorized', async () => {
+  it('should throw FORBIDDEN when user is not authorized', async () => {
     const id = 1
     const otherUserId = 999
     const invitation = fakeEventInvitation({
@@ -96,6 +102,9 @@ describe('remove', () => {
           updatedAt: new Date(),
         }),
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => false,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -105,7 +114,7 @@ describe('remove', () => {
     await expect(deleteInvitation({ id })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
-        message: 'Not authorized to remove this invitation',
+        message: 'Not authorized. Admin access required.',
       })
     )
   })

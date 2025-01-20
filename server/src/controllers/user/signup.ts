@@ -45,7 +45,5 @@ export default publicProcedure
         throw error
       })
 
-    return {
-      id: userCreated.id,
-    }
+    return `User with ${userCreated.id} created`
   })

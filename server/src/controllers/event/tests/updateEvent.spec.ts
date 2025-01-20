@@ -5,11 +5,11 @@ import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import eventRouter from '..'
 import type { EventRowUpdate } from '@server/types/event'
+import type { UserEventRepository } from '@server/repositories/userEventRepository'
 
 describe('update', () => {
   const TEST_USER = fakeAuthUser({
     id: 1,
-    auth0Id: 'auth0|test123',
   })
 
   const id = 1
@@ -48,6 +48,9 @@ describe('update', () => {
           return updatedEvent
         },
       } satisfies Partial<EventRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -75,6 +78,9 @@ describe('update', () => {
       eventRepository: {
         find: async () => null,
       } satisfies Partial<EventRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -100,6 +106,9 @@ describe('update', () => {
       eventRepository: {
         find: async () => eventByAnotherUser,
       } satisfies Partial<EventRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => false,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -109,7 +118,7 @@ describe('update', () => {
     await expect(updateEvent({ id, updates })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
-        message: 'Not authorized to update this event',
+        message: 'Not authorized. Admin access required.',
       })
     )
   })
@@ -125,6 +134,9 @@ describe('update', () => {
           throw unknownError
         },
       } satisfies Partial<EventRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)

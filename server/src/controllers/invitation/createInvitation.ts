@@ -5,9 +5,9 @@ import {
 } from '@server/entities/eventInvitation'
 import { invitationRepository } from '@server/repositories/invitationRepository'
 import { TRPCError } from '@trpc/server'
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
+import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
 
-export default authenticatedProcedure
+export default groupAdminProcedure
   .use(
     provideRepos({
       invitationRepository,

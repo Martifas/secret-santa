@@ -2,9 +2,9 @@ import { eventSchema, type EventForMember } from '@server/entities/event'
 import provideRepos from '@server/trpc/provideRepos'
 import { eventRepository } from '@server/repositories/eventRepository'
 import { TRPCError } from '@trpc/server'
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
+import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
 
-export default authenticatedProcedure
+export default groupAdminProcedure
   .use(
     provideRepos({
       eventRepository,
@@ -16,22 +16,12 @@ export default authenticatedProcedure
     })
   )
   .mutation(
-    async ({
-      input: { id },
-      ctx: { repos, authUser },
-    }): Promise<EventForMember> => {
+    async ({ input: { id }, ctx: { repos } }): Promise<EventForMember> => {
       const event = await repos.eventRepository.find(id)
       if (!event) {
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'Event not found',
-        })
-      }
-
-      if (event.createdBy !== authUser.id) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'Not authorized to delete this event',
         })
       }
 

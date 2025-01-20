@@ -1,4 +1,4 @@
-import { fakeAuthUser } from '@server/entities/tests/fakes'
+import { fakeUser } from '@server/entities/tests/fakes'
 import type { UserEventRepository } from '@server/repositories/userEventRepository'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
@@ -6,9 +6,8 @@ import { TRPCError } from '@trpc/server'
 import userEventRouter from '..'
 
 describe('create', () => {
-  const TEST_USER = fakeAuthUser({
+  const TEST_USER = fakeUser({
     id: 1,
-    auth0Id: 'auth0|test123',
   })
 
   const eventId = 100

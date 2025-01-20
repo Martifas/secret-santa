@@ -1,14 +1,13 @@
 import type { WishlistRepository } from '@server/repositories/wishlistRepository'
-import { fakeAuthUser, fakeWishlist } from '@server/entities/tests/fakes'
+import { fakeUser, fakeWishlist } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import wishlistRouter from '..'
 
 describe('remove', () => {
-  const TEST_USER = fakeAuthUser({
+  const TEST_USER = fakeUser({
     id: 1,
-    auth0Id: 'auth0|test123',
   })
 
   const id = 1

@@ -5,9 +5,9 @@ import {
   type InvitationForMember,
 } from '@server/entities/eventInvitation'
 import { TRPCError } from '@trpc/server'
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
+import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
 
-export default authenticatedProcedure
+export default groupAdminProcedure
   .use(
     provideRepos({
       invitationRepository,
@@ -32,7 +32,7 @@ export default authenticatedProcedure
   .mutation(
     async ({
       input: { id, ...updates },
-      ctx: { repos, authUser },
+      ctx: { repos },
     }): Promise<InvitationForMember> => {
       const existingInvitation = await repos.invitationRepository.findById(id)
 
@@ -40,13 +40,6 @@ export default authenticatedProcedure
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'Invitation not found',
-        })
-      }
-
-      if (existingInvitation.userId !== authUser.id) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'Not authorized to update this invitation item',
         })
       }
 

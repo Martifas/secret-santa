@@ -1,14 +1,13 @@
-import { fakeAuthUser } from '@server/entities/tests/fakes'
+import { fakeUser } from '@server/entities/tests/fakes'
 import type { UserEventRepository } from '@server/repositories/userEventRepository'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import userEventRouter from '..'
 
-describe('remove', () => {
-  const TEST_USER = fakeAuthUser({
+describe('removeMember', () => {
+  const TEST_USER = fakeUser({
     id: 1,
-    auth0Id: 'auth0|test123',
   })
 
   const userEventId = 1
@@ -25,12 +24,54 @@ describe('remove', () => {
     updatedAt: new Date(),
   }
 
-  it('should remove user event when user is removing their own membership', async () => {
+  it('should remove user event when user is an admin', async () => {
     const repos = {
       userEventRepository: {
         remove: async (id) => {
           expect(id).toBe(userEventId)
           return existingUserEvent
+        },
+        findByEventAndUserId: async () => existingUserEvent,
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
+    }
+
+    const testContext = authRepoContext(repos, TEST_USER)
+    const createCaller = createCallerFactory(userEventRouter)
+    const { removeMember } = createCaller(testContext)
+
+    const result = await removeMember({ id: userEventId, eventId })
+    expect(result).toEqual(existingUserEvent)
+  })
+
+  it('should throw NOT_FOUND when user event does not exist', async () => {
+    const repos = {
+      userEventRepository: {
+        remove: async () => {
+          throw new Error('Should not be called')
+        },
+        findByEventAndUserId: async () => null,
+        isEventAdmin: async () => true, // Even as admin, should throw NOT_FOUND
+      } satisfies Partial<UserEventRepository>,
+    }
+
+    const testContext = authRepoContext(repos, TEST_USER)
+    const createCaller = createCallerFactory(userEventRouter)
+    const { removeMember } = createCaller(testContext)
+
+    await expect(removeMember({ id: userEventId, eventId })).rejects.toThrow(
+      new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'User event membership not found',
+      })
+    )
+  })
+
+  it('should throw FORBIDDEN when user is not an admin', async () => {
+    const repos = {
+      userEventRepository: {
+        remove: async () => {
+          throw new Error('Should not be called')
         },
         findByEventAndUserId: async () => existingUserEvent,
         isEventAdmin: async () => false,
@@ -41,82 +82,10 @@ describe('remove', () => {
     const createCaller = createCallerFactory(userEventRouter)
     const { removeMember } = createCaller(testContext)
 
-    const result = await removeMember({ id: userEventId })
-    expect(result).toEqual(existingUserEvent)
-  })
-
-  it('should remove user event when user is event admin', async () => {
-    const otherUserEvent = {
-      ...existingUserEvent,
-      userId: TEST_USER.id + 1,
-    }
-
-    const repos = {
-      userEventRepository: {
-        remove: async (id) => {
-          expect(id).toBe(userEventId)
-          return otherUserEvent
-        },
-        findByEventAndUserId: async () => otherUserEvent,
-        isEventAdmin: async () => true,
-      } satisfies Partial<UserEventRepository>,
-    }
-
-    const testContext = authRepoContext(repos, TEST_USER)
-    const createCaller = createCallerFactory(userEventRouter)
-    const { removeMember } = createCaller(testContext)
-
-    const result = await removeMember({ id: userEventId })
-    expect(result).toEqual(otherUserEvent)
-  })
-
-  it('should throw NOT_FOUND when user event does not exist', async () => {
-    const repos = {
-      userEventRepository: {
-        remove: async () => {
-          throw new Error('Should not be called')
-        },
-        findByEventAndUserId: async () => null,
-        isEventAdmin: async () => false,
-      } satisfies Partial<UserEventRepository>,
-    }
-
-    const testContext = authRepoContext(repos, TEST_USER)
-    const createCaller = createCallerFactory(userEventRouter)
-    const { removeMember } = createCaller(testContext)
-
-    await expect(removeMember({ id: userEventId })).rejects.toThrow(
-      new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'User event membership not found',
-      })
-    )
-  })
-
-  it('should throw FORBIDDEN when user is not admin and not removing their own membership', async () => {
-    const otherUserEvent = {
-      ...existingUserEvent,
-      userId: TEST_USER.id + 1,
-    }
-
-    const repos = {
-      userEventRepository: {
-        remove: async () => {
-          throw new Error('Should not be called')
-        },
-        findByEventAndUserId: async () => otherUserEvent,
-        isEventAdmin: async () => false,
-      } satisfies Partial<UserEventRepository>,
-    }
-
-    const testContext = authRepoContext(repos, TEST_USER)
-    const createCaller = createCallerFactory(userEventRouter)
-    const { removeMember } = createCaller(testContext)
-
-    await expect(removeMember({ id: userEventId })).rejects.toThrow(
+    await expect(removeMember({ id: userEventId, eventId })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
-        message: 'Not authorized to remove this membership',
+        message: 'Not authorized. Admin access required.',
       })
     )
   })
@@ -131,7 +100,7 @@ describe('remove', () => {
         findByEventAndUserId: async () => {
           throw unknownError
         },
-        isEventAdmin: async () => false,
+        isEventAdmin: async () => true,
       } satisfies Partial<UserEventRepository>,
     }
 
@@ -139,30 +108,7 @@ describe('remove', () => {
     const createCaller = createCallerFactory(userEventRouter)
     const { removeMember } = createCaller(testContext)
 
-    await expect(removeMember({ id: userEventId })).rejects.toThrow(
-      unknownError
-    )
-  })
-
-  it('should propagate unknown errors from isEventAdmin', async () => {
-    const unknownError = new Error('Database connection failed')
-    const repos = {
-      userEventRepository: {
-        remove: async () => {
-          throw new Error('Should not be called')
-        },
-        findByEventAndUserId: async () => existingUserEvent,
-        isEventAdmin: async () => {
-          throw unknownError
-        },
-      } satisfies Partial<UserEventRepository>,
-    }
-
-    const testContext = authRepoContext(repos, TEST_USER)
-    const createCaller = createCallerFactory(userEventRouter)
-    const { removeMember } = createCaller(testContext)
-
-    await expect(removeMember({ id: userEventId })).rejects.toThrow(
+    await expect(removeMember({ id: userEventId, eventId })).rejects.toThrow(
       unknownError
     )
   })
@@ -183,7 +129,7 @@ describe('remove', () => {
     const createCaller = createCallerFactory(userEventRouter)
     const { removeMember } = createCaller(testContext)
 
-    await expect(removeMember({ id: userEventId })).rejects.toThrow(
+    await expect(removeMember({ id: userEventId, eventId })).rejects.toThrow(
       unknownError
     )
   })

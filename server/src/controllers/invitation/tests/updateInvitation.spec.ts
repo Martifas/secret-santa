@@ -5,11 +5,11 @@ import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import invitationRouter from '..'
 import type { EventRowUpdate } from '@server/types/event'
+import type { UserEventRepository } from '@server/repositories/userEventRepository'
 
 describe('update', () => {
   const TEST_USER = fakeAuthUser({
     id: 1,
-    auth0Id: 'auth0|test123',
   })
 
   const id = 1
@@ -51,6 +51,9 @@ describe('update', () => {
           return updatedInvitation
         },
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -81,6 +84,9 @@ describe('update', () => {
       invitationRepository: {
         findById: async () => null,
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -111,6 +117,9 @@ describe('update', () => {
       invitationRepository: {
         findById: async () => invitationByAnotherUser,
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => false,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -125,7 +134,7 @@ describe('update', () => {
     ).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
-        message: 'Not authorized to update this invitation item',
+        message: 'Not authorized. Admin access required.',
       })
     )
   })
@@ -141,6 +150,9 @@ describe('update', () => {
           throw unknownError
         },
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)

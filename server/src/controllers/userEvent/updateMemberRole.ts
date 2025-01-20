@@ -1,4 +1,3 @@
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import provideRepos from '@server/trpc/provideRepos'
 import { userEventRepository } from '@server/repositories/userEventRepository'
 import {
@@ -6,8 +5,9 @@ import {
   type UserEventForMember,
 } from '@server/entities/userEvent'
 import { TRPCError } from '@trpc/server'
+import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
 
-export default authenticatedProcedure
+export default groupAdminProcedure
   .use(
     provideRepos({
       userEventRepository,
@@ -17,6 +17,7 @@ export default authenticatedProcedure
     userEventSchema.pick({
       id: true,
       role: true,
+      eventId: true,
     })
   )
   .mutation(
@@ -33,18 +34,6 @@ export default authenticatedProcedure
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'User event membership not found',
-        })
-      }
-
-      const isAdmin = await repos.userEventRepository.isEventAdmin(
-        authUser.id,
-        userEvent.eventId
-      )
-
-      if (!isAdmin) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'Only event admins can update roles',
         })
       }
 

@@ -4,11 +4,11 @@ import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import invitationRouter from '..'
+import type { UserEventRepository } from '@server/repositories/userEventRepository'
 
 describe('findById', () => {
   const TEST_USER = fakeAuthUser({
     id: 1,
-    auth0Id: 'auth0|test123',
   })
 
   const id = 1
@@ -26,11 +26,14 @@ describe('findById', () => {
     updatedAt: new Date(),
   }
 
-  it('should return an invitation when user is authorized', async () => {
+  it('should return an invitation when user is authorized group admin', async () => {
     const repos = {
       invitationRepository: {
         findById: async () => baseInvitation,
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -57,6 +60,9 @@ describe('findById', () => {
       invitationRepository: {
         findById: async () => null,
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -81,6 +87,9 @@ describe('findById', () => {
       invitationRepository: {
         findById: async () => invitationByAnotherUser,
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => false,
+      } satisfies Partial<UserEventRepository>,
     }
 
     const testContext = authRepoContext(repos, TEST_USER)
@@ -90,7 +99,7 @@ describe('findById', () => {
     await expect(getInvitation({ id })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
-        message: 'Not authorized to view this invitation',
+        message: 'Not authorized. Admin access required.',
       })
     )
   })

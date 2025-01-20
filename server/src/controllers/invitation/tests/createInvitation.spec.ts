@@ -4,11 +4,11 @@ import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import invitationRouter from '..'
+import type { UserEventRepository } from '@server/repositories/userEventRepository'
 
 describe('create', () => {
   const TEST_USER = fakeAuthUser({
     id: 1,
-    auth0Id: 'auth0|test123',
   })
   const eventId = 100
   const newInvitationInput = {
@@ -37,6 +37,9 @@ describe('create', () => {
           return createdInvitation
         },
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
@@ -68,6 +71,9 @@ describe('create', () => {
           throw new Error('Should not be called')
         },
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
@@ -91,6 +97,9 @@ describe('create', () => {
           throw unknownError
         },
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)
@@ -112,6 +121,9 @@ describe('create', () => {
           throw new Error('Should not be called')
         },
       } satisfies Partial<InvitationRepository>,
+      userEventRepository: {
+        isEventAdmin: async () => true,
+      } satisfies Partial<UserEventRepository>,
     }
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(invitationRouter)

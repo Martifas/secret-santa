@@ -5,10 +5,9 @@ import {
   eventInvitationSchema,
   type InvitationForMember,
 } from '@server/entities/eventInvitation'
-import { TRPCError } from '@trpc/server'
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
+import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
 
-export default authenticatedProcedure
+export default groupAdminProcedure
   .use(
     provideRepos({
       invitationRepository,
@@ -24,19 +23,8 @@ export default authenticatedProcedure
   .query(
     async ({
       input: { eventId, userId },
-      ctx: { repos, authUser },
+      ctx: { repos },
     }): Promise<InvitationForMember | null> => {
-      const isEventMember = await repos.userEventRepository.isMember(
-        eventId,
-        authUser.id
-      )
-      if (!isEventMember) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'Not a member of this event',
-        })
-      }
-
       return repos.invitationRepository.findByEventAndUserId(eventId, userId)
     }
   )

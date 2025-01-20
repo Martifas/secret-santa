@@ -1,15 +1,14 @@
 import type { InvitationRepository } from '@server/repositories/invitationRepository'
 import type { UserEventRepository } from '@server/repositories/userEventRepository'
-import { fakeEventInvitation, fakeAuthUser } from '@server/entities/tests/fakes'
+import { fakeEventInvitation, fakeUser } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import invitationRouter from '..'
 
 describe('findByEventAndUserId', () => {
-  const TEST_USER = fakeAuthUser({
+  const TEST_USER = fakeUser({
     id: 1,
-    auth0Id: 'auth0|test123',
   })
   const eventId = 100
   const targetUserId = 2
@@ -28,10 +27,10 @@ describe('findByEventAndUserId', () => {
     updatedAt: new Date(),
   }
 
-  it('should return invitation when user is event member', async () => {
+  it('should return invitation when user is event admin', async () => {
     const repos = {
       userEventRepository: {
-        isMember: async () => true,
+        isEventAdmin: async () => true,
       } satisfies Partial<UserEventRepository>,
       invitationRepository: {
         findByEventAndUserId: async (event, userId) => {
@@ -67,7 +66,7 @@ describe('findByEventAndUserId', () => {
   it('should return null when invitation does not exist', async () => {
     const repos = {
       userEventRepository: {
-        isMember: async () => true,
+        isEventAdmin: async () => true,
       } satisfies Partial<UserEventRepository>,
       invitationRepository: {
         findByEventAndUserId: async () => null,
@@ -89,7 +88,7 @@ describe('findByEventAndUserId', () => {
   it('should throw FORBIDDEN when user is not event member', async () => {
     const repos = {
       userEventRepository: {
-        isMember: async () => false,
+        isEventAdmin: async () => false,
       } satisfies Partial<UserEventRepository>,
       invitationRepository: {
         findByEventAndUserId: async () => {
@@ -107,16 +106,16 @@ describe('findByEventAndUserId', () => {
     ).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
-        message: 'Not a member of this event',
+        message: 'Not authorized. Admin access required.',
       })
     )
   })
 
-  it('should propagate unknown errors from event membership check', async () => {
+  it('should propagate unknown errors from event ownership check', async () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
       userEventRepository: {
-        isMember: async () => {
+        isEventAdmin: async () => {
           throw unknownError
         },
       } satisfies Partial<UserEventRepository>,
@@ -140,7 +139,7 @@ describe('findByEventAndUserId', () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
       userEventRepository: {
-        isMember: async () => true,
+        isEventAdmin: async () => true,
       } satisfies Partial<UserEventRepository>,
       invitationRepository: {
         findByEventAndUserId: async () => {

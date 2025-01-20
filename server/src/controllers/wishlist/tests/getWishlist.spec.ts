@@ -1,15 +1,15 @@
 import type { WishlistRepository } from '@server/repositories/wishlistRepository'
 import type { UserEventRepository } from '@server/repositories/userEventRepository'
-import { fakeAuthUser, fakeWishlist } from '@server/entities/tests/fakes'
+import { fakeUser, fakeWishlist } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import wishlistRouter from '..'
 
 describe('findByEventAndUserId', () => {
-  const TEST_USER = fakeAuthUser({
+  const TEST_USER = fakeUser({
     id: 1,
-    auth0Id: 'auth0|test123',
+
   })
   const eventId = 100
   const targetUserId = 2
@@ -111,7 +111,7 @@ describe('findByEventAndUserId', () => {
     ).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
-        message: 'Not a member of this event',
+        message: 'Not authorized. Event member access required.',
       })
     )
   })

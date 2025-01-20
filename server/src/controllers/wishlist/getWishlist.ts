@@ -5,10 +5,9 @@ import {
   wishlistSchema,
   type WishlistForMember,
 } from '@server/entities/wishlist'
-import { TRPCError } from '@trpc/server'
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
+import { groupMemberProcedure } from '@server/trpc/groupMemberProcedure'
 
-export default authenticatedProcedure
+export default groupMemberProcedure
   .use(
     provideRepos({
       wishlistRepository,
@@ -24,18 +23,8 @@ export default authenticatedProcedure
   .query(
     async ({
       input: { eventId, userId },
-      ctx: { repos, authUser },
-    }): Promise<WishlistForMember | null> => {
-      const isEventMember = await repos.userEventRepository.isMember(
-        eventId,
-        authUser.id
-      )
-      if (!isEventMember) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'Not a member of this event',
-        })
-      }
+      ctx: { repos },
+    }): Promise<WishlistForMember | null> => {     
 
       return repos.wishlistRepository.findByEventAndUserId(eventId, userId)
     }

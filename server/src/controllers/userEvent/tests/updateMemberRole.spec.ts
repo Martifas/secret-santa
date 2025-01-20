@@ -1,4 +1,4 @@
-import { fakeAuthUser } from '@server/entities/tests/fakes'
+import { fakeUser } from '@server/entities/tests/fakes'
 import type { UserEventRepository } from '@server/repositories/userEventRepository'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
@@ -6,9 +6,8 @@ import { TRPCError } from '@trpc/server'
 import userEventRouter from '..'
 
 describe('updateRole', () => {
-  const TEST_USER = fakeAuthUser({
+  const TEST_USER = fakeUser({
     id: 1,
-    auth0Id: 'auth0|test123',
   })
 
   const userEventId = 1
@@ -28,6 +27,7 @@ describe('updateRole', () => {
   const updateInput = {
     id: userEventId,
     role: 'event_admin',
+    eventId
   }
 
   it('should update role when user is event admin', async () => {
@@ -98,7 +98,7 @@ describe('updateRole', () => {
     await expect(updateMemberRole(updateInput)).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
-        message: 'Only event admins can update roles',
+        message: 'Not authorized. Admin access required.',
       })
     )
   })

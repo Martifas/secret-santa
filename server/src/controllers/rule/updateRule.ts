@@ -2,10 +2,9 @@ import provideRepos from '@server/trpc/provideRepos'
 import { eventRuleSchema, type RuleForMember } from '@server/entities/eventRule'
 import { ruleRepository } from '@server/repositories/ruleRepository'
 import { userEventRepository } from '@server/repositories/userEventRepository'
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
-import { TRPCError } from '@trpc/server'
+import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
 
-export default authenticatedProcedure
+export default groupAdminProcedure
   .use(
     provideRepos({
       ruleRepository,
@@ -25,22 +24,12 @@ export default authenticatedProcedure
         ruleData: true,
       })
   )
-  .mutation(
-    async ({
-      input: { id, eventId, ...updates },
-      ctx: { repos, authUser },
-    }): Promise<RuleForMember> => {
-      const isEventAdmin = await repos.userEventRepository.isEventAdmin(
-        authUser.id,
-        eventId
-      )
-      if (!isEventAdmin) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'Not an admin of this event',
-        })
-      }
-      const rule = await repos.ruleRepository.update(id, updates)
-      return rule
+  .mutation(async ({ input, ctx: { repos } }): Promise<RuleForMember> => {
+    const updates = {
+      ...(input.ruleType && { ruleType: input.ruleType }),
+      ...(input.ruleData && { ruleData: input.ruleData }),
     }
-  )
+
+    const rule = await repos.ruleRepository.update(input.id, updates)
+    return rule
+  })

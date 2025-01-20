@@ -1,4 +1,4 @@
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
+import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
 import provideRepos from '@server/trpc/provideRepos'
 import { userEventRepository } from '@server/repositories/userEventRepository'
 import {
@@ -7,7 +7,7 @@ import {
 } from '@server/entities/userEvent'
 import { TRPCError } from '@trpc/server'
 
-export default authenticatedProcedure
+export default groupAdminProcedure
   .use(
     provideRepos({
       userEventRepository,
@@ -16,6 +16,7 @@ export default authenticatedProcedure
   .input(
     userEventSchema.pick({
       id: true,
+      eventId: true,
     })
   )
   .mutation(
@@ -27,23 +28,10 @@ export default authenticatedProcedure
         input.id,
         authUser.id
       )
-
       if (!userEvent) {
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'User event membership not found',
-        })
-      }
-
-      const isAdmin = await repos.userEventRepository.isEventAdmin(
-        authUser.id,
-        userEvent.eventId
-      )
-
-      if (!isAdmin && userEvent.userId !== authUser.id) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'Not authorized to remove this membership',
         })
       }
 
