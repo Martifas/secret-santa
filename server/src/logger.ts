@@ -12,10 +12,6 @@ export const logger = pino({
           colorize: true,
         },
       },
-      {
-        target: 'pino/file',
-        options: { destination: `./logs/app.log` },
-      },
     ],
   },
 })
