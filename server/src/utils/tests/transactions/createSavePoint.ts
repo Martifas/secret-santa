@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { type Kysely, type Transaction, sql } from 'kysely'
 
 export default function createSavePoint(db: Kysely<any> | Transaction<any>) {

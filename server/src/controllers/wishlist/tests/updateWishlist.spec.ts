@@ -4,6 +4,7 @@ import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import wishlistRouter from '..'
+import type { WishlistRowUpdate } from '@server/types/wishlist'
 
 describe('update', () => {
   const TEST_USER = fakeAuthUser({
@@ -39,7 +40,10 @@ describe('update', () => {
     const repos = {
       wishlistRepository: {
         findById: async () => baseWishlist,
-        update: async (wishlistId: number, wishlistUpdates: any) => {
+        update: async (
+          wishlistId: number,
+          wishlistUpdates: WishlistRowUpdate
+        ) => {
           expect(wishlistId).toBe(id)
           expect(wishlistUpdates).toEqual(updates)
           return updatedWishlist

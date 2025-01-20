@@ -8,10 +8,6 @@ import type { Insertable } from 'kysely'
 
 export function eventRepository(db: Database) {
   return {
-    async findAll(): Promise<EventRowSelect[]> {
-      return db.selectFrom('event').select(eventKeysForMembers).execute()
-    },
-
     async find(id: number): Promise<EventRowSelect | null> {
       const result = await db
         .selectFrom('event')

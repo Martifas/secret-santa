@@ -2,6 +2,8 @@ import type { EventRepository } from '@server/repositories/eventRepository'
 import { fakeEvent, fakeAuthUser } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
+import type { Insertable } from 'kysely'
+import type { Event } from '@server/database'
 import eventRouter from '..'
 
 describe('create', () => {
@@ -34,7 +36,7 @@ describe('create', () => {
 
     const repos = {
       eventRepository: {
-        create: async (eventData: any) => {
+        create: async (eventData: Insertable<Event>) => {
           expect(eventData).toEqual(expectedEventData)
           return createdEvent
         },

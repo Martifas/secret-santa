@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import config from '@server/config'
 import jsonwebtoken from 'jsonwebtoken'
 import { TRPCError } from '@trpc/server'

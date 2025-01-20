@@ -4,6 +4,7 @@ import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import invitationRouter from '..'
+import type { EventRowUpdate } from '@server/types/event'
 
 describe('update', () => {
   const TEST_USER = fakeAuthUser({
@@ -41,7 +42,10 @@ describe('update', () => {
     const repos = {
       invitationRepository: {
         findById: async () => baseInvitation,
-        update: async (invitationId: number, invitationUpdates: any) => {
+        update: async (
+          invitationId: number,
+          invitationUpdates: EventRowUpdate
+        ) => {
           expect(invitationId).toBe(id)
           expect(invitationUpdates).toEqual(updates)
           return updatedInvitation

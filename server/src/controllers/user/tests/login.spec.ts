@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createCallerFactory } from '@server/trpc'
 import { wrapInRollbacks } from '@server/utils/tests/transactions'
 import { createTestDatabase } from '@server/utils/tests/database'

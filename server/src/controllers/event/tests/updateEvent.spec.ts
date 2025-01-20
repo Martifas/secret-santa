@@ -4,6 +4,7 @@ import { createCallerFactory } from '@server/trpc'
 import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import eventRouter from '..'
+import type { EventRowUpdate } from '@server/types/event'
 
 describe('update', () => {
   const TEST_USER = fakeAuthUser({
@@ -41,7 +42,7 @@ describe('update', () => {
     const repos = {
       eventRepository: {
         find: async () => baseEvent,
-        update: async (eventId: number, eventUpdates: any) => {
+        update: async (eventId: number, eventUpdates: EventRowUpdate) => {
           expect(eventId).toBe(id)
           expect(eventUpdates).toEqual(updates)
           return updatedEvent
