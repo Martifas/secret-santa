@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import config from '@server/config'
@@ -16,8 +17,10 @@ function getUserFromToken(token: string) {
   try {
     const tokenVerified = verify(token)
     const tokenParsed = parseTokenPayload(tokenVerified)
-
-    return tokenParsed.user
+    return {
+      user: tokenParsed.user,
+      exp: (tokenVerified as any).exp,
+    }
   } catch (error) {
     return null
   }
@@ -32,20 +35,18 @@ export const authenticatedProcedure = publicProcedure.use(({ ctx, next }) => {
     })
   }
 
-  if (!ctx.req) {
+  if (!ctx.req || !ctx.res) {
     const message =
       config.env === 'development' || config.env === 'test'
         ? 'Missing Express request object. If you are running tests, make sure to provide some req object in the procedure context.'
         : 'Missing Express request object.'
-
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
       message,
     })
   }
 
-  const token = ctx.req.header('Authorization')?.replace('Bearer ', '')
-
+  const token = ctx.req.cookies.access_token
   if (!token) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
@@ -53,18 +54,34 @@ export const authenticatedProcedure = publicProcedure.use(({ ctx, next }) => {
     })
   }
 
-  const authUser = getUserFromToken(token)
-
-  if (!authUser) {
+  const tokenData = getUserFromToken(token)
+  if (!tokenData) {
+     ctx.res.clearCookie('access_token')
     throw new TRPCError({
       code: 'UNAUTHORIZED',
       message: 'Invalid token.',
     })
   }
 
+  const expiresIn = tokenData.exp - Math.floor(Date.now() / 1000)
+  if (expiresIn < 120) {
+    const newToken = jsonwebtoken.sign(
+      { user: tokenData.user },
+      tokenKey,
+      { expiresIn: '15m' }
+    )
+
+    ctx.res.cookie('access_token', newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000,
+    })
+  }
+
   return next({
     ctx: {
-      authUser,
+      authUser: tokenData.user,
     },
   })
 })

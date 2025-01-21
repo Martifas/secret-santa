@@ -15,3 +15,5 @@ export type UserEventWithoutIdsAndDates = Omit<
 export type UserEventRowSelect = Selectable<UserEventRow>
 export type UserEventRowInsert = Insertable<UserEventWithoutIdsAndDates>
 export type UserEventRowUpdate = Updateable<UserEventWithoutIdsAndDates>
+export type UserIdRowSelect = Pick<UserEventRow, 'userId'>
+export type SantaUserIdSelect = Pick<UserEventRow, 'santaForUserId'>
