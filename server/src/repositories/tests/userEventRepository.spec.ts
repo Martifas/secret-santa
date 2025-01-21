@@ -184,3 +184,60 @@ describe('remove', () => {
     await expect(repository.remove(99999)).rejects.toThrowError(/no result/i)
   })
 })
+
+describe('getAllEventUsers', () => {
+  it('should return all user IDs for a specific event', async () => {
+    const [userThree] = await insertAll(db, 'user', fakeUser())
+    await insertAll(db, 'userEvent', [
+      fakeUserEventDefault({
+        userId: userThree.id,
+        eventId: eventOne.id,
+      }),
+    ])
+
+    const users = await repository.getAllEventUsers(eventOne.id)
+    expect(users).toHaveLength(2)
+    expect(users).toEqual(
+      expect.arrayContaining([{ userId: userOne.id }, { userId: userThree.id }])
+    )
+  })
+
+  it('should return empty array for non-existent event', async () => {
+    const users = await repository.getAllEventUsers(99999)
+    expect(users).toEqual([])
+  })
+})
+
+describe('updateSecretSanta', () => {
+  it('should update santa assignment for a user', async () => {
+    const [newSanta] = await insertAll(db, 'user', fakeUser())
+
+    const result = await repository.updateSecretSanta(userOne.id, newSanta.id)
+
+    expect(result).toEqual({
+      santaForUserId: newSanta.id,
+    })
+
+    const updatedRecord = await db
+      .selectFrom('userEvent')
+      .select(['santaForUserId', 'updatedAt'])
+      .where('userId', '=', userOne.id)
+      .executeTakeFirst()
+
+    expect(updatedRecord).toBeTruthy()
+    expect(updatedRecord?.santaForUserId).toBe(newSanta.id)
+    expect(updatedRecord?.updatedAt).toBeInstanceOf(Date)
+  })
+
+  it('should throw error when updating non-existent user', async () => {
+    await expect(
+      repository.updateSecretSanta(99999, userTwo.id)
+    ).rejects.toThrowError(/no result/i)
+  })
+
+  it('should throw error when updating with non-existent santa', async () => {
+    await expect(
+      repository.updateSecretSanta(userOne.id, 99999)
+    ).rejects.toThrowError()
+  })
+})

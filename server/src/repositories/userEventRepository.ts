@@ -1,8 +1,10 @@
 import type { Database } from '@server/database'
 import { userEventKeysForMembers } from '@server/entities/userEvent'
 import type {
+  SantaUserIdSelect,
   UserEventRowSelect,
   UserEventRowUpdate,
+  UserIdRowSelect,
 } from '@server/types/userEvent'
 import type { Insertable } from 'kysely'
 import type { UserEvent } from '../database/types'
@@ -10,6 +12,24 @@ import type { UserEventForMember } from '../entities/userEvent'
 
 export function userEventRepository(db: Database) {
   return {
+    async getAllEventUsers(eventId: number): Promise<UserIdRowSelect[]> {
+      return db
+        .selectFrom('userEvent')
+        .select('userId')
+        .where('eventId', '=', eventId)
+        .execute()
+    },
+    async updateSecretSanta(
+      userId: number,
+      santaForUserId: number
+    ): Promise<SantaUserIdSelect> {
+      return db
+        .updateTable('userEvent')
+        .set({ santaForUserId: santaForUserId, updatedAt: new Date() })
+        .where('userId', '=', userId)
+        .returning(['santaForUserId'])
+        .executeTakeFirstOrThrow()
+    },
     async findByEventAndUserId(
       eventId: number,
       userId: number

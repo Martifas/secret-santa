@@ -51,7 +51,7 @@ describe('removeMember', () => {
           throw new Error('Should not be called')
         },
         findByEventAndUserId: async () => null,
-        isEventAdmin: async () => true, // Even as admin, should throw NOT_FOUND
+        isEventAdmin: async () => true,
       } satisfies Partial<UserEventRepository>,
     }
 

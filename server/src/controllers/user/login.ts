@@ -11,20 +11,20 @@ import config from '@server/config'
 const { expiresIn, tokenKey } = config.auth
 
 export default publicProcedure
-  .use(
-    provideRepos({
-      userRepository,
-    })
-  )
-  .input(
-    userSchema.pick({
-      email: true,
-      password: true,
-    })
-  )
-  .mutation(async ({ input: { email, password }, ctx: { repos } }) => {
-    const user = await repos.userRepository.findByEmail(email)
+  .use(provideRepos({ userRepository }))
+  .input(userSchema.pick({
+    email: true,
+    password: true,
+  }))
+  .mutation(async ({ input: { email, password }, ctx: { repos, res } }) => {
+    if (!res) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Missing response object',
+      })
+    }
 
+    const user = await repos.userRepository.findByEmail(email)
     if (!user) {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
@@ -33,7 +33,6 @@ export default publicProcedure
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password)
-
     if (!passwordMatch) {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
@@ -42,12 +41,16 @@ export default publicProcedure
     }
 
     const payload = prepareTokenPayload(user)
-
     const accessToken = jsonwebtoken.sign(payload, tokenKey, {
       expiresIn,
     })
 
-    return {
-      accessToken,
-    }
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 30 * 60 * 1000, // 30 minutes
+    })
+
+    return { success: true }
   })
