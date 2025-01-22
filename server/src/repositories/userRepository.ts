@@ -16,6 +16,7 @@ export function userRepository(db: Database) {
         .returning(userKeysForMembers)
         .executeTakeFirstOrThrow()
     },
+
     async findByAuth0Id(auth0Id: string): Promise<UserForMember | null> {
       const user = await db
         .selectFrom('user')
@@ -58,13 +59,13 @@ export function userRepository(db: Database) {
         .returning(userKeysForMembers)
         .executeTakeFirstOrThrow()
     },
-    async updateLastLogin(id: number): Promise<UserForMember> {
+    async updateLastLogin(auth0Id: string): Promise<UserForMember> {
       return db
         .updateTable('user')
         .set({
           lastLogin: new Date(),
         })
-        .where('id', '=', id)
+        .where('auth0Id', '=', auth0Id)
         .returning(userKeysForMembers)
         .executeTakeFirstOrThrow()
     },

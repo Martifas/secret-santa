@@ -1,15 +1,20 @@
 import type { AuthUser } from '@server/shared/types'
+import { useAuth0 } from '@auth0/auth0-vue'
 
 export function getUserFromToken(token: string): AuthUser {
-  return JSON.parse(atob(token.split('.')[1])).user
+  return JSON.parse(atob(token.split('.')[1]))
 }
 
 export function getUserIdFromToken(token: string) {
-  return getUserFromToken(token).id
+  return getUserFromToken(token).auth0Id
 }
 
-export function getAccessToken(): string | undefined {
-  const cookies = document.cookie.split(';')
-  const tokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='))
-  return tokenCookie ? tokenCookie.split('=')[1] : undefined
+export async function getAccessToken(): Promise<string | undefined> {
+  try {
+    const { getAccessTokenSilently } = useAuth0()
+    return await getAccessTokenSilently()
+  } catch (error) {
+    console.error('Error getting access token:', error)
+    return undefined
+  }
 }
