@@ -9,9 +9,17 @@ jobs:
     env:
       VITE_API_ORIGIN: http://localhost:3000
       VITE_API_PATH: /api/v1/trpc
-
+      VITE_AUTH0_DOMAIN: ${{ secrets.VITE_AUTH0_DOMAIN }}
+      VITE_AUTH0_CLIENT_ID: ${{ secrets.VITE_AUTH0_CLIENT_ID }}
+      VITE_AUTH0_AUDIENCE: ${{ secrets.VITE_AUTH0_AUDIENCE }}
+            
       # variables for back-end tests
       DATABASE_URL: postgres://test:test@localhost:5432/testdb
+      AUTH0_ISSUER_BASE_URL: ${{ secrets.AUTH0_ISSUER_BASE_URL }}
+      AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+      AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+      AUTH0_SECRET: ${{ secrets.AUTH0_SECRET }}
+      BASE_URL: ${{ secrets.BASE_URL }}
     services:
       # Database for tests
       postgres:
