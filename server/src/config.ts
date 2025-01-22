@@ -14,7 +14,7 @@ const schema = z
     port: z.coerce.number().default(3000),
     baseUrl: z.string().url().optional(),
     auth: z.object({
-      issuerBaseUrl: z.string().url().optional(),
+      issuerBaseUrl: z.string().url(),
       clientId: z.string().optional(),
       clientSecret: z.string().optional(),
       secret: z.string().optional(),
