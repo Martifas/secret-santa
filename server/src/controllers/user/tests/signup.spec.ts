@@ -11,74 +11,70 @@ const { signup } = createCaller({ db })
 
 it('should save a user', async () => {
   const user = fakeUser()
-  const response = await signup(user)
-
+  const response = await signup({
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    auth0Id: 'auth0|123456789'
+  })
+  
   const [userCreated] = await selectAll(db, 'user', (eb) =>
-    eb('email', '=', user.email)
+    eb('auth0Id', '=', 'auth0|123456789')
   )
-
+  
   expect(userCreated).toMatchObject({
     id: expect.any(Number),
-    ...user,
-    password: expect.not.stringContaining(user.password),
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    auth0Id: 'auth0|123456789'
   })
-
-  expect(userCreated.password).toHaveLength(60)
-
   expect(response).toEqual(`User with ${userCreated.id} created`)
 })
 
 it('should require a valid email', async () => {
   await expect(
-    signup(
-      fakeUser({
-        email: 'user-email-invalid',
-      })
-    )
+    signup({
+      ...fakeUser(),
+      auth0Id: 'auth0|123456789',
+      email: 'user-email-invalid'
+    })
   ).rejects.toThrow(/email/i)
-})
-
-it('should require a password with at least 8 characters', async () => {
-  await expect(
-    signup(
-      fakeUser({
-        password: 'pas.123',
-      })
-    )
-  ).rejects.toThrow(/password/i)
-})
-
-it('throws an error for invalid email', async () => {
-  await expect(
-    signup(
-      fakeUser({
-        email: 'not-an-email',
-      })
-    )
-  ).rejects.toThrow(/email/)
 })
 
 it('stores lowercased email', async () => {
   const user = fakeUser()
-
+  const auth0Id = 'auth0|123456789'
+  
   await signup({
     ...user,
-    email: user.email.toUpperCase(),
+    auth0Id,
+    email: user.email.toUpperCase()
   })
-
-  const userSaved = await selectAll(db, 'user', (eb) =>
-    eb('email', '=', user.email)
+  
+  const [userSaved] = await selectAll(db, 'user', (eb) =>
+    eb('auth0Id', '=', auth0Id)
   )
-
-  expect(userSaved).toHaveLength(1)
+  
+  expect(userSaved.email).toBe(user.email.toLowerCase())
 })
 
 it('throws an error for duplicate email', async () => {
   const email = 'duplicate@example.com'
-
-  await signup(fakeUser({ email }))
-
-  await expect(signup(fakeUser({ email }))).rejects.toThrow(
-    /email already exists/i
-  )
+  const auth0Id1 = 'auth0|123456789'
+  const auth0Id2 = 'auth0|987654321'
+  
+  await signup({
+    ...fakeUser(),
+    email,
+    auth0Id: auth0Id1
+  })
+  
+  await expect(
+    signup({
+      ...fakeUser(),
+      email,
+      auth0Id: auth0Id2
+    })
+  ).rejects.toThrow(/email already exists/i)
 })

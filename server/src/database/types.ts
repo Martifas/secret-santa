@@ -56,14 +56,14 @@ export interface EventRule {
 }
 
 export interface User {
-  avatarUrl: string | null
+  auth0Id: string
   createdAt: Generated<Timestamp>
   email: string
   firstName: string | null
   id: Generated<number>
   lastLogin: Generated<Timestamp>
   lastName: string | null
-  password: string
+  picture: string | null
 }
 
 export interface UserEvent {

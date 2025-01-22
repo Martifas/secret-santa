@@ -14,11 +14,11 @@ describe('updateProfile', () => {
 
   const existingUser: UserForMember = {
     id: TEST_USER.id,
-    password: 'Password147',
     email: 'test@example.com',
+    auth0Id: 'auth0 | 125',
     firstName: 'Old First',
     lastName: 'Old Last',
-    avatarUrl: 'https://old-avatar.com',
+    picture: 'https://old-avatar.com',
     createdAt: new Date(),
     lastLogin: new Date(),
   }
@@ -26,7 +26,7 @@ describe('updateProfile', () => {
   const updateInput = {
     firstName: 'New First',
     lastName: 'New Last',
-    avatarUrl: 'https://new-avatar.com',
+    picture: 'https://new-avatar.com',
   }
 
   it('should update user profile when user exists', async () => {
@@ -37,7 +37,7 @@ describe('updateProfile', () => {
 
     const repos = {
       userRepository: {
-        findById: async () => existingUser,
+        findByAuth0Id: async () => existingUser,
         updateProfile: async (id, updates) => {
           expect(id).toBe(existingUser.id)
           expect(updates).toEqual(updateInput)
@@ -67,7 +67,7 @@ describe('updateProfile', () => {
 
     const repos = {
       userRepository: {
-        findById: async () => existingUser,
+        findByAuth0Id: async () => existingUser,
         updateProfile: async (id, updates) => {
           expect(updates).toEqual(partialUpdate)
           return partiallyUpdatedUser
@@ -87,7 +87,7 @@ describe('updateProfile', () => {
   it('should throw NOT_FOUND when user does not exist', async () => {
     const repos = {
       userRepository: {
-        findById: async () => null,
+        findByAuth0Id: async () => null,
         updateProfile: async () => {
           throw new Error('Should not be called')
         },
@@ -110,7 +110,7 @@ describe('updateProfile', () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
       userRepository: {
-        findById: async () => {
+        findByAuth0Id: async () => {
           throw unknownError
         },
       } satisfies Partial<UserRepository>,
@@ -127,7 +127,7 @@ describe('updateProfile', () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
       userRepository: {
-        findById: async () => existingUser,
+        findByAuth0Id: async () => existingUser,
         updateProfile: async () => {
           throw unknownError
         },

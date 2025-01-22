@@ -16,12 +16,11 @@ export function userRepository(db: Database) {
         .returning(userKeysForMembers)
         .executeTakeFirstOrThrow()
     },
-
-    async findByEmail(email: string): Promise<UserForMember | null> {
+    async findByAuth0Id(auth0Id: string): Promise<UserForMember | null> {
       const user = await db
         .selectFrom('user')
         .select(userKeysForMembers)
-        .where('email', '=', email)
+        .where('auth0Id', '=', auth0Id)
         .executeTakeFirst()
       return user ?? null
     },
@@ -33,13 +32,12 @@ export function userRepository(db: Database) {
         .executeTakeFirst()
       return user ?? null
     },
-
     async updateProfile(
       id: number,
       updates: {
         firstName?: string | null
         lastName?: string | null
-        avatarUrl?: string | null
+        picture?: string | null
       }
     ): Promise<UserForMember> {
       return db
@@ -49,7 +47,6 @@ export function userRepository(db: Database) {
         .returning(userKeysForMembers)
         .executeTakeFirstOrThrow()
     },
-
     async updateEmail(
       id: number,
       updates: { email: string }
@@ -61,7 +58,6 @@ export function userRepository(db: Database) {
         .returning(userKeysForMembers)
         .executeTakeFirstOrThrow()
     },
-
     async updateLastLogin(id: number): Promise<UserForMember> {
       return db
         .updateTable('user')

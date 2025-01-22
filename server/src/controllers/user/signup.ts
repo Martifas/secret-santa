@@ -3,8 +3,6 @@ import provideRepos from '@server/trpc/provideRepos'
 import { userRepository } from '@server/repositories/userRepository'
 import { userSchema } from '@server/entities/user'
 import { TRPCError } from '@trpc/server'
-import { hash } from 'bcrypt'
-import config from '@server/config'
 import { assertError } from '@server/utils/errors'
 
 export default publicProcedure
@@ -16,19 +14,18 @@ export default publicProcedure
   .input(
     userSchema.pick({
       email: true,
-      password: true,
       firstName: true,
       lastName: true,
+      auth0Id: true,
     })
   )
   .mutation(async ({ input: user, ctx: { repos } }) => {
-    const passwordHash = await hash(user.password, config.auth.passwordCost)
 
     const userCreated = await repos.userRepository
       .create({
         ...user,
         email: user.email.toLowerCase(),
-        password: passwordHash,
+        auth0Id: user.auth0Id,
       })
 
       .catch((error: unknown) => {
