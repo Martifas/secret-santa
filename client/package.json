@@ -47,6 +47,8 @@
   },
   "dependencies": {
     "@auth0/auth0-vue": "^2.3.3",
+    "@headlessui/vue": "^1.7.23",
+    "@heroicons/vue": "^2.2.0",
     "@trpc/client": "^10.45.2",
     "flowbite": "^2.5.2",
     "flowbite-vue": "^0.1.7",
