@@ -12,10 +12,12 @@ const { expiresIn, tokenKey } = config.auth
 
 export default publicProcedure
   .use(provideRepos({ userRepository }))
-  .input(userSchema.pick({
-    email: true,
-    password: true,
-  }))
+  .input(
+    userSchema.pick({
+      email: true,
+      password: true,
+    })
+  )
   .mutation(async ({ input: { email, password }, ctx: { repos, res } }) => {
     if (!res) {
       throw new TRPCError({
@@ -48,8 +50,10 @@ export default publicProcedure
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 30 * 60 * 1000, // 30 minutes
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      partitioned: process.env.NODE_ENV === 'production',
+      maxAge: 30 * 60 * 1000,
+      path: '/',
     })
 
     return { success: true }

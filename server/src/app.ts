@@ -13,12 +13,21 @@ import config from './config'
 export default function createApp(db: Database) {
   const app = express()
 
-  app.use(cors())
-  app.use(express.json())
+  app.use(
+    cors({
+      origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'trpc-batch',
+        'x-trpc-source',
+      ],
+    })
+  )
 
-  app.use('/api/health', (_, res) => {
-    res.status(200).send('OK')
-  })
+  app.use(express.json())
 
   app.use(
     '/api/v1/trpc',
@@ -28,7 +37,6 @@ export default function createApp(db: Database) {
         req,
         res,
       }),
-
       router: appRouter,
     })
   )
