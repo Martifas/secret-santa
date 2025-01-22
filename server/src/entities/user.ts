@@ -5,15 +5,12 @@ import { idSchema } from './shared'
 
 export const userSchema = z.object({
   id: idSchema,
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters long')
-    .max(64, 'Password must be at most 64 characters long'),
+  auth0Id: z.string(),
   email: z.string().email('Invalid email address').trim(),
   createdAt: z.date(),
   firstName: z.string().min(1).optional().nullable(),
   lastName: z.string().min(1).optional().nullable(),
-  avatarUrl: z.string().min(1).optional().nullable(),
+  picture: z.string().min(1).optional().nullable(),
   lastLogin: z.date().default(() => new Date()),
 })
 
@@ -27,15 +24,15 @@ export type UserForMember = Pick<
 >
 
 export const userKeysForTesting = [
-  'username',
   'email',
   'firstName',
   'lastName',
-  'avatarUrl',
+  'picture',
 ] as const
 
 export const authUserSchema = userSchema.pick({
   id: true,
+  auth0Id: true,
 })
 
 export type AuthUser = z.infer<typeof authUserSchema>

@@ -125,7 +125,8 @@ export const fakeUser = <T extends Partial<Insertable<User>>>(
     email: random.email(),
     firstName: random.first(),
     lastName: random.last(),
-    password: 'Password.123!',
+    auth0Id: `auth0|${random.integer({ min: 1, max: 999 })}`,
+    picture: random.url(),
     ...overrides,
   }) satisfies Insertable<User>
 
@@ -134,6 +135,7 @@ export const fakeAuthUser = <T extends Partial<AuthUser>>(
 ): AuthUser => ({
   id: randomId(),
   email: random.email(),
+  auth0Id: `auth0|${random.integer({ min: 1, max: 999 })}`,
   ...overrides,
 })
 

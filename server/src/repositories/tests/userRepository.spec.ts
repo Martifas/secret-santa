@@ -13,11 +13,12 @@ const [userOne] = await insertAll(db, 'user', fakeUser())
 const fakeUserDefault = (user: Parameters<typeof fakeUser>[0] = {}) =>
   fakeUser({
     ...user,
+    auth0Id: 'auth0 | 1234',
   })
 
 describe('find', () => {
-  it('should return a user by email', async () => {
-    const foundUser = await repository.findByEmail(userOne.email)
+  it('should return a user by auth0 id', async () => {
+    const foundUser = await repository.findByAuth0Id(userOne.auth0Id)
     expect(foundUser).not.toBeNull()
     if (!foundUser) throw new Error('No user found')
     expect(pick(foundUser, userKeysForTesting)).toEqual(
@@ -26,7 +27,7 @@ describe('find', () => {
   })
 
   it('should return null for non-existent user', async () => {
-    const foundUser = await repository.findByEmail('medis@miskas.lt')
+    const foundUser = await repository.findByAuth0Id('google | 123')
     expect(foundUser).toBeNull()
   })
 
@@ -60,6 +61,7 @@ describe('create', () => {
     const createdUser = await repository.create(user)
     expect(createdUser).toMatchObject({
       ...pick(user, userKeysForTesting),
+      auth0Id: 'auth0 | 1234',
       id: expect.any(Number),
       createdAt: expect.any(Date),
       lastLogin: expect.any(Date),
@@ -72,7 +74,7 @@ describe('updateProfile', () => {
     const updates = {
       firstName: 'Updated',
       lastName: 'Name',
-      avatarUrl: 'https://example.com/new.jpg',
+      picture: 'https://example.com/new.jpg',
     }
 
     const updatedUser = await repository.updateProfile(userOne.id, updates)
@@ -108,7 +110,7 @@ describe('updateProfile', () => {
       ...updates,
       id: userOne.id,
       lastName: userOne.lastName,
-      avatarUrl: userOne.avatarUrl,
+      picture: userOne.picture,
     })
   })
 

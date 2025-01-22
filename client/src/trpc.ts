@@ -9,21 +9,9 @@ export const trpc = createTRPCProxyClient<AppRouter>({
     httpBatchLink({
       url: apiBase,
       fetch(url, options) {
-        // Log the original options to understand serialization
-        console.log('tRPC Fetch Options:', {
-          url,
-          method: options?.method,
-          headers: options?.headers,
-          body: options?.body,
-        })
-
         return fetch(url, {
           ...options,
           credentials: 'include',
-          headers: {
-            ...options?.headers,
-            'Content-Type': 'application/json',
-          },
         })
       },
     }),

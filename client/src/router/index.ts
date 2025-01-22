@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { authGuard } from '@auth0/auth0-vue'
 import HealthView from '@/views/HealthView.vue'
 import HomeView from '@/views/HomeView.vue'
 import MainLayout from '@/layout/MainLayout.vue'
@@ -14,15 +15,11 @@ const routes = [
         component: HomeView,
       },
       {
-        path: '/login',
-        name: 'Login',
-        component: () => import('../views/LoginView.vue'),
-      },
-      {
-        path: '/signup',
-        name: 'Signup',
-        component: () => import('../views/SignupView.vue'),
-      },
+        path: 'write',
+        name: 'WriteArticle',
+        component: () => import('@/views/WriteArticle.vue'),
+        beforeEnter: authGuard
+      }
     ],
   },
   {

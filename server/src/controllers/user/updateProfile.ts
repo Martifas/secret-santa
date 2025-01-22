@@ -15,13 +15,13 @@ export default authenticatedProcedure
       .pick({
         firstName: true,
         lastName: true,
-        avatarUrl: true,
+        picture: true,
       })
       .partial()
   )
   .mutation(
     async ({ input, ctx: { repos, authUser } }): Promise<UserForMember> => {
-      const user = await repos.userRepository.findById(authUser.id)
+      const user = await repos.userRepository.findByAuth0Id(authUser.auth0Id)
       if (!user) {
         throw new TRPCError({
           code: 'NOT_FOUND',
