@@ -13,6 +13,7 @@ export default publicProcedure
       firstName: true,
       lastName: true,
       auth0Id: true,
+      picture: true
     })
   )
   .mutation(async ({ input: userData, ctx: { repos } }) => {

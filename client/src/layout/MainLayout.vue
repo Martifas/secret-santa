@@ -14,7 +14,6 @@ import {
   SparklesIcon,
   GiftIcon,
   ChevronDownIcon,
-  UserCircleIcon,
 } from '@heroicons/vue/24/outline'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { watch } from 'vue'
@@ -52,6 +51,7 @@ watch(
           email: authUser.value.email,
           firstName: authUser.value.given_name || '',
           lastName: authUser.value.family_name || '',
+          picture: authUser.value.picture || '',
         })
       } catch (error) {
         console.error('Failed to sync user with database:', error)
@@ -74,7 +74,7 @@ const navigation = [
         <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
           <!-- Mobile menu button-->
           <DisclosureButton
-            class="relative inline-flex items-center justify-center rounded-md p-2 text-black hover:bg-green-900 hover:text-white focus:outline-hidden focus:ring-inset"
+            class="relative inline-flex items-center justify-center rounded-md p-1 text-black hover:bg-green-900 hover:text-white focus:outline-hidden focus:ring-inset border-1"
           >
             <span class="absolute -inset-0.5" />
             <span class="sr-only">Open main menu</span>
@@ -119,12 +119,17 @@ const navigation = [
           <Menu v-else-if="isAuthenticated" as="div" class="relative ml-3">
             <div>
               <MenuButton
-                class="relative flex rounded-full border-3 border-green-900 text-sm hover:border-black focus:outline-hidden"
+                class="relative flex rounded-full border-2 border-green-900 text-sm hover:border-black focus:outline-hidden"
               >
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">Open user menu</span>
-                <UserCircleIcon class="size-8 rounded-full text-green-900" />
-                <ChevronDownIcon class="mx-1 mt-1 inline size-6 text-slate-600" />
+                <img
+                  :src="user?.picture"
+                  :alt="`${user?.name}'s profile picture`"
+                  class="m-0.5 size-8 rounded-full"
+                />
+
+                <ChevronDownIcon class="mt-2 mr-1 inline size-6 text-slate-600" />
               </MenuButton>
             </div>
             <transition
@@ -138,9 +143,9 @@ const navigation = [
               <MenuItems
                 class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden"
               >
-                <MenuItem v-slot="{ active }" v-if="user?.value?.name">
+                <MenuItem v-slot="{ active }" v-if="user?.name">
                   <span class="block px-4 py-2 text-sm text-gray-700">
-                    {{ user.value.name }}
+                    {{ user.name }}
                   </span>
                 </MenuItem>
                 <MenuItem v-slot="{ active }">
