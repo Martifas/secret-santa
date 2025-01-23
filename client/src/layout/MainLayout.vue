@@ -1,3 +1,17 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
+import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+
+const isMobileMenuOpen = ref(false)
+
+const navigation = [
+  { name: 'Home', href: '#', current: true },
+  { name: 'Exchanges', href: '#', current: false },
+  { name: 'Wishlists', href: '#', current: false },
+]
+</script>
+
 <template>
   <nav class="bg-green-100">
     <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -132,17 +146,3 @@
     </div>
   </nav>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue'
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/vue/24/outline'
-
-const isMobileMenuOpen = ref(false)
-
-const navigation = [
-  { name: 'Home', href: '#', current: true },
-  { name: 'Exchanges', href: '#', current: false },
-  { name: 'Wishlists', href: '#', current: false },
-]
-</script>
