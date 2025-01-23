@@ -8,12 +8,62 @@ import {
   MenuItem,
   MenuItems,
 } from '@headlessui/vue'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import {
+  Bars3Icon,
+  XMarkIcon,
+  SparklesIcon,
+  GiftIcon,
+  ChevronDownIcon,
+  UserCircleIcon,
+} from '@heroicons/vue/24/outline'
+import { useAuth0 } from '@auth0/auth0-vue'
+import { watch } from 'vue'
+import { trpc } from '@/trpc'
+
+const { user, isAuthenticated, isLoading, logout, loginWithRedirect } = useAuth0()
+
+async function loginUser() {
+  try {
+    await loginWithRedirect()
+  } catch (error) {
+    console.error('Login failed:', error)
+  }
+}
+
+async function logoutUser() {
+  try {
+    await logout({
+      logoutParams: {
+        returnTo: window.location.origin,
+      },
+    })
+  } catch (error) {
+    console.error('Logout failed:', error)
+  }
+}
+
+watch(
+  [isLoading, () => isAuthenticated, () => user],
+  async ([loading, isAuth, authUser]) => {
+    if (!loading && isAuth && authUser?.value?.sub && authUser?.value?.email) {
+      try {
+        await trpc.user.userSync.mutate({
+          auth0Id: authUser.value.sub,
+          email: authUser.value.email,
+          firstName: authUser.value.given_name || '',
+          lastName: authUser.value.family_name || '',
+        })
+      } catch (error) {
+        console.error('Failed to sync user with database:', error)
+      }
+    }
+  },
+  { immediate: true }
+)
 
 const navigation = [
-  { name: 'Home', href: '#', current: true },
-  { name: 'Exchanges', href: '#', current: false },
-  { name: 'Wishlists', href: '#', current: false },
+  { name: 'Draw Names', href: '#', current: false },
+  { name: 'Create Wishlist', href: '#', current: false },
 ]
 </script>
 
@@ -24,7 +74,7 @@ const navigation = [
         <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
           <!-- Mobile menu button-->
           <DisclosureButton
-            class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset"
+            class="relative inline-flex items-center justify-center rounded-md p-2 text-black hover:bg-green-900 hover:text-white focus:outline-hidden focus:ring-inset"
           >
             <span class="absolute -inset-0.5" />
             <span class="sr-only">Open main menu</span>
@@ -36,8 +86,8 @@ const navigation = [
           <div class="flex shrink-0 items-center">
             <img
               class="h-8 w-auto"
-              src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
-              alt="Your Company"
+              src="https://i.ibb.co/6ytXyyw/gift-meister-final.png"
+              alt="Gift Meister"
             />
           </div>
           <div class="hidden sm:ml-6 sm:block">
@@ -47,13 +97,14 @@ const navigation = [
                 :key="item.name"
                 :href="item.href"
                 :class="[
-                  item.current
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                  'rounded-md px-3 py-2 text-sm font-medium',
+                  item.current ? 'text-green-900 underline' : 'text-black hover:text-green-900',
+                  'rounded-md px-3 py-2 text-sm font-bold',
                 ]"
                 :aria-current="item.current ? 'page' : undefined"
-                >{{ item.name }}</a
+              >
+                <GiftIcon v-if="item.name === 'Draw Names'" class="inline size-6" />
+                <SparklesIcon v-if="item.name === 'Create Wishlist'" class="inline size-6" />
+                {{ item.name }}</a
               >
             </div>
           </div>
@@ -61,19 +112,19 @@ const navigation = [
         <div
           class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"
         >
-          <!-- Profile dropdown -->
-          <Menu as="div" class="relative ml-3">
+          <!-- Loading State -->
+          <div v-if="isLoading" class="text-sm text-gray-500">Loading...</div>
+
+          <!-- Authenticated State: Profile dropdown -->
+          <Menu v-else-if="isAuthenticated" as="div" class="relative ml-3">
             <div>
               <MenuButton
-                class="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
+                class="relative flex rounded-full border-3 border-green-900 text-sm hover:border-black focus:outline-hidden"
               >
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">Open user menu</span>
-                <img
-                  class="size-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  alt=""
-                />
+                <UserCircleIcon class="size-8 rounded-full text-green-900" />
+                <ChevronDownIcon class="mx-1 mt-1 inline size-6 text-slate-600" />
               </MenuButton>
             </div>
             <transition
@@ -87,6 +138,11 @@ const navigation = [
               <MenuItems
                 class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden"
               >
+                <MenuItem v-slot="{ active }" v-if="user?.value?.name">
+                  <span class="block px-4 py-2 text-sm text-gray-700">
+                    {{ user.value.name }}
+                  </span>
+                </MenuItem>
                 <MenuItem v-slot="{ active }">
                   <a
                     href="#"
@@ -108,18 +164,28 @@ const navigation = [
                   >
                 </MenuItem>
                 <MenuItem v-slot="{ active }">
-                  <a
-                    href="#"
+                  <button
+                    @click="logoutUser"
                     :class="[
                       active ? 'bg-gray-100 outline-hidden' : '',
                       'block px-4 py-2 text-sm text-gray-700',
                     ]"
-                    >Sign out</a
                   >
+                    Sign out
+                  </button>
                 </MenuItem>
               </MenuItems>
             </transition>
           </Menu>
+
+          <!-- Unauthenticated State: Login button -->
+          <button
+            v-else
+            @click="loginUser"
+            class="rounded-md bg-green-900 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
+          >
+            Log in
+          </button>
         </div>
       </div>
     </div>
@@ -133,13 +199,14 @@ const navigation = [
           :href="item.href"
           :class="[
             item.current
-              ? 'bg-gray-900 text-white'
-              : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-            'block rounded-md px-3 py-2 text-base font-medium',
+              ? 'text-green-900 underline'
+              : 'border-t-1 border-black text-black last:border-b-1 hover:text-green-900',
+            'block px-3 py-2 text-base font-bold',
           ]"
           :aria-current="item.current ? 'page' : undefined"
-          >{{ item.name }}</DisclosureButton
         >
+          {{ item.name }}
+        </DisclosureButton>
       </div>
     </DisclosurePanel>
   </Disclosure>

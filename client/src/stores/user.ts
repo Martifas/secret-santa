@@ -1,4 +1,3 @@
-// stores/user.ts
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { getAccessToken, getUserIdFromToken } from '@/utils/auth'
