@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import '../../../node_modules/flowbite-vue/dist/index.css';
+
+body {
+    font-family: 'Montserrat', sand-serif;
+}

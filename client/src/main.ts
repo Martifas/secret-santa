@@ -4,8 +4,6 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import { auth0Config } from './config'
-import './index.css'
-import 'flowbite/dist/flowbite.css'
 
 const app = createApp(App)
 
@@ -17,6 +15,7 @@ app.use(
       redirect_uri: auth0Config.redirectUri,
       audience: auth0Config.audience,
     },
+    
   })
 )
 
