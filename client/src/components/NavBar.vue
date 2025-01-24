@@ -21,7 +21,7 @@ const { user, isAuthenticated, isLoading, loginUser, logoutUser } = useAuthSync(
 
 const navigation = [
   { name: 'Draw Names', to: { name: 'Exchange' }, current: false },
-  { name: 'Create Wishlist', to: { name: 'Home' }, current: false },
+  { name: 'Create Wishlist', to: { name: 'Wishlist' }, current: false },
 ]
 </script>
 
@@ -41,13 +41,14 @@ const navigation = [
           </DisclosureButton>
         </div>
         <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-          <div class="flex shrink-0 items-center">
+          <router-link class="flex shrink-0 items-center" :to="{ name: 'Home' }">
             <img
               class="h-8 w-auto"
               src="https://i.ibb.co/6ytXyyw/gift-meister-final.png"
               alt="Gift Meister"
             />
-          </div>
+          </router-link>
+
           <div class="hidden sm:ml-6 sm:block">
             <div class="flex space-x-4">
               <router-link
