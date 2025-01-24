@@ -79,6 +79,8 @@ jobs:
     env:
       CLIENT_IMAGE_TAG: client-${{ github.sha }}
       SERVER_IMAGE_TAG: server-${{ github.sha }}
+      VITE_API_ORIGIN: http://localhost:3000
+      VITE_API_PATH: /api/v1/trpc
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -113,6 +115,11 @@ jobs:
         run: >-
           docker build
           -t $CLIENT_IMAGE_TAG
+            --build-arg VITE_AUTH0_DOMAIN=${{ secrets.VITE_AUTH0_DOMAIN }}
+            --build-arg VITE_AUTH0_CLIENT_ID=${{ secrets.VITE_AUTH0_CLIENT_ID }}
+            --build-arg VITE_AUTH0_AUDIENCE=${{ secrets.VITE_AUTH0_AUDIENCE }}
+            --build-arg VITE_API_ORIGIN=${{ env.VITE_API_ORIGIN }}
+            --build-arg VITE_API_PATH=${{ env.VITE_API_PATH }}
           -f ./client/Dockerfile .
 
       - name: Push server image
