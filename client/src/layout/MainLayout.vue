@@ -62,8 +62,8 @@ watch(
 )
 
 const navigation = [
-  { name: 'Draw Names', href: '#', current: false },
-  { name: 'Create Wishlist', href: '#', current: false },
+  { name: 'Draw Names', href: '/gift-exchanges', current: false },
+  { name: 'Create Wishlist', href: '/', current: false },
 ]
 </script>
 
