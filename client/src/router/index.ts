@@ -23,10 +23,10 @@ const routes = [
     component: MainLayout,
     children: [
       {
-        path: '',
+        path: '/gift-exchanges',
         name: 'Exchange',
         component: ExchangeView,
-        beforeEnter: authGuard
+        beforeEnter: authGuard,
       },
     ],
   },
@@ -35,10 +35,10 @@ const routes = [
     component: MainLayout,
     children: [
       {
-        path: '',
+        path: '/wishlist',
         name: 'Wishlist',
         component: WishlistView,
-        beforeEnter: authGuard
+        beforeEnter: authGuard,
       },
     ],
   },
@@ -47,12 +47,23 @@ const routes = [
     name: 'health-check',
     component: HealthView,
   },
-  
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+router.beforeEach(async (to, from) => {
+  if (to.fullPath.includes('state=') && to.fullPath.includes('code=')) {
+    const targetRoute = sessionStorage.getItem('targetRoute') || '/gift-exchanges'
+    sessionStorage.removeItem('targetRoute')
+    return targetRoute
+  }
+
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    sessionStorage.setItem('targetRoute', to.fullPath)
+  }
 })
 
 export default router
