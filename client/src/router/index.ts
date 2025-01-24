@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { authGuard } from '@auth0/auth0-vue'
 import HealthView from '@/views/HealthView.vue'
 import HomeView from '@/views/HomeView.vue'
 import MainLayout from '@/layout/MainLayout.vue'
+import ExchangeView from '@/views/ExchangeView.vue'
 
 const routes = [
   {
@@ -14,12 +14,17 @@ const routes = [
         name: 'Home',
         component: HomeView,
       },
+    ],
+  },
+  {
+    path: '/gift-exchanges',
+    component: MainLayout,
+    children: [
       {
-        path: 'write',
-        name: 'WriteArticle',
-        component: () => import('@/views/WriteArticle.vue'),
-        beforeEnter: authGuard
-      }
+        path: '',
+        name: 'Exchange',
+        component: ExchangeView,
+      },
     ],
   },
   {
@@ -27,6 +32,7 @@ const routes = [
     name: 'health-check',
     component: HealthView,
   },
+  
 ]
 
 const router = createRouter({

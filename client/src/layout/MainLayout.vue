@@ -71,10 +71,10 @@ const navigation = [
   <Disclosure as="nav" class="bg-white" v-slot="{ open }">
     <div class="container mx-auto max-w-7xl">
       <div class="relative flex h-16 items-center justify-between">
-        <div class="absolute inset-y-0 left-0 flex px-4 items-center sm:hidden">
+        <div class="absolute inset-y-0 left-0 flex items-center px-4 sm:hidden">
           <!-- Mobile menu button-->
           <DisclosureButton
-            class="relative inline-flex items-center justify-center rounded-md p-1 text-black hover:bg-green-900 hover:text-white focus:outline-hidden focus:ring-inset border-1"
+            class="relative inline-flex items-center justify-center rounded-md border-1 p-1 text-black hover:bg-green-900 hover:text-white focus:outline-hidden focus:ring-inset"
           >
             <span class="absolute -inset-0.5" />
             <span class="sr-only">Open main menu</span>
