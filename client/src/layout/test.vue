@@ -15,15 +15,20 @@ import {
   GiftIcon,
   ChevronDownIcon,
 } from '@heroicons/vue/24/outline'
-import { useAuth0 } from '@auth0/auth0-vue'
-import { watch } from 'vue'
-import { trpc } from '@/trpc'
+import { storeToRefs } from 'pinia'
+import { useAuthStore } from '@/stores/user'
+import { onMounted } from 'vue'
 
-const { user, isAuthenticated, isLoading, logout, loginWithRedirect } = useAuth0()
+const authStore = useAuthStore()
+const { isLoggedIn, authUser, userPicture } = storeToRefs(authStore)
+
+onMounted(() => {
+  authStore.loadFromStorage()
+})
 
 async function loginUser() {
   try {
-    await loginWithRedirect()
+    await authStore.login()
   } catch (error) {
     console.error('Login failed:', error)
   }
@@ -31,39 +36,15 @@ async function loginUser() {
 
 async function logoutUser() {
   try {
-    await logout({
-      logoutParams: {
-        returnTo: window.location.origin,
-      },
-    })
+    await authStore.logout()
   } catch (error) {
     console.error('Logout failed:', error)
   }
 }
 
-watch(
-  [isLoading, () => isAuthenticated, () => user],
-  async ([loading, isAuth, authUser]) => {
-    if (!loading && isAuth && authUser?.value?.sub && authUser?.value?.email) {
-      try {
-        await trpc.user.userSync.mutate({
-          auth0Id: authUser.value.sub,
-          email: authUser.value.email,
-          firstName: authUser.value.given_name || '',
-          lastName: authUser.value.family_name || '',
-          picture: authUser.value.picture || '',
-        })
-      } catch (error) {
-        console.error('Failed to sync user with database:', error)
-      }
-    }
-  },
-  { immediate: true }
-)
-
 const navigation = [
-  { name: 'Draw Names', to: { name: 'Exchange' }, current: false },
-  { name: 'Create Wishlist', to: { name: 'Home' }, current: false },
+  { name: 'Draw Names', href: '/gift-exchanges', current: false },
+  { name: 'Create Wishlist', href: '/', current: false },
 ]
 </script>
 
@@ -92,10 +73,10 @@ const navigation = [
           </div>
           <div class="hidden sm:ml-6 sm:block">
             <div class="flex space-x-4">
-              <router-link
+              
                 v-for="item in navigation"
                 :key="item.name"
-                :to="item.to"
+                :href="item.href"
                 :class="[
                   item.current ? 'text-green-900 underline' : 'text-black hover:text-green-900',
                   'rounded-md px-3 py-2 text-sm font-bold',
@@ -104,7 +85,7 @@ const navigation = [
               >
                 <GiftIcon v-if="item.name === 'Draw Names'" class="inline size-6" />
                 <SparklesIcon v-if="item.name === 'Create Wishlist'" class="inline size-6" />
-                {{ item.name }}</router-link
+                {{ item.name }}</a
               >
             </div>
           </div>
@@ -112,11 +93,8 @@ const navigation = [
         <div
           class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-4"
         >
-          <!-- Loading State -->
-          <div v-if="isLoading" class="text-sm text-gray-500">Loading...</div>
-
           <!-- Authenticated State: Profile dropdown -->
-          <Menu v-else-if="isAuthenticated" as="div" class="relative ml-3">
+          <Menu v-if="isLoggedIn" as="div" class="relative ml-3">
             <div>
               <MenuButton
                 class="relative flex rounded-full border-2 border-green-900 text-sm hover:border-black focus:outline-hidden"
@@ -124,11 +102,10 @@ const navigation = [
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">Open user menu</span>
                 <img
-                  :src="user?.picture"
-                  :alt="`${user?.name}'s profile picture`"
+                  :src="userPicture"
+                  :alt="`${authUser?.firstName}'s profile picture`"
                   class="m-0.5 size-8 rounded-full"
                 />
-
                 <ChevronDownIcon class="mt-2 mr-1 inline size-6 text-slate-600" />
               </MenuButton>
             </div>
@@ -143,13 +120,13 @@ const navigation = [
               <MenuItems
                 class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden"
               >
-                <MenuItem v-slot="{ active }" v-if="user?.name">
+                <MenuItem v-slot="{ active }" v-if="authUser?.firstName">
                   <span class="block px-4 py-2 text-sm text-gray-700">
-                    {{ user.name }}
+                    {{ authUser.firstName }} {{ authUser.lastName }}
                   </span>
                 </MenuItem>
                 <MenuItem v-slot="{ active }">
-                  <a
+                  
                     href="#"
                     :class="[
                       active ? 'bg-gray-100 outline-hidden' : '',
@@ -159,7 +136,7 @@ const navigation = [
                   >
                 </MenuItem>
                 <MenuItem v-slot="{ active }">
-                  <a
+                  
                     href="#"
                     :class="[
                       active ? 'bg-gray-100 outline-hidden' : '',
@@ -201,7 +178,7 @@ const navigation = [
           v-for="item in navigation"
           :key="item.name"
           as="a"
-          :href="item.to"
+          :href="item.href"
           :class="[
             item.current
               ? 'text-green-900 underline'
