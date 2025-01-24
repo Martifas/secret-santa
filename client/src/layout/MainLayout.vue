@@ -69,9 +69,9 @@ const navigation = [
 
 <template>
   <Disclosure as="nav" class="bg-white" v-slot="{ open }">
-    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <div class="container mx-auto max-w-7xl">
       <div class="relative flex h-16 items-center justify-between">
-        <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+        <div class="absolute inset-y-0 left-0 flex px-4 items-center sm:hidden">
           <!-- Mobile menu button-->
           <DisclosureButton
             class="relative inline-flex items-center justify-center rounded-md p-1 text-black hover:bg-green-900 hover:text-white focus:outline-hidden focus:ring-inset border-1"
@@ -110,7 +110,7 @@ const navigation = [
           </div>
         </div>
         <div
-          class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"
+          class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-4"
         >
           <!-- Loading State -->
           <div v-if="isLoading" class="text-sm text-gray-500">Loading...</div>
