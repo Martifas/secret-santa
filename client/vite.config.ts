@@ -12,4 +12,10 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  preview: {
+    allowedHosts: [
+      'giftmeister.eu',
+      'secret-santa.y3peb2c7ghy0t.eu-central-1.cs.amazonlightsail.com',
+    ],
+  },
 })
