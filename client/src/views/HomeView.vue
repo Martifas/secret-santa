@@ -1,3 +1,8 @@
+<script setup lang="ts">
+import ExchangeView from './ExchangeView.vue';
+
+</script>
+
 <template>
   <div
     class="h-96 min-h-[300px] w-full bg-[url(https://images.unsplash.com/photo-1467810563316-b5476525c0f9?q=80&w=1469&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] bg-cover bg-center"
@@ -13,12 +18,12 @@
         </p>
       </div>
       <div class="text-md mx-auto flex w-40 flex-col mt-20">
-        <a class="m-2 rounded-sm bg-green-900 p-2 text-center text-white hover:bg-green-700">
+        <router-link :to="{ name: 'Home' }" class="m-2 rounded-sm bg-green-900 p-2 text-center text-white hover:bg-green-700">
           Create Wishlist
-        </a>
-        <a class="m-2 rounded-sm bg-green-900 p-2 text-center text-white hover:bg-green-700">
+        </router-link>
+        <router-link :to="{ name: 'Exchange' }" class="m-2 rounded-sm bg-green-900 p-2 text-center text-white hover:bg-green-700">
           Draw Names
-        </a>
+        </router-link>
       </div>
     </div>
   </div>
