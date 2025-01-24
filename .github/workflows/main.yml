@@ -108,11 +108,9 @@ jobs:
           -t $SERVER_IMAGE_TAG
           -f ./server/Dockerfile .
 
-      # if you need to pass additional environment variables to the client
-      # build, then you will need to pass them as a docker build argument:
-      # --build-arg VITE_MY_CUSTOM_VAR=${{vars.MY_CUSTOM_VAR}}
+      
       - name: Build client image
-        run: >-
+        run: >
           docker build
           -t $CLIENT_IMAGE_TAG
             --build-arg VITE_AUTH0_DOMAIN=${{ secrets.VITE_AUTH0_DOMAIN }}
