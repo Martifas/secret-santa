@@ -79,7 +79,7 @@ jobs:
     env:
       CLIENT_IMAGE_TAG: client-${{ github.sha }}
       SERVER_IMAGE_TAG: server-${{ github.sha }}
-      VITE_API_ORIGIN: http://localhost:3000
+      VITE_API_ORIGIN: http://localhost:80
       VITE_API_PATH: /api/v1/trpc
     steps:
       - name: Check out repository
