@@ -8,9 +8,7 @@ export async function up(db: Kysely<any>) {
     )
     .addColumn('name', 'text', (c) => c.notNull())
     .addColumn('description', 'text', (c) => c.notNull())
-    .addColumn('created_by', 'integer', (c) =>
-      c.references('user.id').notNull()
-    )
+    .addColumn('created_by', 'text', (c) => c.notNull())
     .addColumn('event_date', 'date', (c) => c.notNull())
     .addColumn('budget_limit', 'integer', (c) => c.notNull())
     .addColumn('status', 'text', (c) => c.notNull())

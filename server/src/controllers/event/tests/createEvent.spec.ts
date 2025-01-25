@@ -16,7 +16,7 @@ describe('create', () => {
       name: 'Christmas Party',
       description: 'Annual office party',
       budgetLimit: 50,
-      status: 'draft',
+      status: 'active',
       eventDate: new Date('2024-12-25'),
     }
 
@@ -54,7 +54,7 @@ describe('create', () => {
       name: 'Christmas Party',
       description: 'Annual office party',
       budgetLimit: 50,
-      status: 'draft',
+      status: 'active',
       eventDate: expect.any(Date),
       createdBy: TEST_USER.id,
       createdAt: expect.any(Date),

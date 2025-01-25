@@ -7,7 +7,7 @@ export const eventSchema = z.object({
   id: idSchema,
   name: z.string().min(1),
   description: z.string().min(1),
-  createdBy: idSchema,
+  createdBy: z.string(),
   eventDate: z.coerce.date(),
   budgetLimit: z.number().int().positive(),
   status: z.string().min(1),

@@ -20,7 +20,7 @@ import { useAuthSync } from '@/composables/userErrorMessage/useAuthSync'
 const { user, isAuthenticated, isLoading, loginUser, logoutUser } = useAuthSync()
 
 const navigation = [
-  { name: 'Draw Names', to: { name: 'Exchange' }, current: false },
+  { name: 'Gift Exchange', to: { name: 'Exchange' }, current: false },
   { name: 'Create Wishlist', to: { name: 'Wishlist' }, current: false },
 ]
 </script>

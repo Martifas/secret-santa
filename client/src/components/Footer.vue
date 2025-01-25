@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { GiftIcon, SparklesIcon, HomeIcon, InformationCircleIcon } from '@heroicons/vue/24/outline'
+
 const navigation = [
   { name: 'Home', to: { name: 'Home' }, icon: HomeIcon, current: false },
-  { name: 'Draw Names', to: { name: 'Exchange' }, icon: GiftIcon, current: false },
+  { name: 'Gift Exchange', to: { name: 'Exchange' }, icon: GiftIcon, current: false },
   { name: 'Create Wishlist', to: { name: 'Wishlist' }, icon: SparklesIcon, current: false },
   { name: 'About', to: { name: 'About' }, icon: InformationCircleIcon, current: false },
 ]

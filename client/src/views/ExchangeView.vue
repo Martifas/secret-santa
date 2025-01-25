@@ -2,7 +2,11 @@
 import { ref, onMounted } from 'vue'
 import { FwbInput, FwbTextarea } from 'flowbite-vue'
 import { Datepicker } from 'flowbite-datepicker'
-import { TrashIcon } from '@heroicons/vue/24/outline'
+import { TrashIcon, ArrowRightIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { trpc } from '@/trpc'
+import { useAuth0 } from '@auth0/auth0-vue'
+
+const { user } = useAuth0()
 
 interface ExchangeForm {
   title: string
@@ -38,9 +42,74 @@ onMounted(() => {
       autohide: true,
       todayHighlight: true,
       clearBtn: true,
+      orientation: 'bottom',
+    })
+
+    datepickerElement.addEventListener('changeDate', (e: any) => {
+      const date = e.detail.date
+      if (date) {
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        const year = date.getFullYear()
+        form.value.date = `${month}/${day}/${year}`
+      } else {
+        form.value.date = ''
+      }
     })
   }
 })
+
+async function createEvent() {
+  try {
+    if (!user.value?.sub) {
+      throw new Error('User not authenticated')
+    }
+
+    if (!form.value.date) {
+      throw new Error('Date is required')
+    }
+
+    const dateParts = form.value.date.split('/')
+    if (dateParts.length !== 3) {
+      throw new Error('Invalid date format')
+    }
+
+    const month = parseInt(dateParts[0]) - 1
+    const day = parseInt(dateParts[1])
+    const year = parseInt(dateParts[2])
+
+    const eventDate = new Date(year, month, day)
+
+    if (isNaN(eventDate.getTime())) {
+      throw new Error('Invalid date')
+    }
+
+    const event = await trpc.event.createEvent.mutate({
+      createdBy: user.value.sub,
+      eventDate: eventDate,
+      budgetLimit: form.value.budget,
+      description: form.value.description,
+      status: 'active',
+      name: form.value.title,
+    })
+
+    // Reset form after successful creation
+    form.value = {
+      title: '',
+      description: '',
+      budget: 0,
+      date: '',
+      name: '',
+      participants: [{ email: '' }],
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Failed to create event:', error.message)
+    } else {
+      console.error('Failed to create event:', error)
+    }
+  }
+}
 </script>
 
 <template>
@@ -55,14 +124,14 @@ onMounted(() => {
       </div>
       <div class="basis-full md:basis-1/2">
         <div class="mb-8">
-          <h2 class="mb-4 text-3xl font-bold">Draw Names Online</h2>
+          <h2 class="mb-4 text-3xl font-bold">Create Gift Exchange</h2>
           <p class="text-gray-600">
             Draw names for gifts online with Gift Meister. Easily add gifts and invite participants
             for a quick and simple gift exchange.
           </p>
         </div>
 
-        <form class="space-y-6" @submit.prevent>
+        <form class="space-y-6" @submit.prevent="createEvent">
           <div class="space-y-4">
             <FwbInput v-model="form.title" placeholder="Enter a title" label="Title" required />
 
@@ -71,6 +140,7 @@ onMounted(() => {
               placeholder="Description"
               label="Enter a description"
               :rows="5"
+              class="text-black"
               required
             />
 
@@ -119,18 +189,28 @@ onMounted(() => {
                 />
               </div>
             </div>
-            <button
-              @click="addParticipant"
-              type="button"
-              class="rounded-lg border-1 bg-green-900 px-4 py-2 text-center text-white hover:bg-green-700"
-            >
-              Add Participant
-            </button>
+            <div class="flex flex-row justify-between">
+              <button
+                @click="addParticipant"
+                type="button"
+                class="flex rounded-lg border-1 bg-green-900 px-4 py-2 text-center text-white hover:bg-green-700"
+              >
+                Add Participant
+                <PlusIcon class="my-auto ml-2 inline size-5 flex-none cursor-pointer" />
+              </button>
+              <button
+                type="submit"
+                class="flex rounded-lg border-1 bg-sky-900 px-4 py-2 text-center text-white hover:bg-sky-700"
+              >
+                Create gift exchange
+                <ArrowRightIcon class="my-auto ml-2 inline size-5 cursor-pointer" />
+              </button>
+            </div>
           </div>
         </form>
       </div>
     </div>
-    <div class="border-1 border-gray-300 p-8 mt-8">
+    <div class="mt-8 border-1 border-gray-300 p-8">
       <div>
         <h2 class="text-xl font-bold">Draw Names with Gift Meister</h2>
         <p class="py-2">
@@ -159,7 +239,7 @@ onMounted(() => {
         </ul>
       </div>
       <div>
-        <h2 class="text-xl font-bold mt-7">Choosing the Perfect Gift for Your Draw</h2>
+        <h2 class="mt-7 text-xl font-bold">Choosing the Perfect Gift for Your Draw</h2>
         <p class="py-2">
           Finding the ideal gift can be simple with a little thought and creativity. Here are some
           tips to help you pick something special:
@@ -181,7 +261,7 @@ onMounted(() => {
         </ul>
       </div>
       <div>
-        <h2 class="text-xl font-bold mt-7">Benefits of Drawing Names</h2>
+        <h2 class="mt-7 text-xl font-bold">Benefits of Drawing Names</h2>
         <p class="py-2">
           Drawing names for gift exchanges is an exciting way to celebrate with friends, family, or
           colleagues. Here are a few reasons why it's great:
@@ -202,7 +282,7 @@ onMounted(() => {
         </ul>
       </div>
       <div>
-        <h2 class="text-xl font-bold mt-7">Is Happy Giftmeister Free?</h2>
+        <h2 class="mt-7 text-xl font-bold">Is Happy Giftmeister Free?</h2>
         <p class="py-2">
           Yes, Happy Giftlist is totally free! Whether you’re arranging a gift exchange, creating
           wishlists for special events, or just keeping track of your holiday desires, Happy
