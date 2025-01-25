@@ -15,7 +15,6 @@ describe('create', () => {
     userId: TEST_USER.id,
     eventId,
     email: 'ezys@miskas.lt',
-    token: '124asb',
     status: 'sent',
     expiresAt: new Date('2025-12-24'),
   }
@@ -51,7 +50,6 @@ describe('create', () => {
       userId: TEST_USER.id,
       eventId,
       email: 'ezys@miskas.lt',
-      token: '124asb',
       status: 'sent',
       expiresAt: expect.any(Date),
       createdAt: expect.any(Date),

@@ -11,7 +11,7 @@ export async function up(db: Kysely<any>) {
     .addColumn('created_by', 'integer', (c) =>
       c.references('user.id').notNull()
     )
-    .addColumn('event_date', 'timestamptz', (c) => c.notNull())
+    .addColumn('event_date', 'date', (c) => c.notNull())
     .addColumn('budget_limit', 'integer', (c) => c.notNull())
     .addColumn('status', 'text', (c) => c.notNull())
     .addColumn('created_at', 'timestamptz', (c) =>

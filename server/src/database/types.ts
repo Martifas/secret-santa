@@ -43,7 +43,6 @@ export interface EventInvitations {
   expiresAt: Timestamp
   id: Generated<number>
   status: string
-  token: string
   updatedAt: Generated<Timestamp>
   userId: number
 }

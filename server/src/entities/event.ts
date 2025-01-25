@@ -8,12 +8,11 @@ export const eventSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   createdBy: idSchema,
-  eventDate: z.date(),
-  // eventDate: z.string().transform((str) => new Date(str)),
+  eventDate: z.coerce.date(),
   budgetLimit: z.number().int().positive(),
   status: z.string().min(1),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 })
 
 export const eventKeysForMembers = Object.keys(
