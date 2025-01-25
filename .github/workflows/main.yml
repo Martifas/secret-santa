@@ -151,10 +151,10 @@ jobs:
               "image": "${{ env.LIGHTSAIL_CLIENT_IMAGE }}",
               "command": [],
               "ports": {
-                "80": "HTTP"
+                "8080": "HTTP"
               },
               "environment": {
-                "API_PROXY_PASS": "http://localhost:3000",
+                "API_PROXY_PASS": "http://localhost:80",
                 "VITE_AUTH0_DOMAIN": "${{ secrets.VITE_AUTH0_DOMAIN }}",
                 "VITE_AUTH0_CLIENT_ID": "${{ secrets.VITE_AUTH0_CLIENT_ID }}",
                 "VITE_AUTH0_AUDIENCE": "${{ secrets.VITE_AUTH0_AUDIENCE }}"
@@ -184,7 +184,7 @@ jobs:
         run: |
           echo '{
             "containerName": "client",
-            "containerPort": 80,
+            "containerPort": 8080,
             "healthCheck": {
               "intervalSeconds": 10,
               "path": "/api/health"
