@@ -65,6 +65,8 @@ async function createEvent() {
       throw new Error('User not authenticated')
     }
 
+    // Get the access token but we'll configure it at the tRPC client level
+
     if (!form.value.date) {
       throw new Error('Date is required')
     }

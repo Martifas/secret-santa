@@ -15,9 +15,21 @@ import {
   GiftIcon,
   ChevronDownIcon,
 } from '@heroicons/vue/24/outline'
-import { useAuthSync } from '@/composables/userErrorMessage/useAuthSync'
+import { useAuth0 } from '@auth0/auth0-vue'
 
-const { user, isAuthenticated, isLoading, loginUser, logoutUser } = useAuthSync()
+const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0()
+
+const login = () => {
+  loginWithRedirect()
+}
+
+const logoutUser = () => {
+  logout({
+    logoutParams: {
+      returnTo: window.location.origin,
+    },
+  })
+}
 
 const navigation = [
   { name: 'Gift Exchange', to: { name: 'Exchange' }, current: false },
@@ -26,7 +38,11 @@ const navigation = [
 </script>
 
 <template>
-  <Disclosure as="nav" class="border-bottom border-1 sticky top-0 z-50 border-gray-300 bg-white" v-slot="{ open }">
+  <Disclosure
+    as="nav"
+    class="border-bottom sticky top-0 z-50 border-1 border-gray-300 bg-white"
+    v-slot="{ open }"
+  >
     <div class="container mx-auto max-w-7xl">
       <div class="relative flex h-16 items-center justify-center">
         <div class="absolute inset-y-0 left-0 flex items-center px-4 sm:hidden">
@@ -40,9 +56,7 @@ const navigation = [
             <XMarkIcon v-else class="block size-6" aria-hidden="true" />
           </DisclosureButton>
         </div>
-        <div
-          class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start"
-        >
+        <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
           <router-link class="flex items-center" :to="{ name: 'Home' }">
             <img
               class="h-8 w-auto"
@@ -147,7 +161,7 @@ const navigation = [
           <!-- Unauthenticated State: Login button -->
           <button
             v-else
-            @click="loginUser"
+            @click="login"
             class="rounded-md bg-green-900 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
           >
             Log in

@@ -29,6 +29,8 @@ export default function createApp(db: Database) {
 
   app.use(express.json())
 
+  
+
   app.use('/api/health', (_, res) => {
     res.status(200).send('OK')
   })
