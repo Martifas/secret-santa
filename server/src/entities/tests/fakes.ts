@@ -76,7 +76,7 @@ export const fakeEvent = <T extends Partial<Insertable<Event>>>(
 
   return {
     budgetLimit: random.integer({ min: 10, max: 1000 }),
-    createdBy: randomId(),
+    createdBy: `auth0|${random.guid()}`,
     description: random.paragraph(),
     eventDate: dateWithoutTime,
     name: random.word(),
