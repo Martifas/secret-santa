@@ -17,8 +17,16 @@ export default function createApp(db: Database) {
     cors({
       origin: [
         'http://localhost:5173',
+        'https://localhost:5173',
         'http://127.0.0.1:5174',
         'https://giftmeister.eu',
+        'http://giftmeister.eu',
+        'http://localhost:3000',
+        'https://localhost:3000',
+        'http://localhost',
+        'https://localhost',
+        'http://localhost:80',
+        'https://localhost:80',
       ],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
