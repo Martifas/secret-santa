@@ -26,7 +26,7 @@ const navigation = [
 </script>
 
 <template>
-  <Disclosure as="nav" class="bg-white" v-slot="{ open }">
+  <Disclosure as="nav" class="border-bottom border-1 border-gray-300 bg-white" v-slot="{ open }">
     <div class="container mx-auto max-w-7xl">
       <div class="relative flex h-16 items-center justify-between">
         <div class="absolute inset-y-0 left-0 flex items-center px-4 sm:hidden">
@@ -40,8 +40,10 @@ const navigation = [
             <XMarkIcon v-else class="block size-6" aria-hidden="true" />
           </DisclosureButton>
         </div>
-        <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-          <router-link class="flex shrink-0 items-center" :to="{ name: 'Home' }">
+        <div
+          class="flex flex-1 items-center justify-center sm:items-start sm:justify-start md:items-start md:justify-start lg:items-start lg:justify-start xl:items-start xl:justify-start"
+        >
+          <router-link class="flex items-center" :to="{ name: 'Home' }">
             <img
               class="h-8 w-auto"
               src="https://i.ibb.co/6ytXyyw/gift-meister-final.png"
