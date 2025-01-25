@@ -111,7 +111,6 @@ describe('update', () => {
       email: 'barsukas@miskas.lt',
       status: 'confirmed',
       expiresAt: new Date('2025-12-24'),
-    
     }
     const updatedInvitation = await repository.update(invitationOne.id, updates)
     expect(pick(updatedInvitation, invitationKeysForTesting)).toEqual(

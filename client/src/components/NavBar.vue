@@ -26,7 +26,7 @@ const navigation = [
 </script>
 
 <template>
-  <Disclosure as="nav" class="border-bottom border-1 border-gray-300 bg-white" v-slot="{ open }">
+  <Disclosure as="nav" class="border-bottom border-1 sticky top-0 z-50 border-gray-300 bg-white" v-slot="{ open }">
     <div class="container mx-auto max-w-7xl">
       <div class="relative flex h-16 items-center justify-center">
         <div class="absolute inset-y-0 left-0 flex items-center px-4 sm:hidden">

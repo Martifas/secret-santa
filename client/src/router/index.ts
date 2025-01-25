@@ -5,6 +5,7 @@ import MainLayout from '@/layout/MainLayout.vue'
 import ExchangeView from '@/views/ExchangeView.vue'
 import WishlistView from '@/views/WishlistView.vue'
 import { authGuard } from '@auth0/auth0-vue'
+import AboutView from '@/views/AboutView.vue'
 
 const routes = [
   {
@@ -15,6 +16,17 @@ const routes = [
         path: '',
         name: 'Home',
         component: HomeView,
+      },
+    ],
+  },
+  {
+    path: '/about',
+    component: MainLayout,
+    children: [
+      {
+        path: 'about',
+        name: 'About',
+        component: AboutView,
       },
     ],
   },
