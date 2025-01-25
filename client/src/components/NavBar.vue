@@ -16,6 +16,8 @@ import {
   ChevronDownIcon,
 } from '@heroicons/vue/24/outline'
 import { useAuth0 } from '@auth0/auth0-vue'
+import { watch } from 'vue';
+import { trpc } from '@/trpc';
 
 const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0()
 
@@ -30,6 +32,26 @@ const logoutUser = () => {
     },
   })
 }
+
+watch(
+  [isLoading, () => isAuthenticated, () => user],
+  async ([loading, isAuth, authUser]) => {
+    if (!loading && isAuth && authUser?.value?.sub && authUser?.value?.email) {
+      try {
+        await trpc.user.userSync.mutate({
+          auth0Id: authUser.value.sub,
+          email: authUser.value.email,
+          firstName: authUser.value.given_name || '',
+          lastName: authUser.value.family_name || '',
+          picture: authUser.value.picture || '',
+        })
+      } catch (error) {
+        console.error('Failed to sync user with database:', error)
+      }
+    }
+  },
+  { immediate: true }
+)
 
 const navigation = [
   { name: 'Gift Exchange', to: { name: 'Exchange' }, current: false },
