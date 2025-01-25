@@ -39,6 +39,14 @@ export default function createApp(db: Database) {
     })
   )
 
+  app.use((req, res, next) => {
+    console.log('CORS - Incoming Request:', {
+      origin: req.get('origin'),
+      host: req.get('host'),
+    })
+    next()
+  })
+
   app.use(express.json())
 
   app.use('/api/health', (_, res) => {
