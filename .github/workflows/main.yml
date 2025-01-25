@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     # variables for front-end tests
     env:
-      VITE_API_ORIGIN: http://localhost:3000
+      VITE_API_ORIGIN: http://localhost:80
       VITE_API_PATH: /api/v1/trpc
       VITE_AUTH0_DOMAIN: ${{ secrets.VITE_AUTH0_DOMAIN }}
       VITE_AUTH0_CLIENT_ID: ${{ secrets.VITE_AUTH0_CLIENT_ID }}
@@ -108,7 +108,6 @@ jobs:
           -t $SERVER_IMAGE_TAG
           -f ./server/Dockerfile .
 
-      
       - name: Build client image
         run: >
           docker build
@@ -153,8 +152,7 @@ jobs:
               "ports": {
                 "8080": "HTTP"
               },
-              "environment": {
-                "API_PROXY_PASS": "http://localhost:80",
+              "environment": {                
                 "VITE_AUTH0_DOMAIN": "${{ secrets.VITE_AUTH0_DOMAIN }}",
                 "VITE_AUTH0_CLIENT_ID": "${{ secrets.VITE_AUTH0_CLIENT_ID }}",
                 "VITE_AUTH0_AUDIENCE": "${{ secrets.VITE_AUTH0_AUDIENCE }}"
