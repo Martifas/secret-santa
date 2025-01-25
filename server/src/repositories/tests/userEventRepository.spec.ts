@@ -16,7 +16,7 @@ const repository = userEventRepository(db)
 const [userOne] = await insertAll(db, 'user', fakeUser())
 const [userTwo] = await insertAll(db, 'user', fakeUser())
 const [eventOne] = await insertAll(db, 'event', [
-  fakeEvent({ createdBy: userOne.id }),
+  fakeEvent({ createdBy: userOne.auth0Id }),
 ])
 const [wishlistOne] = await insertAll(db, 'wishlist', [
   fakeWishlist({ userId: userOne.id, eventId: eventOne.id }),
@@ -83,7 +83,7 @@ describe('isEventAdmin', () => {
   it('should return true when user is a admin of event', async () => {
     const [newUser] = await insertAll(db, 'user', fakeUser())
     const [newEvent] = await insertAll(db, 'event', [
-      fakeEvent({ createdBy: newUser.id }),
+      fakeEvent({ createdBy: newUser.auth0Id }),
     ])
 
     await insertAll(db, 'userEvent', [
@@ -123,7 +123,7 @@ describe('create', () => {
   it('should create a new record', async () => {
     const [newUser] = await insertAll(db, 'user', fakeUser())
     const [newEvent] = await insertAll(db, 'event', [
-      fakeEvent({ createdBy: newUser.id }),
+      fakeEvent({ createdBy: newUser.auth0Id }),
     ])
     const [newWishlist] = await insertAll(db, 'wishlist', [
       fakeWishlist({ userId: newUser.id, eventId: newEvent.id }),

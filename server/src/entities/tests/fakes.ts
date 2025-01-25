@@ -59,19 +59,31 @@ const generateRuleData = (ruleType: string): Json => {
  */
 export const fakeEvent = <T extends Partial<Insertable<Event>>>(
   overrides: T = {} as T
-) =>
-  ({
+) => {
+  // Force the random date to be a Date object
+  const randomDate = new Date(random.date({
+    min: now,
+    max: new Date(now.getFullYear() + 1, now.getMonth(), now.getDate()),
+  }))
+  
+  const dateWithoutTime = new Date(
+    Date.UTC(
+      randomDate.getFullYear(),
+      randomDate.getMonth(),
+      randomDate.getDate()
+    )
+  )
+
+  return {
     budgetLimit: random.integer({ min: 10, max: 1000 }),
-    createdBy: randomId(),
+    createdBy: `auth0|${random.guid()}`,
     description: random.paragraph(),
-    eventDate: random.date({
-      min: now,
-      max: new Date(now.getFullYear() + 1, now.getMonth(), now.getDate()),
-    }),
+    eventDate: dateWithoutTime,
     name: random.word(),
     status: random.pickone(EVENT_STATUS),
     ...overrides,
-  }) satisfies Insertable<Event>
+  } satisfies Insertable<Event>
+}
 
 /**
  * Generates a fake wishlist with some default test data.
@@ -110,7 +122,6 @@ export const fakeEventInvitation = <
       max: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7),
     }),
     status: random.pickone(INVITATION_STATUS),
-    token: random.string(),
     ...overrides,
   }) satisfies Insertable<EventInvitations>
 
@@ -125,7 +136,7 @@ export const fakeUser = <T extends Partial<Insertable<User>>>(
     email: random.email(),
     firstName: random.first(),
     lastName: random.last(),
-    auth0Id: `auth0|${random.integer({ min: 1, max: 999 })}`,
+    auth0Id: `auth0|${random.guid()}`,
     picture: random.url(),
     ...overrides,
   }) satisfies Insertable<User>

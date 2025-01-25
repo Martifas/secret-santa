@@ -10,11 +10,11 @@ const db = await wrapInRollbacks(createTestDatabase())
 const repository = eventRepository(db)
 const [userOne] = await insertAll(db, 'user', fakeUser())
 const [eventOne] = await insertAll(db, 'event', [
-  fakeEvent({ createdBy: userOne.id }),
+  fakeEvent({ createdBy: userOne.auth0Id }),
 ])
 
 const fakeEventDefault = (event: Parameters<typeof fakeEvent>[0] = {}) =>
-  fakeEvent({ createdBy: userOne.id, ...event })
+  fakeEvent({ createdBy: userOne.auth0Id, ...event })
 
 describe('find', () => {
   it('should return an event by id', async () => {
@@ -79,9 +79,15 @@ describe('update', () => {
 
 describe('remove', () => {
   it('should remove event', async () => {
-    const removedEvent = await repository.remove(eventOne.id)
+    await db.deleteFrom('event').execute()
+
+    const [testEvent] = await insertAll(db, 'event', [
+      fakeEvent({ createdBy: userOne.auth0Id }),
+    ])
+
+    const removedEvent = await repository.remove(testEvent.id)
     expect(pick(removedEvent, eventKeysForTesting)).toEqual(
-      pick(eventOne, eventKeysForTesting)
+      pick(testEvent, eventKeysForTesting)
     )
     const result = await selectAll(db, 'event')
     expect(result).toHaveLength(0)
@@ -94,7 +100,7 @@ describe('remove', () => {
 
 describe('findAllForUser', () => {
   it('should return events created by user', async () => {
-    const events = await repository.findAllForUser(userOne.id)
+    const events = await repository.findAllForUser(userOne.auth0Id)
 
     expect(events).toHaveLength(1)
     expect(events).toEqual([
@@ -105,7 +111,7 @@ describe('findAllForUser', () => {
   it('should return events where user is a member', async () => {
     const [userTwo] = await insertAll(db, 'user', [fakeUser()])
     const [eventTwo] = await insertAll(db, 'event', [
-      fakeEvent({ createdBy: userTwo.id }),
+      fakeEvent({ createdBy: userTwo.auth0Id }),
     ])
 
     // Make userOne a member of eventTwo
@@ -117,7 +123,7 @@ describe('findAllForUser', () => {
       },
     ])
 
-    const events = await repository.findAllForUser(userOne.id)
+    const events = await repository.findAllForUser(userOne.auth0Id)
 
     expect(events).toHaveLength(2)
     expect(events).toEqual(
@@ -138,7 +144,7 @@ describe('findAllForUser', () => {
       },
     ])
 
-    const events = await repository.findAllForUser(userOne.id)
+    const events = await repository.findAllForUser(userOne.auth0Id)
 
     expect(events).toHaveLength(1)
     expect(events).toEqual([
@@ -149,7 +155,7 @@ describe('findAllForUser', () => {
   it('should return empty array when user has no events', async () => {
     const [userTwo] = await insertAll(db, 'user', [fakeUser()])
 
-    const events = await repository.findAllForUser(userTwo.id)
+    const events = await repository.findAllForUser(userTwo.auth0Id)
 
     expect(events).toEqual([])
   })

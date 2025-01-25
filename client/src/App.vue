@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import { useAuth0 } from '@auth0/auth0-vue'
+import { setTokenGetter } from './trpc'
+import { onMounted } from 'vue'
 
-const { isLoading } = useAuth0()
+const { isLoading, getAccessTokenSilently } = useAuth0()
+
+onMounted(() => {
+  // Set up the token getter function
+  setTokenGetter(() => getAccessTokenSilently())
+})
 </script>
 
 <template>

@@ -14,7 +14,7 @@ const db = await wrapInRollbacks(createTestDatabase())
 const repository = ruleRepository(db)
 const [userOne] = await insertAll(db, 'user', fakeUser())
 const [eventOne] = await insertAll(db, 'event', [
-  fakeEvent({ createdBy: userOne.id }),
+  fakeEvent({ createdBy: userOne.auth0Id }),
 ])
 
 const [ruleOne] = await insertAll(

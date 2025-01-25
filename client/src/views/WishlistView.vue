@@ -1,18 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { FwbInput } from 'flowbite-vue'
-import { useAuth0 } from '@auth0/auth0-vue'
 
 const name = ref('')
-const { isAuthenticated, loginWithRedirect } = useAuth0()
-
-onMounted(async () => {
-  if (!isAuthenticated.value) {
-    await loginWithRedirect({
-      appState: { returnTo: '/gift-exchanges' },
-    })
-  }
-})
 </script>
 
 <template>

@@ -27,7 +27,7 @@ export type Timestamp = ColumnType<Date, Date | string, Date | string>
 export interface Event {
   budgetLimit: number
   createdAt: Generated<Timestamp>
-  createdBy: number
+  createdBy: string
   description: string
   eventDate: Timestamp
   id: Generated<number>
@@ -43,7 +43,6 @@ export interface EventInvitations {
   expiresAt: Timestamp
   id: Generated<number>
   status: string
-  token: string
   updatedAt: Generated<Timestamp>
   userId: number
 }

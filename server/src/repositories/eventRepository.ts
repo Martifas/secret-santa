@@ -46,10 +46,11 @@ export function eventRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async findAllForUser(userId: number): Promise<EventRowSelect[]> {
+    async findAllForUser(userAuth0Id: string): Promise<EventRowSelect[]> {
       return db
         .selectFrom('event')
         .leftJoin('userEvent', 'event.id', 'userEvent.eventId')
+        .leftJoin('user', 'userEvent.userId', 'user.id')
         .select([
           'event.id',
           'event.name',
@@ -64,8 +65,8 @@ export function eventRepository(db: Database) {
         .distinct()
         .where((eb) =>
           eb.or([
-            eb('event.createdBy', '=', userId),
-            eb('userEvent.userId', '=', userId),
+            eb('event.createdBy', '=', userAuth0Id),
+            eb('user.auth0Id', '=', userAuth0Id),
           ])
         )
         .execute()

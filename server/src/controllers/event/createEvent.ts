@@ -12,7 +12,6 @@ export default authenticatedProcedure
   .input(
     eventSchema.omit({
       id: true,
-      createdBy: true,
       createdAt: true,
       updatedAt: true,
     })
@@ -21,8 +20,12 @@ export default authenticatedProcedure
     async ({ input, ctx: { repos, authUser } }): Promise<EventForMember> => {
       const event = await repos.eventRepository.create({
         ...input,
-        createdBy: authUser.id,
+        createdBy: authUser.auth0Id,
         eventDate: input.eventDate,
+        budgetLimit: input.budgetLimit,
+        description: input.description,
+        status: 'active',
+        name: input.name,
       })
       return event
     }

@@ -27,7 +27,7 @@ export function useAuthSync() {
 
   async function loginUser() {
     try {
-      await loginWithRedirect()
+      await loginWithRedirect({ appState: { targetUrl: window.location.pathname } })
     } catch (error) {
       console.error('Login failed:', error)
     }

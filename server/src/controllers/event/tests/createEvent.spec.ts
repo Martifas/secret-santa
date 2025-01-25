@@ -8,7 +8,7 @@ import eventRouter from '..'
 
 describe('create', () => {
   const TEST_USER = fakeAuthUser({
-    id: 1,
+    auth0Id: 'auth0|test123',
   })
 
   it('should create a new event', async () => {
@@ -16,13 +16,14 @@ describe('create', () => {
       name: 'Christmas Party',
       description: 'Annual office party',
       budgetLimit: 50,
-      status: 'draft',
+      status: 'active',
       eventDate: new Date('2024-12-25'),
+      createdBy: 'auth0|1245',
     }
 
     const expectedEventData = {
       ...newEventInput,
-      createdBy: TEST_USER.id,
+      createdBy: TEST_USER.auth0Id,
     }
 
     const createdEvent = {
@@ -54,9 +55,9 @@ describe('create', () => {
       name: 'Christmas Party',
       description: 'Annual office party',
       budgetLimit: 50,
-      status: 'draft',
+      status: 'active',
       eventDate: expect.any(Date),
-      createdBy: TEST_USER.id,
+      createdBy: TEST_USER.auth0Id,
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date),
     })
@@ -67,6 +68,7 @@ describe('create', () => {
       name: 'Christmas Party',
       description: 'Annual office party',
       budgetLimit: 50,
+      createdBy: 'auth0|1478',
       status: 'draft',
       eventDate: new Date('2024-12-25'),
     }

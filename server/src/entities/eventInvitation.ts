@@ -8,7 +8,6 @@ export const eventInvitationSchema = z.object({
   userId: idSchema,
   eventId: idSchema,
   email: z.string().email(),
-  token: z.string().min(1),
   status: z.string().min(1),
   createdAt: z.date(),
   expiresAt: z.date(),
@@ -25,8 +24,7 @@ export type InvitationForMember = Pick<
 >
 
 export const invitationKeysForTesting = [
-  'email',
-  'token',
+  'email',  
   'status',
   'expiresAt',
 ] as const

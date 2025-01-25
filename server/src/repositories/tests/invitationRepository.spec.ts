@@ -14,7 +14,7 @@ const db = await wrapInRollbacks(createTestDatabase())
 const repository = invitationRepository(db)
 const [userOne] = await insertAll(db, 'user', fakeUser())
 const [eventOne] = await insertAll(db, 'event', [
-  fakeEvent({ createdBy: userOne.id }),
+  fakeEvent({ createdBy: userOne.auth0Id }),
 ])
 const [invitationOne] = await insertAll(db, 'eventInvitations', [
   fakeEventInvitation({ eventId: eventOne.id, userId: userOne.id }),
@@ -67,7 +67,7 @@ describe('find all for user', () => {
   it('should return all invitations for the user', async () => {
     const [userTwo] = await insertAll(db, 'user', [fakeUser()])
     const [eventTwo] = await insertAll(db, 'event', [
-      fakeEvent({ createdBy: userTwo.id }),
+      fakeEvent({ createdBy: userTwo.auth0Id }),
     ])
     const [invitationTwo] = await insertAll(db, 'eventInvitations', [
       fakeEventInvitation({ eventId: eventTwo.id, userId: userTwo.id }),
@@ -111,7 +111,6 @@ describe('update', () => {
       email: 'barsukas@miskas.lt',
       status: 'confirmed',
       expiresAt: new Date('2025-12-24'),
-      token: 'superRandomToken',
     }
     const updatedInvitation = await repository.update(invitationOne.id, updates)
     expect(pick(updatedInvitation, invitationKeysForTesting)).toEqual(

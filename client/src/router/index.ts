@@ -5,6 +5,7 @@ import MainLayout from '@/layout/MainLayout.vue'
 import ExchangeView from '@/views/ExchangeView.vue'
 import WishlistView from '@/views/WishlistView.vue'
 import { authGuard } from '@auth0/auth0-vue'
+import AboutView from '@/views/AboutView.vue'
 
 const routes = [
   {
@@ -19,6 +20,17 @@ const routes = [
     ],
   },
   {
+    path: '/about',
+    component: MainLayout,
+    children: [
+      {
+        path: '',
+        name: 'About',
+        component: AboutView,
+      },
+    ],
+  },
+  {
     path: '/gift-exchanges',
     component: MainLayout,
     children: [
@@ -26,7 +38,7 @@ const routes = [
         path: '',
         name: 'Exchange',
         component: ExchangeView,
-        beforeEnter: authGuard
+        beforeEnter: authGuard,
       },
     ],
   },
@@ -38,7 +50,7 @@ const routes = [
         path: '',
         name: 'Wishlist',
         component: WishlistView,
-        beforeEnter: authGuard
+        beforeEnter: authGuard,
       },
     ],
   },
@@ -47,7 +59,6 @@ const routes = [
     name: 'health-check',
     component: HealthView,
   },
-  
 ]
 
 const router = createRouter({

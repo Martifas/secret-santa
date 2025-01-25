@@ -12,15 +12,13 @@ app.use(
     domain: auth0Config.domain,
     clientId: auth0Config.clientId,
     authorizationParams: {
-      redirect_uri: auth0Config.redirectUri,
+      redirect_uri: window.location.origin,
       audience: auth0Config.audience,
     },
-    
   })
 )
 
 const pinia = createPinia()
 app.use(pinia)
 app.use(router)
-
 app.mount('#app')

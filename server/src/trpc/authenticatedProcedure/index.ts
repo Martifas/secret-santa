@@ -26,33 +26,45 @@ export const authenticatedProcedure = publicProcedure.use(({ ctx, next }) => {
       config.env === 'development' || config.env === 'test'
         ? 'Missing Express request object. If you are running tests, make sure to provide some req object in the procedure context.'
         : 'Missing Express request object.'
-
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
       message,
     })
   }
 
-  const token = ctx.req.cookies.access_token
-
-  if (!token) {
+  const authHeader = ctx.req.headers.authorization
+  if (!authHeader) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
-      message: 'Unauthenticated. Please log in.',
+      message: 'Missing authorization header',
     })
   }
 
-  if (!ctx.req.oidc?.isAuthenticated()) {
-    ctx.res.clearCookie('access_token')
+  const [bearer, token] = authHeader.split(' ')
+
+  if (bearer !== 'Bearer' || !token) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
-      message: 'Invalid token.',
+      message: 'Invalid authorization format',
     })
   }
 
-  return next({
-    ctx: {
-      authUser: ctx.req.oidc?.user,
-    },
-  })
+  try {
+    const tokenPayload = JSON.parse(
+      Buffer.from(token.split('.')[1], 'base64').toString()
+    )
+
+    return next({
+      ctx: {
+        authUser: {
+          auth0Id: tokenPayload.sub,
+        },
+      },
+    })
+  } catch (error) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Invalid token format',
+    })
+  }
 })
