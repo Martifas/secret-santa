@@ -164,11 +164,11 @@ jobs:
             "server": {
               "image": "${{ env.LIGHTSAIL_SERVER_IMAGE }}",
               "ports": {
-                "3000": "HTTP"
+                "80": "HTTP"
               },
               "environment": {
                 "NODE_ENV": "production",
-                "PORT": "3000",
+                "PORT": "80",
                 "DATABASE_URL": "${{ secrets.PROD_DATABASE_URL }}",
                 "TOKEN_KEY": "${{ secrets.PROD_TOKEN_KEY }}",
                 "AUTH0_ISSUER_BASE_URL": "${{ secrets.AUTH0_ISSUER_BASE_URL }}",
