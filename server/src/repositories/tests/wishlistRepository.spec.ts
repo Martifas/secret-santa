@@ -10,7 +10,7 @@ const db = await wrapInRollbacks(createTestDatabase())
 const repository = wishlistRepository(db)
 const [userOne] = await insertAll(db, 'user', fakeUser())
 const [eventOne] = await insertAll(db, 'event', [
-  fakeEvent({ createdBy: userOne.id }),
+  fakeEvent({ createdBy: userOne.auth0Id }),
 ])
 const [wishlistOne] = await insertAll(db, 'wishlist', [
   fakeWishlist({ userId: userOne.id, eventId: eventOne.id }),

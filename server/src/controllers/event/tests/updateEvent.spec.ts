@@ -16,7 +16,7 @@ describe('update', () => {
   const baseEvent = {
     ...fakeEvent({
       id,
-      createdBy: TEST_USER.id,
+      createdBy: TEST_USER.auth0Id,
       name: 'Christmas Party',
       description: 'Annual office party',
       budgetLimit: 50,
@@ -99,7 +99,7 @@ describe('update', () => {
     const updates = { name: 'New Year Party' }
     const eventByAnotherUser = {
       ...baseEvent,
-      createdBy: TEST_USER.id + 1,
+      createdBy: 'auth0|1258',
     }
 
     const repos = {

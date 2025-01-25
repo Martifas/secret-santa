@@ -10,6 +10,6 @@ export default authenticatedProcedure
     })
   )
   .query(async ({ ctx: { repos, authUser } }): Promise<EventRowSelect[]> => {
-    const events = await repos.eventRepository.findAllForUser(authUser.id)
+    const events = await repos.eventRepository.findAllForUser(authUser.auth0Id)
     return events
   })

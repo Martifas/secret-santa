@@ -15,7 +15,7 @@ describe('remove', () => {
     const id = 1
     const event = fakeEvent({
       id,
-      createdBy: TEST_USER.id,
+      createdBy: TEST_USER.auth0Id,
       name: 'Christmas Party',
       description: 'Annual office party',
       budgetLimit: 50,
@@ -82,7 +82,7 @@ describe('remove', () => {
 
   it('should throw error when user is not the creator', async () => {
     const id = 1
-    const otherUserId = 999
+    const otherUserId = 'auth0|9512'
 
     const event = fakeEvent({
       id,
