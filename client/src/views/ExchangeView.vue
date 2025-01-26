@@ -65,8 +65,6 @@ async function createEvent() {
       throw new Error('User not authenticated')
     }
 
-    // Get the access token but we'll configure it at the tRPC client level
-
     if (!form.value.date) {
       throw new Error('Date is required')
     }
@@ -135,14 +133,20 @@ async function createEvent() {
 
         <form class="space-y-6" @submit.prevent="createEvent">
           <div class="space-y-4">
-            <FwbInput v-model="form.title" placeholder="Enter a title" label="Title" required />
+            <FwbInput
+              v-model="form.title"
+              placeholder="Enter a title"
+              label="Title"
+              required
+              class="bg-white"
+            />
 
             <FwbTextarea
               v-model="form.description"
               placeholder="Description"
               label="Enter a description"
               :rows="5"
-              class="text-black"
+              class="bg-white"
               required
             />
 
@@ -153,6 +157,7 @@ async function createEvent() {
                   min="0"
                   data-input-counter
                   v-model="form.budget"
+                  class="bg-white"
                   placeholder="Enter a budget"
                   label="Budget"
                   required
@@ -162,6 +167,7 @@ async function createEvent() {
                 <FwbInput
                   id="date"
                   datepicker
+                  class="bg-white"
                   v-model="form.date"
                   label="Select date"
                   placeholder="Select date"
@@ -181,7 +187,7 @@ async function createEvent() {
                   v-model="participant.email"
                   :placeholder="`Participant's ${index + 1} email `"
                   required
-                  class="w-80"
+                  class="w-80 bg-white"
                 />
               </div>
               <div class="flex items-center">
