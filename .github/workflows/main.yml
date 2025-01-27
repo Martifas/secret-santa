@@ -155,7 +155,7 @@ jobs:
               "environment": {                
                 "VITE_AUTH0_DOMAIN": "${{ secrets.VITE_AUTH0_DOMAIN }}",
                 "VITE_AUTH0_CLIENT_ID": "${{ secrets.VITE_AUTH0_CLIENT_ID }}",
-                "VITE_AUTH0_AUDIENCE": "${{ secrets.VITE_AUTH0_AUDIENCE }}"
+                "VITE_AUTH0_AUDIENCE": "${{ secrets.VITE_AUTH0_AUDIENCE }}",
                 "API_PROXY_PASS": "http://server:3000"
 
               }
