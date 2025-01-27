@@ -35,14 +35,25 @@ export default function createApp(db: Database) {
         'Authorization',
         'trpc-batch',
         'x-trpc-source',
+        'content-type',
+        'authorization',
       ],
     })
   )
+
+  app.options('*', cors())
 
   app.use((req, res, next) => {
     console.log('CORS - Incoming Request:', {
       origin: req.get('origin'),
       host: req.get('host'),
+      method: req.method,
+      headers: {
+        'access-control-request-headers':
+          req.headers['access-control-request-headers'],
+        'access-control-request-method':
+          req.headers['access-control-request-method'],
+      },
     })
     next()
   })
