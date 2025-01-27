@@ -79,7 +79,7 @@ jobs:
     env:
       CLIENT_IMAGE_TAG: client-${{ github.sha }}
       SERVER_IMAGE_TAG: server-${{ github.sha }}
-      VITE_API_ORIGIN: ''
+      VITE_API_ORIGIN: http://server:3000
       VITE_API_PATH: /api/v1/trpc
     steps:
       - name: Check out repository
@@ -182,8 +182,8 @@ jobs:
       - name: Create public-endpoint.json file
         run: |
           echo '{
-            "containerName": "server",
-            "containerPort": 3000,
+            "containerName": "client",
+            "containerPort": 80,
             "healthCheck": {
               "intervalSeconds": 10,
               "path": "/api/health"
