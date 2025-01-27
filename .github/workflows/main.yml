@@ -182,8 +182,8 @@ jobs:
       - name: Create public-endpoint.json file
         run: |
           echo '{
-            "containerName": "server",
-            "containerPort": 3000,
+            "containerName": "client",
+            "containerPort": 80,
             "healthCheck": {
               "intervalSeconds": 10,
               "path": "/api/health"
