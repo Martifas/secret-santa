@@ -8,7 +8,7 @@ logger.info('Database initialized')
 
 const app = createApp(database)
 const server = app.listen(config.port, () => {
-  logger.info(`Server is running at http://localhost:${config.port}`)
+  logger.info(`Server is running on port ${config.port}`)
 })
 
 const gracefulShutdown = async () => {
