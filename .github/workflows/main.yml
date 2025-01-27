@@ -79,7 +79,7 @@ jobs:
     env:
       CLIENT_IMAGE_TAG: client-${{ github.sha }}
       SERVER_IMAGE_TAG: server-${{ github.sha }}
-      VITE_API_ORIGIN: http://localhost:80
+      VITE_API_ORIGIN: ''
       VITE_API_PATH: /api/v1/trpc
     steps:
       - name: Check out repository
@@ -150,23 +150,24 @@ jobs:
               "image": "${{ env.LIGHTSAIL_CLIENT_IMAGE }}",
               "command": [],
               "ports": {
-                "8080": "HTTP"
+                "80": "HTTP"
               },
               "environment": {                
                 "VITE_AUTH0_DOMAIN": "${{ secrets.VITE_AUTH0_DOMAIN }}",
                 "VITE_AUTH0_CLIENT_ID": "${{ secrets.VITE_AUTH0_CLIENT_ID }}",
                 "VITE_AUTH0_AUDIENCE": "${{ secrets.VITE_AUTH0_AUDIENCE }}"
+                "API_PROXY_PASS": "http://server:3000"
 
               }
             },
             "server": {
               "image": "${{ env.LIGHTSAIL_SERVER_IMAGE }}",
               "ports": {
-                "80": "HTTP"
+                "3000": "HTTP"
               },
               "environment": {
                 "NODE_ENV": "production",
-                "PORT": "80",
+                "PORT": "3000",
                 "DATABASE_URL": "${{ secrets.PROD_DATABASE_URL }}",
                 "TOKEN_KEY": "${{ secrets.PROD_TOKEN_KEY }}",
                 "AUTH0_ISSUER_BASE_URL": "${{ secrets.AUTH0_ISSUER_BASE_URL }}",
@@ -181,8 +182,8 @@ jobs:
       - name: Create public-endpoint.json file
         run: |
           echo '{
-            "containerName": "client",
-            "containerPort": 8080,
+            "containerName": "server",
+            "containerPort": 3000,
             "healthCheck": {
               "intervalSeconds": 10,
               "path": "/api/health"

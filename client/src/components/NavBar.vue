@@ -16,8 +16,8 @@ import {
   ChevronDownIcon,
 } from '@heroicons/vue/24/outline'
 import { useAuth0 } from '@auth0/auth0-vue'
-import { watch } from 'vue';
-import { trpc } from '@/trpc';
+import { watch } from 'vue'
+import { trpc } from '@/trpc'
 
 const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0()
 
@@ -124,6 +124,7 @@ const navigation = [
                   :src="user?.picture"
                   :alt="`${user?.name}'s profile picture`"
                   class="m-0.5 size-8 rounded-full"
+                  crossorigin="anonymous"
                 />
 
                 <ChevronDownIcon class="mt-2 mr-1 inline size-6 text-slate-600" />
