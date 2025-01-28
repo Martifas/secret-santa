@@ -19,13 +19,19 @@ export default function createApp(db: Database) {
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: [
-        'Content-Type',
         'Authorization',
+        'Content-Type',
+        'Accept',
+        'Origin',
+        'User-Agent',
+        'DNT',
+        'Cache-Control',
+        'X-Mx-ReqToken',
+        'Keep-Alive',
+        'X-Requested-With',
+        'If-Modified-Since',
         'trpc-batch',
         'x-trpc-source',
-        'content-type',
-        'authorization',
-        'x-requested-with',
       ],
     })
   )
