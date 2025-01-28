@@ -3,7 +3,7 @@ import {
   createExpressMiddleware,
   type CreateExpressContextOptions,
 } from '@trpc/server/adapters/express'
-import cors from 'cors'
+// import cors from 'cors'
 import { renderTrpcPanel } from 'trpc-panel'
 import type { Database } from './database'
 import { appRouter } from './controllers'
