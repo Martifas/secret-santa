@@ -15,7 +15,7 @@ export default function createApp(db: Database) {
 
   app.use(
     cors({
-      origin: '*',
+      origin: ['http://giftmeister.eu', 'https://giftmeister.eu'],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: [
@@ -25,11 +25,10 @@ export default function createApp(db: Database) {
         'x-trpc-source',
         'content-type',
         'authorization',
+        'x-requested-with',
       ],
     })
   )
-
-  app.options('*', cors())
 
   app.use(express.json())
 

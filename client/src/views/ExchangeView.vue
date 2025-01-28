@@ -171,9 +171,10 @@ async function createEvent() {
                   >Select date</label
                 >
                 <input
-                  type="date"
+                  type="text"
                   id="date"
                   datepicker
+                  placeholder="mm/dd/yyyy"
                   class="datepicker block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
