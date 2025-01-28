@@ -22,7 +22,7 @@ import { trpc } from '@/trpc'
 const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0()
 
 const login = () => {
-  loginWithRedirect()
+  loginWithRedirect({})
 }
 
 const logoutUser = () => {

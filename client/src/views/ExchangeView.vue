@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { FwbInput, FwbTextarea } from 'flowbite-vue'
 import { Datepicker } from 'flowbite-datepicker'
 import { TrashIcon, ArrowRightIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import { trpc } from '@/trpc'
@@ -133,45 +132,49 @@ async function createEvent() {
 
         <form class="space-y-6" @submit.prevent="createEvent">
           <div class="space-y-4">
-            <FwbInput
-              v-model="form.title"
-              placeholder="Enter a title"
-              label="Title"
-              required
-              class="bg-white"
+            <label for="date" class="mb-2 block text-sm font-medium text-gray-900"
+              >Enter a title</label
+            >
+            <input
+              type="text"
+              id="title"
+              placeholder="Title"
+              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
             />
 
-            <FwbTextarea
-              v-model="form.description"
+            <label for="message" class="mb-2 block text-sm font-medium text-gray-900"
+              >Enter a description</label
+            >
+
+            <textarea
+              id="message"
+              rows="4"
+              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
               placeholder="Description"
-              label="Enter a description"
-              :rows="5"
-              class="bg-white"
-              required
-            />
+            ></textarea>
 
             <div class="flex flex-col gap-2 sm:flex-row">
               <div class="flex-1">
-                <FwbInput
+                <label for="budget" class="mb-2 block text-sm font-medium text-gray-900"
+                  >Budget</label
+                >
+                <input
                   type="number"
-                  min="0"
-                  data-input-counter
-                  v-model="form.budget"
-                  class="bg-white"
-                  placeholder="Enter a budget"
-                  label="Budget"
-                  required
+                  id="budget"
+                  placeholder="0"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
+
               <div class="flex-1">
-                <FwbInput
+                <label for="date" class="mb-2 block text-sm font-medium text-gray-900"
+                  >Select date</label
+                >
+                <input
+                  type="date"
                   id="date"
                   datepicker
-                  class="bg-white"
-                  v-model="form.date"
-                  label="Select date"
-                  placeholder="Select date"
-                  required
+                  class="datepicker block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -183,11 +186,16 @@ async function createEvent() {
               :key="index"
             >
               <div class="w-full">
-                <FwbInput
+                <label
+                  for="participant"
+                  class="mb-2 block text-sm font-medium text-gray-900"
+                ></label>
+                <input
+                  type="email"
+                  id="participant"
                   v-model="participant.email"
                   :placeholder="`Participant's ${index + 1} email `"
-                  required
-                  class="w-80 bg-white"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
               <div class="flex items-center">

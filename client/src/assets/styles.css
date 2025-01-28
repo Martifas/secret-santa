@@ -4,3 +4,24 @@
 body {
     font-family: 'Montserrat', sand-serif;
 }
+
+.datepicker-controls,
+.datepicker-grid,
+.datepicker-cell,
+.datepicker-picker {
+    border-color: rgb(209 213 219) !important;
+    background-color: rgb(249 250 251) !important;
+    color: rgb(17 24 39) !important;
+}
+
+.datepicker-controls button {
+    border-color: rgb(209 213 219) !important;
+    background-color: rgb(249 250 251) !important;
+    color: rgb(17 24 39) !important;
+    border-width: 1px !important;
+}
+
+.datepicker-controls button svg {
+    color: rgb(17 24 39) !important;
+    fill: rgb(17 24 39) !important;
+}
