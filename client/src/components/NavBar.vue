@@ -78,7 +78,7 @@ const navigation = [
             <XMarkIcon v-else class="block size-6" aria-hidden="true" />
           </DisclosureButton>
         </div>
-        <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+        <div class="sm:justify-endstart flex flex-1 items-center justify-center sm:justify-start! sm:items-stretch">
           <router-link class="flex items-center" :to="{ name: 'Home' }">
             <img
               class="h-8 w-auto"
@@ -106,6 +106,7 @@ const navigation = [
             </div>
           </div>
         </div>
+
         <div
           class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-4"
         >

@@ -6,24 +6,25 @@ import type { Insertable } from 'kysely'
 import type { Event } from '@server/database'
 import eventRouter from '..'
 
-describe('create', () => {
+describe('create event', () => {
   const TEST_USER = fakeAuthUser({
     auth0Id: 'auth0|test123',
   })
 
-  it('should create a new event', async () => {
+  it('should create a new event and return its id', async () => {
     const newEventInput = {
       name: 'Christmas Party',
       description: 'Annual office party',
       budgetLimit: 50,
       status: 'active',
       eventDate: new Date('2024-12-25'),
-      createdBy: 'auth0|1245',
+      createdBy: 'auth0|1234',
     }
 
     const expectedEventData = {
       ...newEventInput,
       createdBy: TEST_USER.auth0Id,
+      status: 'active',
     }
 
     const createdEvent = {
@@ -39,6 +40,10 @@ describe('create', () => {
       eventRepository: {
         create: async (eventData: Insertable<Event>) => {
           expect(eventData).toEqual(expectedEventData)
+          return createdEvent.id
+        },
+        find: async (id: number) => {
+          expect(id).toBe(createdEvent.id)
           return createdEvent
         },
       } satisfies Partial<EventRepository>,
@@ -49,41 +54,55 @@ describe('create', () => {
     const { createEvent } = createCaller(testContext)
 
     const result = await createEvent(newEventInput)
-
-    expect(result).toMatchObject({
-      id: expect.any(Number),
-      name: 'Christmas Party',
-      description: 'Annual office party',
-      budgetLimit: 50,
-      status: 'active',
-      eventDate: expect.any(Date),
-      createdBy: TEST_USER.auth0Id,
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
-    })
+    expect(result).toBe(createdEvent.id)
   })
 
-  it('should propagate repository errors', async () => {
+  it('should throw error when event creation fails', async () => {
     const newEventInput = {
       name: 'Christmas Party',
       description: 'Annual office party',
       budgetLimit: 50,
-      createdBy: 'auth0|1478',
-      status: 'draft',
+      status: 'active',
       eventDate: new Date('2024-12-25'),
+      createdBy: 'auth0|1234',
     }
 
-    const repositoryError = new Error('Failed to create event')
     const repos = {
       eventRepository: {
         create: async () => {
-          throw repositoryError
+          throw new Error('Database error')
         },
       } satisfies Partial<EventRepository>,
     }
 
     const createCaller = createCallerFactory(eventRouter)
     const { createEvent } = createCaller(authRepoContext(repos, TEST_USER))
-    await expect(createEvent(newEventInput)).rejects.toThrow(repositoryError)
+
+    await expect(createEvent(newEventInput)).rejects.toThrow('Database error')
+  })
+
+  it('should throw error when created event cannot be found', async () => {
+    const newEventInput = {
+      name: 'Christmas Party',
+      description: 'Annual office party',
+      budgetLimit: 50,
+      status: 'active',
+      eventDate: new Date('2024-12-25'),
+      createdBy: 'auth0|1234',
+    }
+
+    const repos = {
+      eventRepository: {
+        create: async () => 1,
+        find: async () => null,
+      } satisfies Partial<EventRepository>,
+    }
+
+    const createCaller = createCallerFactory(eventRouter)
+    const { createEvent } = createCaller(authRepoContext(repos, TEST_USER))
+
+    await expect(createEvent(newEventInput)).rejects.toThrow(
+      'Failed to create event'
+    )
   })
 })

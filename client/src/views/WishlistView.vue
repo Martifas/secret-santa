@@ -48,11 +48,11 @@ async function createWishlist() {}
             />
           </div>
 
-          <div class="flex justify-center text-sm">On the next page you can add your gifts.</div>
-          <div class="flex flex-row justify-end">
+          <div class="flex justify-center text-sm sm:justify-end!">On the next page you can add your gifts.</div>
+          <div class="flex w-full flex-row justify-center sm:justify-end!">
             <button
               type="submit"
-              class="flex rounded-lg border-1 bg-sky-900 px-4 py-2 text-center text-white hover:bg-sky-700"
+              class="flex rounded-xl sm:px-8 sm:py-4 bg-green-900 px-4 py-2 text-center text-white hover:bg-green-700"
             >
               Create wishlist
               <ArrowRightIcon class="my-auto ml-2 inline size-5 cursor-pointer" />

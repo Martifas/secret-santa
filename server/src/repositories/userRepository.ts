@@ -5,16 +5,18 @@ import type { Insertable } from 'kysely'
 
 export function userRepository(db: Database) {
   return {
-    async create(user: Insertable<User>): Promise<UserForMember> {
-      return db
+    async create(user: Insertable<User>): Promise<number> {
+      const result = await db
         .insertInto('user')
         .values({
           ...user,
           createdAt: new Date(),
           lastLogin: new Date(),
         })
-        .returning(userKeysForMembers)
+        .returning('id')
         .executeTakeFirstOrThrow()
+
+      return result.id
     },
 
     async findByAuth0Id(auth0Id: string): Promise<UserForMember | null> {
@@ -59,13 +61,13 @@ export function userRepository(db: Database) {
         .returning(userKeysForMembers)
         .executeTakeFirstOrThrow()
     },
-    async updateLastLogin(auth0Id: string): Promise<UserForMember> {
+    async updateLastLogin(id: number): Promise<UserForMember> {
       return db
         .updateTable('user')
         .set({
           lastLogin: new Date(),
         })
-        .where('auth0Id', '=', auth0Id)
+        .where('id', '=', id)
         .returning(userKeysForMembers)
         .executeTakeFirstOrThrow()
     },

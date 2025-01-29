@@ -1,4 +1,4 @@
-import { eventSchema, type EventForMember } from '@server/entities/event'
+import { eventSchema } from '@server/entities/event'
 import provideRepos from '@server/trpc/provideRepos'
 import { eventRepository } from '@server/repositories/eventRepository'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
@@ -16,17 +16,14 @@ export default authenticatedProcedure
       updatedAt: true,
     })
   )
-  .mutation(
-    async ({ input, ctx: { repos, authUser } }): Promise<EventForMember> => {
-      const event = await repos.eventRepository.create({
-        ...input,
-        createdBy: authUser.auth0Id,
-        eventDate: input.eventDate,
-        budgetLimit: input.budgetLimit,
-        description: input.description,
-        status: 'active',
-        name: input.name,
-      })
-      return event
-    }
-  )
+  .mutation(async ({ input, ctx: { repos, authUser } }): Promise<number> => {
+    const createdEventId = await repos.eventRepository.create({
+      ...input,
+      createdBy: authUser.auth0Id,
+      status: 'active',
+    })
+
+    const event = await repos.eventRepository.find(createdEventId)
+    if (!event) throw new Error('Failed to create event')
+    return createdEventId
+  })

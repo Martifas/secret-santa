@@ -6,6 +6,7 @@ import ExchangeView from '@/views/ExchangeView.vue'
 import WishlistView from '@/views/WishlistView.vue'
 import { authGuard } from '@auth0/auth0-vue'
 import AboutView from '@/views/AboutView.vue'
+import InvitationView from '@/views/InvitationView.vue'
 
 const routes = [
   {
@@ -39,6 +40,19 @@ const routes = [
         name: 'Exchange',
         component: ExchangeView,
         beforeEnter: authGuard,
+      },
+    ],
+  },
+  {
+    path: '/invite/:id',
+    component: MainLayout,
+    children: [
+      {
+        path: '',
+        name: 'Invitation',
+        component: InvitationView,
+        beforeEnter: authGuard,
+        prop: true,
       },
     ],
   },

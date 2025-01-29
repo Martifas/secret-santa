@@ -21,16 +21,18 @@ export default publicProcedure
       let user = await repos.userRepository.findByAuth0Id(userData.auth0Id)
 
       if (!user) {
-        user = await repos.userRepository.create({
+        const createdId = await repos.userRepository.create({
           ...userData,
           email: userData.email.toLowerCase(),
           lastLogin: new Date(),
         })
+        user = await repos.userRepository.findById(createdId)
+        if (!user) throw new Error('Failed to create user')
       } else {
-        await repos.userRepository.updateLastLogin(user.auth0Id)
+        await repos.userRepository.updateLastLogin(user.id)
       }
 
-      return { success: true, user }
+      return { success: true, id:user.id }
     } catch (error) {
       assertError(error)
       if (error.message.includes('duplicate key')) {

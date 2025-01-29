@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { Datepicker } from 'flowbite-datepicker'
-import { TrashIcon, ArrowRightIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { ArrowRightIcon } from '@heroicons/vue/24/outline'
 import { trpc } from '@/trpc'
 import { useAuth0 } from '@auth0/auth0-vue'
+import { useRouter } from 'vue-router'
 
 const { user } = useAuth0()
+const router = useRouter()
 
 interface ExchangeForm {
   title: string
   description: string
   budget: number
   date: string
-  name: string
-  participants: Array<{ email: string }>
 }
 
 const form = ref<ExchangeForm>({
@@ -21,17 +21,7 @@ const form = ref<ExchangeForm>({
   description: '',
   budget: 0,
   date: '',
-  name: '',
-  participants: [{ email: '' }],
 })
-
-const addParticipant = () => {
-  form.value.participants.push({ email: '' })
-}
-
-const removeParticipant = (index: number) => {
-  form.value.participants = form.value.participants.filter((_, i) => i !== index)
-}
 
 onMounted(() => {
   const datepickerElement = document.querySelector('[datepicker]') as HTMLElement
@@ -83,7 +73,7 @@ async function createEvent() {
       throw new Error('Invalid date')
     }
 
-    const event = await trpc.event.createEvent.mutate({
+    const createdEventId = await trpc.event.createEvent.mutate({
       createdBy: user.value.sub,
       eventDate: eventDate,
       budgetLimit: form.value.budget,
@@ -98,9 +88,12 @@ async function createEvent() {
       description: '',
       budget: 0,
       date: '',
-      name: '',
-      participants: [{ email: '' }],
     }
+
+    router.push({
+      name: 'Invitation',
+      params: { id: createdEventId },
+    })
   } catch (error) {
     if (error instanceof Error) {
       console.error('Failed to create event:', error.message)
@@ -138,16 +131,18 @@ async function createEvent() {
             <input
               type="text"
               id="title"
+              v-model="form.title"
               placeholder="Title"
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
             />
 
-            <label for="message" class="mb-2 block text-sm font-medium text-gray-900"
+            <label for="description" class="mb-2 block text-sm font-medium text-gray-900"
               >Enter a description</label
             >
 
             <textarea
-              id="message"
+              id="description"
+              v-model="form.description"
               rows="4"
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
               placeholder="Description"
@@ -160,6 +155,7 @@ async function createEvent() {
                 >
                 <input
                   type="number"
+                  v-model="form.budget"
                   id="budget"
                   placeholder="0"
                   class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
@@ -173,6 +169,7 @@ async function createEvent() {
                 <input
                   type="text"
                   id="date"
+                  v-model="form.date"
                   datepicker
                   placeholder="mm/dd/yyyy"
                   class="datepicker block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
@@ -180,49 +177,18 @@ async function createEvent() {
               </div>
             </div>
           </div>
-          <div>
-            <div
-              class="my-2 flex flex-row gap-2"
-              v-for="(participant, index) in form.participants"
-              :key="index"
+
+          <div class="flex justify-center text-sm sm:justify-end!">
+            On the next page you can add send invitations.
+          </div>
+          <div class="flex w-full flex-row justify-center sm:justify-end!">
+            <button
+              type="submit"
+              class="flex rounded-xl bg-green-900 px-4 py-2 text-center text-white hover:bg-green-700 sm:px-8 sm:py-4"
             >
-              <div class="w-full">
-                <label
-                  for="participant"
-                  class="mb-2 block text-sm font-medium text-gray-900"
-                ></label>
-                <input
-                  type="email"
-                  id="participant"
-                  v-model="participant.email"
-                  :placeholder="`Participant's ${index + 1} email `"
-                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div class="flex items-center">
-                <TrashIcon
-                  @click="removeParticipant(index)"
-                  class="block size-7 flex-none cursor-pointer hover:text-green-900"
-                />
-              </div>
-            </div>
-            <div class="flex flex-row justify-between">
-              <button
-                @click="addParticipant"
-                type="button"
-                class="flex rounded-lg border-1 bg-green-900 px-4 py-2 text-center text-white hover:bg-green-700"
-              >
-                Add Participant
-                <PlusIcon class="my-auto ml-2 inline size-5 flex-none cursor-pointer" />
-              </button>
-              <button
-                type="submit"
-                class="flex rounded-lg border-1 bg-sky-900 px-4 py-2 text-center text-white hover:bg-sky-700"
-              >
-                Create gift exchange
-                <ArrowRightIcon class="my-auto ml-2 inline size-5 cursor-pointer" />
-              </button>
-            </div>
+              Create gift exchange
+              <ArrowRightIcon class="my-auto ml-2 inline size-5 cursor-pointer" />
+            </button>
           </div>
         </form>
       </div>

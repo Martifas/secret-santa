@@ -38,11 +38,12 @@ describe('create', () => {
   it('should create a new event', async () => {
     const event = fakeEventDefault()
 
-    const createdEvent = await repository.create(event)
+    const createdEventId = await repository.create(event)
 
+    const createdEvent = await repository.find(createdEventId)
     expect(createdEvent).toMatchObject({
       ...pick(event, eventKeysForTesting),
-      id: expect.any(Number),
+      id: createdEventId,
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date),
     })
