@@ -12,7 +12,6 @@ describe('create', () => {
   })
   const eventId = 100
   const newInvitationInput = {
-    userId: TEST_USER.id,
     eventId,
     email: 'ezys@miskas.lt',
     status: 'sent',
@@ -30,7 +29,7 @@ describe('create', () => {
   it('should create a new invitation when one does not exist', async () => {
     const repos = {
       invitationRepository: {
-        findByEventAndUserId: async () => null,
+        findByEventAndEmail: async () => null,
         create: async (input) => {
           expect(input).toEqual(newInvitationInput)
           return createdInvitation
@@ -47,7 +46,6 @@ describe('create', () => {
     const result = await createInvitation(newInvitationInput)
     expect(result).toMatchObject({
       id: expect.any(Number),
-      userId: TEST_USER.id,
       eventId,
       email: 'ezys@miskas.lt',
       status: 'sent',
@@ -64,7 +62,7 @@ describe('create', () => {
     }
     const repos = {
       invitationRepository: {
-        findByEventAndUserId: async () => existingInvitation,
+        findByEventAndEmail: async () => existingInvitation,
         create: async () => {
           throw new Error('Should not be called')
         },
@@ -90,7 +88,7 @@ describe('create', () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
       invitationRepository: {
-        findByEventAndUserId: async () => null,
+        findByEventAndEmail: async () => null,
         create: async () => {
           throw unknownError
         },
@@ -108,11 +106,11 @@ describe('create', () => {
     )
   })
 
-  it('should propagate unknown errors from findByEventAndUserId', async () => {
+  it('should propagate unknown errors from findByEventAndEmail', async () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
       invitationRepository: {
-        findByEventAndUserId: async () => {
+        findByEventAndEmail: async () => {
           throw unknownError
         },
         create: async () => {

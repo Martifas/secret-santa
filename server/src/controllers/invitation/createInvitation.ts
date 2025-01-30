@@ -16,14 +16,15 @@ export default groupAdminProcedure
   .input(
     eventInvitationSchema.omit({
       id: true,
+      userId: true,
       createdAt: true,
       updatedAt: true,
     })
   )
   .mutation(async ({ input, ctx: { repos } }): Promise<InvitationForMember> => {
-    const existing = await repos.invitationRepository.findByEventAndUserId(
+    const existing = await repos.invitationRepository.findByEventAndEmail(
       input.eventId,
-      input.userId
+      input.email
     )
     if (existing) {
       throw new TRPCError({

@@ -1,71 +1,254 @@
 <template>
-  <Disclosure as="nav" class="bg-gray-800" v-slot="{ open }">
-    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-      <div class="relative flex h-16 items-center justify-between">
-        <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
-          <!-- Mobile menu button-->
-     
-        </div>
-        <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-          <div class="flex shrink-0 items-center">
-            <img class="h-8 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
-          </div>
-          <div class="hidden sm:ml-6 sm:block">
-            <div class="flex space-x-4">
-              <a v-for="item in navigation" :key="item.name" :href="item.href" :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</a>
-            </div>
-          </div>
-        </div>
-        <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-          <button type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
-            <span class="absolute -inset-1.5" />
-            <span class="sr-only">View notifications</span>
-            <BellIcon class="size-6" aria-hidden="true" />
-          </button>
-
-          <!-- Profile dropdown -->
-          <Menu as="div" class="relative ml-3">
-            <div>
-              <MenuButton class="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
-                <span class="absolute -inset-1.5" />
-                <span class="sr-only">Open user menu</span>
-                <img class="size-8 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
-              </MenuButton>
-            </div>
-            <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-              <MenuItems class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden">
-                <MenuItem v-slot="{ active }">
-                  <a href="#" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">Your Profile</a>
-                </MenuItem>
-                <MenuItem v-slot="{ active }">
-                  <a href="#" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">Settings</a>
-                </MenuItem>
-                <MenuItem v-slot="{ active }">
-                  <a href="#" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">Sign out</a>
-                </MenuItem>
-              </MenuItems>
-            </transition>
-          </Menu>
-        </div>
-      </div>
+  <div class="about-container">
+    <div class="hero-section">
+      <h1>{{ title }}</h1>
+      <p class="subtitle">{{ subtitle }}</p>
     </div>
 
-    <DisclosurePanel class="sm:hidden">
-      <div class="space-y-1 px-2 pt-2 pb-3">
-        <DisclosureButton v-for="item in navigation" :key="item.name" as="a" :href="item.href" :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'block rounded-md px-3 py-2 text-base font-medium']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</DisclosureButton>
+    <section class="mission-section">
+      <h2>Our Mission</h2>
+      <p>{{ mission }}</p>
+    </section>
+
+    <section class="team-section">
+      <h2>Meet Our Team</h2>
+      <div class="team-grid">
+        <div 
+          v-for="member in teamMembers" 
+          :key="member.id" 
+          class="team-member"
+        >
+          <img 
+            :src="member.avatar" 
+            :alt="member.name" 
+            loading="lazy"
+          >
+          <h3>{{ member.name }}</h3>
+          <p class="role">{{ member.role }}</p>
+          <p class="bio">{{ member.bio }}</p>
+        </div>
       </div>
-    </DisclosurePanel>
-  </Disclosure>
+    </section>
+
+    <section class="values-section">
+      <h2>Our Values</h2>
+      <div class="values-grid">
+        <div 
+          v-for="value in companyValues" 
+          :key="value.id" 
+          class="value-card"
+        >
+          <i :class="value.icon"></i>
+          <h3>{{ value.title }}</h3>
+          <p>{{ value.description }}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact-section">
+      <h2>Get in Touch</h2>
+      <div class="contact-info">
+        <p>{{ contactInfo.address }}</p>
+        <p>{{ contactInfo.email }}</p>
+        <p>{{ contactInfo.phone }}</p>
+      </div>
+    </section>
+  </div>
 </template>
 
-<script setup>
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+<script lang="ts">
+import { defineComponent } from 'vue'
 
-const navigation = [
-  { name: 'Dashboard', href: '#', current: true },
-  { name: 'Team', href: '#', current: false },
-  { name: 'Projects', href: '#', current: false },
-  { name: 'Calendar', href: '#', current: false },
-]
+// Interfaces for type safety
+interface TeamMember {
+  id: number
+  name: string
+  role: string
+  bio: string
+  avatar: string
+}
+
+interface CompanyValue {
+  id: number
+  title: string
+  description: string
+  icon: string
+}
+
+interface ContactInfo {
+  address: string
+  email: string
+  phone: string
+}
+
+export default defineComponent({
+  name: 'AboutView',
+  setup() {
+    const title = 'About Us'
+    const subtitle = 'Building the future, one innovation at a time'
+    const mission = 'Our mission is to create innovative solutions that empower businesses and individuals to achieve their full potential in the digital age.'
+
+    const teamMembers: TeamMember[] = [
+      {
+        id: 1,
+        name: 'Sarah Johnson',
+        role: 'CEO & Founder',
+        bio: 'With over 15 years of experience in tech leadership, Sarah drives our vision forward.',
+        avatar: '/images/team/sarah.jpg'
+      },
+      {
+        id: 2,
+        name: 'Michael Chen',
+        role: 'CTO',
+        bio: 'Michael brings extensive expertise in scalable architecture and emerging technologies.',
+        avatar: '/images/team/michael.jpg'
+      },
+      {
+        id: 3,
+        name: 'Emma Rodriguez',
+        role: 'Head of Design',
+        bio: 'Emma leads our design team with a passion for creating beautiful, intuitive experiences.',
+        avatar: '/images/team/emma.jpg'
+      }
+    ]
+
+    const companyValues: CompanyValue[] = [
+      {
+        id: 1,
+        title: 'Innovation',
+        description: 'We push boundaries and embrace new technologies to solve complex challenges.',
+        icon: 'fas fa-lightbulb'
+      },
+      {
+        id: 2,
+        title: 'Integrity',
+        description: 'We maintain the highest standards of honesty and ethical behavior.',
+        icon: 'fas fa-shield-alt'
+      },
+      {
+        id: 3,
+        title: 'Collaboration',
+        description: 'We believe in the power of teamwork and diverse perspectives.',
+        icon: 'fas fa-users'
+      }
+    ]
+
+    const contactInfo: ContactInfo = {
+      address: '123 Innovation Drive, Tech City, TC 12345',
+      email: 'hello@company.com',
+      phone: '+1 (555) 123-4567'
+    }
+
+    return {
+      title,
+      subtitle,
+      mission,
+      teamMembers,
+      companyValues,
+      contactInfo
+    }
+  }
+})
 </script>
+
+<style scoped>
+.about-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.hero-section {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.hero-section h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  color: #666;
+}
+
+.mission-section {
+  margin-bottom: 4rem;
+  text-align: center;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.team-member {
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.team-member img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  object-fit: cover;
+}
+
+.role {
+  color: #666;
+  margin: 0.5rem 0;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.value-card {
+  text-align: center;
+  padding: 2rem;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+}
+
+.value-card i {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #007bff;
+}
+
+.contact-section {
+  text-align: center;
+}
+
+.contact-info {
+  margin-top: 1.5rem;
+}
+
+.contact-info p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2.5rem;
+  }
+
+  .subtitle {
+    font-size: 1.25rem;
+  }
+
+  .team-grid,
+  .values-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

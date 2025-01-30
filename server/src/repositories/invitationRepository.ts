@@ -19,15 +19,15 @@ export function invitationRepository(db: Database) {
         .executeTakeFirst()
       return result ?? null
     },
-    async findByEventAndUserId(
+    async findByEventAndEmail(
       eventId: number,
-      userId: number
+      email: string
     ): Promise<InvitationRowSelect | null> {
       const result = await db
         .selectFrom('eventInvitations')
         .select(invitationKeysForMembers)
         .where('eventId', '=', eventId)
-        .where('userId', '=', userId)
+        .where('email', '=', email)
         .executeTakeFirst()
       return result ?? null
     },

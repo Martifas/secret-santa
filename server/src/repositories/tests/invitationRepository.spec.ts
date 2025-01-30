@@ -17,7 +17,7 @@ const [eventOne] = await insertAll(db, 'event', [
   fakeEvent({ createdBy: userOne.auth0Id }),
 ])
 const [invitationOne] = await insertAll(db, 'eventInvitations', [
-  fakeEventInvitation({ eventId: eventOne.id, userId: userOne.id }),
+  fakeEventInvitation({ eventId: eventOne.id, userId: userOne.id, email: userOne.email }),
 ])
 
 const fakeInvitationDefault = (
@@ -48,11 +48,11 @@ describe('findById', () => {
   })
 })
 
-describe('find by event and user id', () => {
+describe('find by event and email', () => {
   it('should return an invitation for a specific event and user', async () => {
-    const foundInvitation = await repository.findByEventAndUserId(
+    const foundInvitation = await repository.findByEventAndEmail(
       eventOne.id,
-      userOne.id
+      userOne.email 
     )
     expect(foundInvitation).not.toBeNull()
     if (!foundInvitation) throw new Error('No invitation found')

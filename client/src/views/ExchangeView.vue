@@ -82,7 +82,6 @@ async function createEvent() {
       name: form.value.title,
     })
 
-    // Reset form after successful creation
     form.value = {
       title: '',
       description: '',

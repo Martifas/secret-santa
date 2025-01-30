@@ -44,7 +44,7 @@ export interface EventInvitations {
   id: Generated<number>
   status: string
   updatedAt: Generated<Timestamp>
-  userId: number
+  userId: number | null
 }
 
 export interface EventRule {
