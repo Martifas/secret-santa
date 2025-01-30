@@ -9,6 +9,24 @@ const route = useRoute()
 const invitationStore = useInvitationStore()
 const participants = ref([{ email: '' }])
 const errorMessage = ref('')
+const typeEventOwner = ref('')
+
+const validateEmails = () => {
+  const filledEmails = participants.value.filter((p) => p.email.trim() !== '')
+
+  if (typeEventOwner.value === 'participating') {
+    if (filledEmails.length < 2) {
+      errorMessage.value = 'At least 2 other participants with email addresses are required'
+      return false
+    }
+  } else if (typeEventOwner.value === 'organising') {
+    if (filledEmails.length < 3) {
+      errorMessage.value = 'At least 3 participants with email addresses are required'
+      return false
+    }
+  }
+  return true
+}
 
 const addParticipant = () => {
   participants.value.push({ email: '' })
@@ -22,8 +40,7 @@ const removeParticipant = (index: number) => {
 
 async function sendInvitations() {
   try {
-    if (participants.value.length < 3) {
-      errorMessage.value = 'At least 3 participants are required'
+    if (!validateEmails()) {
       return
     }
 
@@ -73,6 +90,40 @@ async function sendInvitations() {
           <p class="text-gray-600">Share your gift exhange event with your friends</p>
         </div>
         <form class="mx-auto w-auto" @submit.prevent="sendInvitations">
+          <div class="flex gap-3">
+            <div>
+              <input
+                type="radio"
+                id="participating"
+                name="type_event_owner"
+                v-model="typeEventOwner"
+                value="participating"
+                class="text-green-900"
+              />
+              <label
+                for="participating"
+                class="ml-2"
+                :class="{ 'font-medium': typeEventOwner === 'participating' }"
+                >I am participating</label
+              >
+            </div>
+            <div>
+              <input
+                type="radio"
+                id="organising"
+                name="type_event_owner"
+                v-model="typeEventOwner"
+                value="organising"
+                class="text-green-900"
+              />
+              <label
+                class="ml-2"
+                for="organising"
+                :class="{ 'font-medium': typeEventOwner === 'organising' }"
+                >I am just organising</label
+              >
+            </div>
+          </div>
           <div
             class="mx-auto my-2 flex flex-row gap-2"
             v-for="(participant, index) in participants"
@@ -96,8 +147,7 @@ async function sendInvitations() {
             </div>
           </div>
 
-          <div v-if="errorMessage" class="mt-2 mb-4 text-sm text-red-500">
-            ;
+          <div v-if="errorMessage" class="mx-3 mt-2 mb-4 text-sm text-red-500">
             {{ errorMessage }}
           </div>
           <div class="flex flex-row justify-between">

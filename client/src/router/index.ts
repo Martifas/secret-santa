@@ -7,6 +7,7 @@ import WishlistView from '@/views/WishlistView.vue'
 import { authGuard } from '@auth0/auth0-vue'
 import AboutView from '@/views/AboutView.vue'
 import InvitationView from '@/views/InvitationView.vue'
+import RsvpView from '@/views/RsvpView.vue'
 
 const routes = [
   {
@@ -52,6 +53,18 @@ const routes = [
         name: 'Invitation',
         component: InvitationView,
         beforeEnter: authGuard,
+        prop: true,
+      },
+    ],
+  },
+  {
+    path: '/rsvp/:id',
+    component: MainLayout,
+    children: [
+      {
+        path: '',
+        name: 'rsvp',
+        component: RsvpView,
         prop: true,
       },
     ],

@@ -17,14 +17,12 @@ export default groupAdminProcedure
     eventInvitationSchema
       .pick({
         id: true,
-        email: true,        
+        email: true,
         status: true,
-        expiresAt: true,
       })
       .partial({
-        email: true,       
+        email: true,
         status: true,
-        expiresAt: true,
       })
   )
   .mutation(

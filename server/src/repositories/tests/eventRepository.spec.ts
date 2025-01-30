@@ -80,6 +80,7 @@ describe('update', () => {
 
 describe('remove', () => {
   it('should remove event', async () => {
+    await db.deleteFrom('eventInvitations').execute()
     await db.deleteFrom('event').execute()
 
     const [testEvent] = await insertAll(db, 'event', [
@@ -115,7 +116,6 @@ describe('findAllForUser', () => {
       fakeEvent({ createdBy: userTwo.auth0Id }),
     ])
 
-    // Make userOne a member of eventTwo
     await insertAll(db, 'userEvent', [
       {
         userId: userOne.id,
@@ -136,7 +136,6 @@ describe('findAllForUser', () => {
   })
 
   it('should return events without duplicates when user is both creator and member', async () => {
-    // Make userOne also a member of their own event
     await insertAll(db, 'userEvent', [
       {
         userId: userOne.id,

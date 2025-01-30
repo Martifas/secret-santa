@@ -49,19 +49,19 @@ export default authenticatedProcedure
         status: input.status,
       }
 
-      const invitation = await repos.invitationRepository.create(invitationData)
+      const invitationId = await repos.invitationRepository.create(invitationData)
 
       const emailResult = await sendGiftExchangeInvitation({
         emailReceiver: input.email,
         eventOrganiser: input.eventOrganiser, // Fallback name
         exchangeDate: input.eventDate, // Use event date if available
-        rsvpLink: `https://giftmeister.eu/`, // Construct proper URL
+        rsvpLink: `https://giftmeister.eu/rsvp/${invitationId}`, // Construct proper URL
       })
 
       if (!emailResult.success) {
         console.error('Failed to send invitation email:', emailResult.error)
 
-        await repos.invitationRepository.update(invitation.id, {
+        await repos.invitationRepository.update(invitationId, {
           status: 'FAILED',
         })
 
@@ -74,7 +74,7 @@ export default authenticatedProcedure
 
       return {
         success: true,
-        invitation,
+        invitationId,
         emailSent: true,
         messageId: emailResult.messageId,
       }

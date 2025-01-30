@@ -38,14 +38,13 @@ export function invitationRepository(db: Database) {
         .where('userId', '=', userId)
         .execute()
     },
-    async create(
-      invitation: Insertable<EventInvitations>
-    ): Promise<InvitationForMember> {
-      return db
+    async create(invitation: Insertable<EventInvitations>): Promise<number> {
+      const result = await db
         .insertInto('eventInvitations')
         .values(invitation)
-        .returning(invitationKeysForMembers)
+        .returning('id')
         .executeTakeFirstOrThrow()
+      return result.id
     },
 
     async update(

@@ -54,7 +54,7 @@ describe('create', () => {
             email: 'ezys@miskas.lt',
             status: 'sent',
           })
-          return createdInvitation
+          return createdInvitation.id
         },
       } satisfies Partial<InvitationRepository>,
       userEventRepository: {
@@ -69,14 +69,7 @@ describe('create', () => {
     
     expect(result).toEqual({
       success: true,
-      invitation: expect.objectContaining({
-        id: expect.any(Number),
-        eventId,
-        email: 'ezys@miskas.lt',
-        status: 'sent',
-        createdAt: expect.any(Date),
-        updatedAt: expect.any(Date),
-      }),
+      invitationId: 1,
       emailSent: true,
       messageId: 'test-message-id',
     })
@@ -85,7 +78,7 @@ describe('create', () => {
       emailReceiver: 'ezys@miskas.lt',
       eventOrganiser: 'John Doe',
       exchangeDate: eventDate,
-      rsvpLink: 'https://giftmeister.eu/',
+      rsvpLink: `https://giftmeister.eu/rsvp/${createdInvitation.id}`,
     })
   })
 
@@ -104,7 +97,7 @@ describe('create', () => {
     const repos = {
       invitationRepository: {
         findByEventAndEmail: async () => null,
-        create: async () => createdInvitation,
+        create: async () => createdInvitation.id,
         update: updateSpy,
       } satisfies Partial<InvitationRepository>,
       userEventRepository: {

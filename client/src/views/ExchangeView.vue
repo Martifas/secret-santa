@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { Datepicker } from 'flowbite-datepicker'
+import { ref } from 'vue'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 import { ArrowRightIcon } from '@heroicons/vue/24/outline'
 import { trpc } from '@/trpc'
 import { useAuth0 } from '@auth0/auth0-vue'
@@ -15,44 +16,19 @@ interface ExchangeForm {
   title: string
   description: string
   budget: number
-  date: string
+  date: Date | null
 }
 
 const form = ref<ExchangeForm>({
   title: '',
   description: '',
   budget: 0,
-  date: '',
-})
-
-onMounted(() => {
-  const datepickerElement = document.querySelector('[datepicker]') as HTMLElement
-  if (datepickerElement) {
-    new Datepicker(datepickerElement, {
-      format: 'mm/dd/yyyy',
-      autohide: true,
-      todayHighlight: true,
-      clearBtn: true,
-      orientation: 'bottom',
-    })
-
-    datepickerElement.addEventListener('changeDate', (e: any) => {
-      const date = e.detail.date
-      if (date) {
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const day = String(date.getDate()).padStart(2, '0')
-        const year = date.getFullYear()
-        form.value.date = `${month}/${day}/${year}`
-      } else {
-        form.value.date = ''
-      }
-    })
-  }
+  date: null,
 })
 
 async function createEvent() {
   try {
-    console.log(user.value?.name)
+    console.log('form.value.date:', form.value.date, typeof form.value.date);
     if (!user.value?.sub) {
       throw new Error('User not authenticated')
     }
@@ -61,37 +37,24 @@ async function createEvent() {
       throw new Error('Date is required')
     }
 
-    const dateParts = form.value.date.split('/')
-    if (dateParts.length !== 3) {
-      throw new Error('Invalid date format')
-    }
-
-    const month = parseInt(dateParts[0]) - 1
-    const day = parseInt(dateParts[1])
-    const year = parseInt(dateParts[2])
-
-    const eventDate = new Date(year, month, day)
-
-    if (isNaN(eventDate.getTime())) {
-      throw new Error('Invalid date')
-    }
+    
 
     const createdEventId = await trpc.event.createEvent.mutate({
       createdBy: user.value.sub,
-      eventDate: eventDate,
+      eventDate: form.value.date,
       budgetLimit: form.value.budget,
       description: form.value.description,
       status: 'active',
       name: form.value.title,
     })
 
-    invitationStore.setEventDetails(eventDate, user.value?.name || '')
+    invitationStore.setEventDetails(form.value.date, user.value?.name || '')
 
     form.value = {
       title: '',
       description: '',
       budget: 0,
-      date: '',
+      date: null,
     }
 
     router.push({
@@ -172,14 +135,11 @@ async function createEvent() {
                 <label for="date" class="mb-2 block text-sm font-medium text-gray-900"
                   >Select date</label
                 >
-                <input
-                  type="text"
-                  id="date"
+                <VueDatePicker
+                  :enable-time-picker="false"
                   v-model="form.date"
-                  datepicker
-                  placeholder="mm/dd/yyyy"
-                  class="datepicker block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                />
+                  :min-date="new Date()"
+                ></VueDatePicker>
               </div>
             </div>
           </div>

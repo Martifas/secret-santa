@@ -97,7 +97,6 @@ describe('remove', () => {
       invitationRepository: {
         findById: async () => ({
           ...invitation,
-          expiresAt: new Date(invitation.expiresAt),
           createdAt: new Date(),
           updatedAt: new Date(),
         }),

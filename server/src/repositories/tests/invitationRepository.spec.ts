@@ -98,13 +98,13 @@ describe('create', () => {
   it('should create a new invitation', async () => {
     const invitation = fakeInvitationDefault()
 
-    const createdInvitation = await repository.create(invitation)
+    const createdInvitationId = await repository.create(invitation)
 
+    const createdInvitation = await repository.findById(createdInvitationId)
     expect(createdInvitation).toMatchObject({
-      ...pick(invitation, invitationKeysForTesting),
-      id: expect.any(Number),
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
+      eventId: invitation.eventId,
+      userId: invitation.userId,
+      email: invitation.email,
     })
   })
 })
