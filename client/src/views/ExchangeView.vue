@@ -5,9 +5,11 @@ import { ArrowRightIcon } from '@heroicons/vue/24/outline'
 import { trpc } from '@/trpc'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { useRouter } from 'vue-router'
+import { useInvitationStore } from '@/stores/invitationStore'
 
 const { user } = useAuth0()
 const router = useRouter()
+const invitationStore = useInvitationStore()
 
 interface ExchangeForm {
   title: string
@@ -50,6 +52,7 @@ onMounted(() => {
 
 async function createEvent() {
   try {
+    console.log(user.value?.name)
     if (!user.value?.sub) {
       throw new Error('User not authenticated')
     }
@@ -82,6 +85,8 @@ async function createEvent() {
       name: form.value.title,
     })
 
+    invitationStore.setEventDetails(eventDate, user.value?.name || '')
+
     form.value = {
       title: '',
       description: '',
@@ -91,7 +96,9 @@ async function createEvent() {
 
     router.push({
       name: 'Invitation',
-      params: { id: createdEventId },
+      params: {
+        id: createdEventId,
+      },
     })
   } catch (error) {
     if (error instanceof Error) {

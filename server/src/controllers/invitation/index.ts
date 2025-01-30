@@ -1,12 +1,12 @@
 import { router } from '@server/trpc'
-import createInvitation from './createInvitation'
+import createAndSendInvitation from './createAndSendInvitation'
 import updateInvitation from './updateInvitation'
 import getUserInvitations from './getUserInvitations'
 import getInvitation from './getInvitation'
 import deleteInvitation from './deleteInvitation'
 
 export default router({
-  createInvitation,
+  createAndSendInvitation,
   deleteInvitation,
   updateInvitation,
   getUserInvitations,

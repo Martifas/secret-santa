@@ -16,7 +16,6 @@ export async function up(db: Kysely<any>) {
     .addColumn('updated_at', 'timestamptz', (c) =>
       c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )
-    .addColumn('expires_at', 'timestamptz', (c) => c.notNull())
     .execute()
 }
 

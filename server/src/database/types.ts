@@ -40,7 +40,6 @@ export interface EventInvitations {
   createdAt: Generated<Timestamp>
   email: string
   eventId: number
-  expiresAt: Timestamp
   id: Generated<number>
   status: string
   updatedAt: Generated<Timestamp>

@@ -3,22 +3,28 @@ import { trpc } from '@/trpc'
 import { PlusIcon, TrashIcon, EnvelopeIcon } from '@heroicons/vue/24/outline'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useInvitationStore } from '@/stores/invitationStore'
 
 const route = useRoute()
+const invitationStore = useInvitationStore()
+const participants = ref([{ email: '' }])
+const errorMessage = ref('')
 
-const participants = ref([{ email: '' }, { emaiL: '' }, { email: '' }])
 const addParticipant = () => {
   participants.value.push({ email: '' })
+  errorMessage.value = ''
 }
 
 const removeParticipant = (index: number) => {
   participants.value = participants.value.filter((_, i) => i !== index)
+  errorMessage.value = ''
 }
 
 async function sendInvitations() {
   try {
     if (participants.value.length < 3) {
-      throw new Error('Not enough participants. Atleast 3 are required')
+      errorMessage.value = 'At least 3 participants are required'
+      return
     }
 
     const eventId = parseInt(route.params.id as string, 10)
@@ -27,19 +33,27 @@ async function sendInvitations() {
       throw new Error('Invalid event ID')
     }
 
-    // Use for...of to iterate over array elements
     for (const participant of participants.value) {
       if (!participant.email) {
-        continue // Skip empty email entries
+        continue
       }
 
-      await trpc.invitation.createInvitation.mutate({
+      await trpc.invitation.createAndSendInvitation.mutate({
         email: participant.email,
         eventId: eventId,
-        status: 'sent'
+        status: 'sent',
+        eventOrganiser: invitationStore.eventOrganiser,
+        eventDate: invitationStore.eventDate!,
       })
     }
-  } catch (error) {}
+    errorMessage.value = ''
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      errorMessage.value = error.message
+    } else {
+      errorMessage.value = 'An unexpected error occurred'
+    }
+  }
 }
 </script>
 
@@ -58,7 +72,7 @@ async function sendInvitations() {
           <h2 class="mb-4 text-3xl font-bold">Invite your friends</h2>
           <p class="text-gray-600">Share your gift exhange event with your friends</p>
         </div>
-        <form class="mx-auto w-auto">
+        <form class="mx-auto w-auto" @submit.prevent="sendInvitations">
           <div
             class="mx-auto my-2 flex flex-row gap-2"
             v-for="(participant, index) in participants"
@@ -80,6 +94,11 @@ async function sendInvitations() {
                 class="block size-7 flex-none cursor-pointer hover:text-green-900"
               />
             </div>
+          </div>
+
+          <div v-if="errorMessage" class="mt-2 mb-4 text-sm text-red-500">
+            ;
+            {{ errorMessage }}
           </div>
           <div class="flex flex-row justify-between">
             <button
