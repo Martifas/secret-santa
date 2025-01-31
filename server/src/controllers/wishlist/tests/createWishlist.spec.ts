@@ -9,17 +9,12 @@ describe('create', () => {
   const TEST_USER = fakeUser({
     id: 1,
   })
-  const eventId = 100
 
   const newWishlistInput = {
-    userId: TEST_USER.id,
-    eventId,
+    userId: TEST_USER.auth0Id,
     itemName: 'Bike',
     description: 'Blue mountain bike',
-    url: 'https://www.bike.com',
     price: 120,
-    priority: 1,
-    isPurchased: false,
   }
 
   const createdWishlist = {
@@ -34,7 +29,7 @@ describe('create', () => {
   it('should create a new wishlist item when one does not exist', async () => {
     const repos = {
       wishlistRepository: {
-        findByEventAndUserId: async () => null,
+        findByUserIdAndItem: async () => null,
         create: async (input) => {
           expect(input).toEqual(newWishlistInput)
           return createdWishlist
@@ -47,19 +42,7 @@ describe('create', () => {
     const { createWishlist } = createCaller(testContext)
 
     const result = await createWishlist(newWishlistInput)
-    expect(result).toMatchObject({
-      id: expect.any(Number),
-      userId: TEST_USER.id,
-      eventId,
-      itemName: 'Bike',
-      description: 'Blue mountain bike',
-      url: 'https://www.bike.com',
-      price: 120,
-      priority: 1,
-      isPurchased: false,
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
-    })
+    expect(result).toEqual(createdWishlist.id)
   })
 
   it('should throw CONFLICT when wishlist item already exists for user and event', async () => {
@@ -70,7 +53,7 @@ describe('create', () => {
 
     const repos = {
       wishlistRepository: {
-        findByEventAndUserId: async () => existingWishlist,
+        findByUserIdAndItem: async () => existingWishlist,
         create: async () => {
           throw new Error('Should not be called')
         },
@@ -84,8 +67,7 @@ describe('create', () => {
     await expect(createWishlist(newWishlistInput)).rejects.toThrow(
       new TRPCError({
         code: 'CONFLICT',
-        message:
-          'A wishlist item with this name already exists for this event and user',
+        message: 'A wishlist item with this name already exists for this user',
       })
     )
   })
@@ -95,7 +77,7 @@ describe('create', () => {
 
     const repos = {
       wishlistRepository: {
-        findByEventAndUserId: async () => null,
+        findByUserIdAndItem: async () => null,
         create: async () => {
           throw unknownError
         },
@@ -114,7 +96,7 @@ describe('create', () => {
 
     const repos = {
       wishlistRepository: {
-        findByEventAndUserId: async () => {
+        findByUserIdAndItem: async () => {
           throw unknownError
         },
         create: async () => {

@@ -40,11 +40,10 @@ export interface EventInvitations {
   createdAt: Generated<Timestamp>
   email: string
   eventId: number
-  expiresAt: Timestamp
   id: Generated<number>
   status: string
   updatedAt: Generated<Timestamp>
-  userId: number
+  userId: number | null
 }
 
 export interface EventRule {
@@ -76,18 +75,24 @@ export interface UserEvent {
   wishlistId: number | null
 }
 
+export interface UserWishlist {
+  createdAt: Generated<Timestamp>
+  description: string
+  id: Generated<number>
+  title: string
+  updatedAt: Generated<Timestamp>
+  userId: string
+  wishlistId: number | null
+}
+
 export interface Wishlist {
   createdAt: Generated<Timestamp>
   description: string | null
-  eventId: number
   id: Generated<number>
-  isPurchased: Generated<boolean>
   itemName: string
   price: number | null
-  priority: number | null
   updatedAt: Generated<Timestamp>
-  url: string | null
-  userId: number
+  userId: string
 }
 
 export interface DB {
@@ -96,5 +101,6 @@ export interface DB {
   eventRule: EventRule
   user: User
   userEvent: UserEvent
+  userWishlist: UserWishlist
   wishlist: Wishlist
 }

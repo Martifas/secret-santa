@@ -4,10 +4,8 @@ import { apiBase } from '@/config'
 import SuperJSON from 'superjson'
 import { ref } from 'vue'
 
-// Create a ref to store the token getter function
 const getAccessTokenFn = ref<(() => Promise<string>) | null>(null)
 
-// Function to set up the token getter
 export const setTokenGetter = (fn: () => Promise<string>) => {
   getAccessTokenFn.value = fn
 }

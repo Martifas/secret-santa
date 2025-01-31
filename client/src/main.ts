@@ -4,6 +4,8 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import { auth0Config } from './config'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 
 const app = createApp(App)
 
@@ -17,6 +19,8 @@ app.use(
     },
   })
 )
+
+app.component('VueDatePicker', VueDatePicker)
 
 const pinia = createPinia()
 app.use(pinia)

@@ -61,11 +61,13 @@ export const fakeEvent = <T extends Partial<Insertable<Event>>>(
   overrides: T = {} as T
 ) => {
   // Force the random date to be a Date object
-  const randomDate = new Date(random.date({
-    min: now,
-    max: new Date(now.getFullYear() + 1, now.getMonth(), now.getDate()),
-  }))
-  
+  const randomDate = new Date(
+    random.date({
+      min: now,
+      max: new Date(now.getFullYear() + 1, now.getMonth(), now.getDate()),
+    })
+  )
+
   const dateWithoutTime = new Date(
     Date.UTC(
       randomDate.getFullYear(),
@@ -94,12 +96,8 @@ export const fakeWishlist = <T extends Partial<Insertable<Wishlist>>>(
 ) =>
   ({
     description: random.paragraph(),
-    eventId: randomId(),
-    isPurchased: false,
     itemName: random.word(),
     price: random.floating({ min: 1, max: 10000, fixed: 2 }),
-    priority: random.integer({ min: 1, max: 5 }),
-    url: random.url(),
     userId: randomId(),
     ...overrides,
   }) satisfies Insertable<Wishlist>
@@ -117,10 +115,6 @@ export const fakeEventInvitation = <
     email: random.email(),
     userId: randomId(),
     eventId: randomId(),
-    expiresAt: random.date({
-      min: now,
-      max: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7),
-    }),
     status: random.pickone(INVITATION_STATUS),
     ...overrides,
   }) satisfies Insertable<EventInvitations>

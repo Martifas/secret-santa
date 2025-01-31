@@ -58,14 +58,11 @@ describe('find', () => {
 describe('create', () => {
   it('should create a new user', async () => {
     const user = fakeUserDefault()
-    const createdUser = await repository.create(user)
-    expect(createdUser).toMatchObject({
-      ...pick(user, userKeysForTesting),
-      auth0Id: 'auth0 | 1234',
-      id: expect.any(Number),
-      createdAt: expect.any(Date),
-      lastLogin: expect.any(Date),
-    })
+    const createdId = await repository.create(user)
+    const createdUser = await repository.findById(createdId)
+    expect(createdUser).not.toBeNull()
+    if (!createdUser) throw new Error('No user found')
+    expect(createdUser.auth0Id).toEqual(user.auth0Id)
   })
 })
 

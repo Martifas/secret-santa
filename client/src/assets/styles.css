@@ -5,23 +5,21 @@ body {
     font-family: 'Montserrat', sand-serif;
 }
 
-.datepicker-controls,
-.datepicker-grid,
-.datepicker-cell,
-.datepicker-picker {
-    border-color: rgb(209 213 219) !important;
+.dp__input {
+    border-radius: 0.5rem !important;
+    border: 1px solid rgb(209 213 219) !important;
     background-color: rgb(249 250 251) !important;
+    padding: 0.5rem !important;
+    font-size: 0.875rem !important;
     color: rgb(17 24 39) !important;
-}
+    width: 100% !important;
+  }
+  
+  .dp__input:focus {
+    border-color: rgb(59 130 246) !important;
+    box-shadow: 0 0 0 1px rgb(59 130 246) !important;
+  }
 
-.datepicker-controls button {
-    border-color: rgb(209 213 219) !important;
-    background-color: rgb(249 250 251) !important;
-    color: rgb(17 24 39) !important;
-    border-width: 1px !important;
-}
-
-.datepicker-controls button svg {
-    color: rgb(17 24 39) !important;
-    fill: rgb(17 24 39) !important;
-}
+  .dp__input_icon_pad {
+    padding-left: 2.0rem !important;
+  }

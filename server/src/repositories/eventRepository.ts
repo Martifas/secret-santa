@@ -18,12 +18,14 @@ export function eventRepository(db: Database) {
       return result ?? null
     },
 
-    async create(event: Insertable<Event>): Promise<EventForMember> {
-      return db
+    async create(event: Insertable<Event>): Promise<number> {
+      const result = await db
         .insertInto('event')
         .values(event)
-        .returning(eventKeysForMembers)
+        .returning('id')
         .executeTakeFirstOrThrow()
+
+      return result.id 
     },
 
     async update(id: number, updates: EventRowUpdate): Promise<EventForMember> {

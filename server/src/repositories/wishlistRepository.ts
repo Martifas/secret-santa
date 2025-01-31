@@ -17,20 +17,20 @@ export function wishlistRepository(db: Database) {
       return result ?? null
     },
 
-    async findByEventAndUserId(
-      eventId: number,
-      userId: number
+    async findByUserIdAndItem(
+      userId: string,
+      itemName: string
     ): Promise<WishlistRowSelect | null> {
       const result = await db
         .selectFrom('wishlist')
         .select(wishlistKeys)
-        .where('eventId', '=', eventId)
         .where('userId', '=', userId)
+        .where('itemName', '=', itemName)
         .executeTakeFirst()
       return result ?? null
     },
 
-    async create(wishlist: Insertable<Wishlist>): Promise<WishlistForMember> {
+    async create(wishlist: Insertable<Wishlist>): Promise<WishlistRowSelect> {
       return db
         .insertInto('wishlist')
         .values(wishlist)

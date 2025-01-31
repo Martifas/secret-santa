@@ -17,7 +17,11 @@ const [eventOne] = await insertAll(db, 'event', [
   fakeEvent({ createdBy: userOne.auth0Id }),
 ])
 const [invitationOne] = await insertAll(db, 'eventInvitations', [
-  fakeEventInvitation({ eventId: eventOne.id, userId: userOne.id }),
+  fakeEventInvitation({
+    eventId: eventOne.id,
+    userId: userOne.id,
+    email: userOne.email,
+  }),
 ])
 
 const fakeInvitationDefault = (
@@ -48,11 +52,11 @@ describe('findById', () => {
   })
 })
 
-describe('find by event and user id', () => {
+describe('find by event and email', () => {
   it('should return an invitation for a specific event and user', async () => {
-    const foundInvitation = await repository.findByEventAndUserId(
+    const foundInvitation = await repository.findByEventAndEmail(
       eventOne.id,
-      userOne.id
+      userOne.email
     )
     expect(foundInvitation).not.toBeNull()
     if (!foundInvitation) throw new Error('No invitation found')
@@ -94,13 +98,13 @@ describe('create', () => {
   it('should create a new invitation', async () => {
     const invitation = fakeInvitationDefault()
 
-    const createdInvitation = await repository.create(invitation)
+    const createdInvitationId = await repository.create(invitation)
 
+    const createdInvitation = await repository.findById(createdInvitationId)
     expect(createdInvitation).toMatchObject({
-      ...pick(invitation, invitationKeysForTesting),
-      id: expect.any(Number),
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
+      eventId: invitation.eventId,
+      userId: invitation.userId,
+      email: invitation.email,
     })
   })
 })
@@ -110,7 +114,6 @@ describe('update', () => {
     const updates = {
       email: 'barsukas@miskas.lt',
       status: 'confirmed',
-      expiresAt: new Date('2025-12-24'),
     }
     const updatedInvitation = await repository.update(invitationOne.id, updates)
     expect(pick(updatedInvitation, invitationKeysForTesting)).toEqual(
@@ -133,6 +136,15 @@ describe('update', () => {
 
 describe('remove', () => {
   it('should remove invitation', async () => {
+    await db.deleteFrom('eventInvitations').execute()
+    const [invitationOne] = await insertAll(db, 'eventInvitations', [
+      fakeEventInvitation({
+        eventId: eventOne.id,
+        userId: userOne.id,
+        email: userOne.email,
+      }),
+    ])
+
     const removedInvitation = await repository.remove(invitationOne.id)
     expect(pick(removedInvitation, invitationKeysForTesting)).toEqual(
       pick(invitationOne, invitationKeysForTesting)

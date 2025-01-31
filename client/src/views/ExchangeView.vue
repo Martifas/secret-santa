@@ -1,64 +1,37 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { Datepicker } from 'flowbite-datepicker'
-import { TrashIcon, ArrowRightIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { ref } from 'vue'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
+import { ArrowRightIcon } from '@heroicons/vue/24/outline'
 import { trpc } from '@/trpc'
 import { useAuth0 } from '@auth0/auth0-vue'
+import { useRouter } from 'vue-router'
+import { useInvitationStore } from '@/stores/invitationStore'
+import ActionButton from '@/components/ActionButton.vue'
+import Container from '@/components/Container.vue'
+import InsctructionsContainer from '@/components/instructions/InsctructionsContainer.vue'
 
+const isLoading = ref(false)
 const { user } = useAuth0()
+const router = useRouter()
+const invitationStore = useInvitationStore()
 
 interface ExchangeForm {
   title: string
   description: string
   budget: number
-  date: string
-  name: string
-  participants: Array<{ email: string }>
+  date: Date | null
 }
 
 const form = ref<ExchangeForm>({
   title: '',
   description: '',
   budget: 0,
-  date: '',
-  name: '',
-  participants: [{ email: '' }],
-})
-
-const addParticipant = () => {
-  form.value.participants.push({ email: '' })
-}
-
-const removeParticipant = (index: number) => {
-  form.value.participants = form.value.participants.filter((_, i) => i !== index)
-}
-
-onMounted(() => {
-  const datepickerElement = document.querySelector('[datepicker]') as HTMLElement
-  if (datepickerElement) {
-    new Datepicker(datepickerElement, {
-      format: 'mm/dd/yyyy',
-      autohide: true,
-      todayHighlight: true,
-      clearBtn: true,
-      orientation: 'bottom',
-    })
-
-    datepickerElement.addEventListener('changeDate', (e: any) => {
-      const date = e.detail.date
-      if (date) {
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const day = String(date.getDate()).padStart(2, '0')
-        const year = date.getFullYear()
-        form.value.date = `${month}/${day}/${year}`
-      } else {
-        form.value.date = ''
-      }
-    })
-  }
+  date: null,
 })
 
 async function createEvent() {
+  isLoading.value = true
   try {
     if (!user.value?.sub) {
       throw new Error('User not authenticated')
@@ -68,51 +41,44 @@ async function createEvent() {
       throw new Error('Date is required')
     }
 
-    const dateParts = form.value.date.split('/')
-    if (dateParts.length !== 3) {
-      throw new Error('Invalid date format')
-    }
-
-    const month = parseInt(dateParts[0]) - 1
-    const day = parseInt(dateParts[1])
-    const year = parseInt(dateParts[2])
-
-    const eventDate = new Date(year, month, day)
-
-    if (isNaN(eventDate.getTime())) {
-      throw new Error('Invalid date')
-    }
-
-    const event = await trpc.event.createEvent.mutate({
+    const createdEventId = await trpc.event.createEvent.mutate({
       createdBy: user.value.sub,
-      eventDate: eventDate,
+      eventDate: form.value.date,
       budgetLimit: form.value.budget,
       description: form.value.description,
       status: 'active',
       name: form.value.title,
     })
 
-    // Reset form after successful creation
+    invitationStore.setEventDetails(form.value.date, user.value?.given_name || '')
+
     form.value = {
       title: '',
       description: '',
       budget: 0,
-      date: '',
-      name: '',
-      participants: [{ email: '' }],
+      date: null,
     }
+
+    router.push({
+      name: 'Invitation',
+      params: {
+        id: createdEventId,
+      },
+    })
   } catch (error) {
     if (error instanceof Error) {
       console.error('Failed to create event:', error.message)
     } else {
       console.error('Failed to create event:', error)
     }
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
 
 <template>
-  <div class="container mx-auto max-w-7xl px-4 py-8">
+  <Container>
     <div class="mt-7 flex gap-6">
       <div class="relative hidden h-[600px] basis-1/2 md:block">
         <img
@@ -138,16 +104,18 @@ async function createEvent() {
             <input
               type="text"
               id="title"
+              v-model="form.title"
               placeholder="Title"
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
             />
 
-            <label for="message" class="mb-2 block text-sm font-medium text-gray-900"
+            <label for="description" class="mb-2 block text-sm font-medium text-gray-900"
               >Enter a description</label
             >
 
             <textarea
-              id="message"
+              id="description"
+              v-model="form.description"
               rows="4"
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
               placeholder="Description"
@@ -160,6 +128,7 @@ async function createEvent() {
                 >
                 <input
                   type="number"
+                  v-model="form.budget"
                   id="budget"
                   placeholder="0"
                   class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
@@ -170,64 +139,29 @@ async function createEvent() {
                 <label for="date" class="mb-2 block text-sm font-medium text-gray-900"
                   >Select date</label
                 >
-                <input
-                  type="text"
-                  id="date"
-                  datepicker
-                  placeholder="mm/dd/yyyy"
-                  class="datepicker block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                />
+                <VueDatePicker
+                  :enable-time-picker="false"
+                  v-model="form.date"
+                  :min-date="new Date()"
+                ></VueDatePicker>
               </div>
             </div>
           </div>
-          <div>
-            <div
-              class="my-2 flex flex-row gap-2"
-              v-for="(participant, index) in form.participants"
-              :key="index"
-            >
-              <div class="w-full">
-                <label
-                  for="participant"
-                  class="mb-2 block text-sm font-medium text-gray-900"
-                ></label>
-                <input
-                  type="email"
-                  id="participant"
-                  v-model="participant.email"
-                  :placeholder="`Participant's ${index + 1} email `"
-                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div class="flex items-center">
-                <TrashIcon
-                  @click="removeParticipant(index)"
-                  class="block size-7 flex-none cursor-pointer hover:text-green-900"
-                />
-              </div>
-            </div>
-            <div class="flex flex-row justify-between">
-              <button
-                @click="addParticipant"
-                type="button"
-                class="flex rounded-lg border-1 bg-green-900 px-4 py-2 text-center text-white hover:bg-green-700"
-              >
-                Add Participant
-                <PlusIcon class="my-auto ml-2 inline size-5 flex-none cursor-pointer" />
-              </button>
-              <button
-                type="submit"
-                class="flex rounded-lg border-1 bg-sky-900 px-4 py-2 text-center text-white hover:bg-sky-700"
-              >
-                Create gift exchange
-                <ArrowRightIcon class="my-auto ml-2 inline size-5 cursor-pointer" />
-              </button>
-            </div>
+
+          <div class="flex justify-center text-sm sm:justify-end!">
+            On the next page you can add send invitations.
+          </div>
+
+          <div class="flex w-full flex-row justify-center sm:justify-end!">
+            <ActionButton type="submit" :loading="isLoading" variant="primary" size="md">
+              Create gift exchange
+              <ArrowRightIcon class="my-auto ml-2 inline size-5 cursor-pointer" />
+            </ActionButton>
           </div>
         </form>
       </div>
     </div>
-    <div class="mt-8 border-1 border-gray-300 p-8">
+    <InsctructionsContainer>
       <div>
         <h2 class="text-xl font-bold">Draw Names with Gift Meister</h2>
         <p class="py-2">
@@ -306,6 +240,6 @@ async function createEvent() {
           Giftlist is here to help at no cost to you.
         </p>
       </div>
-    </div>
-  </div>
+    </InsctructionsContainer>
+  </Container>
 </template>
