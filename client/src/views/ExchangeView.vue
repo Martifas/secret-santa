@@ -33,7 +33,6 @@ const form = ref<ExchangeForm>({
 async function createEvent() {
   isLoading.value = true
   try {
-    console.log('form.value.date:', form.value.date, typeof form.value.date)
     if (!user.value?.sub) {
       throw new Error('User not authenticated')
     }

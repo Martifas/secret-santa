@@ -6,8 +6,10 @@ export async function up(db: Kysely<any>) {
     .addColumn('id', 'integer', (c) =>
       c.primaryKey().generatedAlwaysAsIdentity()
     )
-    .addColumn('user_id', 'integer', (c) => c.references('user.id').notNull())
+    .addColumn('user_id', 'text', (c) => c.references('user.auth0_id').notNull())
     .addColumn('wishlist_id', 'integer', (c) => c.references('wishlist.id'))
+    .addColumn('title', 'text', (c) => c.notNull())
+    .addColumn('description', 'text', (c) => c.notNull())
     .addColumn('created_at', 'timestamptz', (c) =>
       c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )

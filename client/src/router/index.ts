@@ -76,7 +76,7 @@ const routes = [
     children: [
       {
         path: '',
-        name: 'rsvp',
+        name: 'WishlistItems',
         component: WishlistItemView,
         props: true,
       },

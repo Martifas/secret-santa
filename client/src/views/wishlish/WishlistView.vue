@@ -4,8 +4,13 @@ import { ArrowRightIcon } from '@heroicons/vue/24/outline'
 import ActionButton from '@/components/ActionButton.vue'
 import Container from '@/components/Container.vue'
 import InsctructionsContainer from '@/components/instructions/InsctructionsContainer.vue'
+import { trpc } from '@/trpc'
+import { useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 
 const isLoading = ref(false)
+const { user } = useAuth0()
+const router = useRouter()
 
 interface WishlistForm {
   title: string
@@ -19,6 +24,36 @@ const form = ref<WishlistForm>({
 
 async function createWishlist() {
   isLoading.value = true
+  try {
+    if (!user.value?.sub) {
+      throw new Error('User not authenticated')
+    }
+    const createdWishlistId = await trpc.userWishlist.createUserWishlist.mutate({
+      title: form.value.title,
+      description: form.value.description,
+      userId: user.value.sub,
+    })
+
+    form.value = {
+      title: '',
+      description: '',
+    }
+
+    router.push({
+      name: 'WishlistItems',
+      params: {
+        id: createdWishlistId,
+      },
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Failed to create wishlist:', error.message)
+    } else {
+      console.error('Failed to create wishlist:', error)
+    }
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 

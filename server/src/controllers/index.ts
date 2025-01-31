@@ -4,6 +4,7 @@ import invitation from './invitation'
 import rule from './rule'
 import user from './user'
 import userEvent from './userEvent'
+import userWishlist from './userWishlist'
 import wishlist from './wishlist'
 
 export const appRouter = router({
@@ -13,6 +14,7 @@ export const appRouter = router({
   user,
   userEvent,
   invitation,
+  userWishlist
 })
 
 export type AppRouter = typeof appRouter

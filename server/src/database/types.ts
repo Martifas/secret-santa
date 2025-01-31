@@ -77,9 +77,11 @@ export interface UserEvent {
 
 export interface UserWishlist {
   createdAt: Generated<Timestamp>
+  description: string
   id: Generated<number>
+  title: string
   updatedAt: Generated<Timestamp>
-  userId: number
+  userId: string
   wishlistId: number | null
 }
 
