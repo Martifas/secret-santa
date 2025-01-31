@@ -58,14 +58,14 @@ const routes = [
     ],
   },
   {
-    path: '/rsvp/:id',
+    path: '/rsvp/:eventId/:id/:response',
     component: MainLayout,
     children: [
       {
         path: '',
         name: 'rsvp',
         component: RsvpView,
-        prop: true,
+        props: true,
       },
     ],
   },

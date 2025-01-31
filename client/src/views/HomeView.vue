@@ -1,6 +1,6 @@
 <template>
   <div
-    class="h-96 min-h-[300px] w-full bg-[url(https://images.unsplash.com/photo-1467810563316-b5476525c0f9?q=80&w=1469&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] bg-cover bg-center"
+    class="h-96 min-h-[400px] w-full bg-[url(https://images.unsplash.com/photo-1467810563316-b5476525c0f9?q=80&w=1469&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] bg-cover bg-center"
   >
     <div class="container mx-auto max-w-7xl flex-col items-center justify-between px-4 py-8">
       <div class="text-white">
@@ -12,12 +12,12 @@
           Quickly add and reserve gifts with convenience!
         </p>
       </div>
-      <div class="text-md mx-auto flex w-40 flex-col mt-20">
-        <router-link :to="{ name: 'Wishlist' }" class="m-2 rounded-sm bg-green-900 p-2 text-center text-white hover:bg-green-700">
+      <div class="text-md mx-auto flex w-40 items-center flex-col mt-20">
+        <router-link :to="{ name: 'Wishlist' }" class="m-2 rounded-sm bg-green-900 p-2 text-center w-3xs text-white hover:bg-green-700">
           Create Wishlist
         </router-link>
-        <router-link :to="{ name: 'Exchange' }" class="m-2 rounded-sm bg-green-900 p-2 text-center text-white hover:bg-green-700">
-          Draw Names
+        <router-link :to="{ name: 'Exchange' }" class="m-2 rounded-sm bg-green-900 p-2 text-center w-3xs text-white hover:bg-green-700">
+          Create Exchange Event
         </router-link>
       </div>
     </div>

@@ -55,12 +55,18 @@ async function sendInvitations() {
         continue
       }
 
+      const eventDetails = await trpc.event.getEvent.query({id: eventId})
+
       await trpc.invitation.createAndSendInvitation.mutate({
         email: participant.email,
         eventId: eventId,
         status: 'sent',
         eventOrganiser: invitationStore.eventOrganiser,
         eventDate: invitationStore.eventDate!,
+        title: eventDetails.name,
+        budgetLimit: eventDetails.budgetLimit,
+        description: eventDetails.description
+
       })
     }
     errorMessage.value = ''

@@ -99,7 +99,7 @@ const navigation = [
                 ]"
                 :aria-current="item.current ? 'page' : undefined"
               >
-                <GiftIcon v-if="item.name === 'Draw Names'" class="inline size-6" />
+                <GiftIcon v-if="item.name === 'Gift Exchange'" class="inline size-6" />
                 <SparklesIcon v-if="item.name === 'Create Wishlist'" class="inline size-6" />
                 {{ item.name }}</router-link
               >

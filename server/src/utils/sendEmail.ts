@@ -5,13 +5,21 @@ interface EmailConfig {
   emailReceiver: string
   eventOrganiser: string
   exchangeDate: Date
-  rsvpLink: string
+  rsvpLinkYes: string
+  rsvpLinkNo: string
+  budgetLimit: number
+  description: string
+  title: string
 }
 
 interface EmailTemplateProps {
   eventOrganiser: string
   exchangeDate: Date
-  rsvpLink: string
+  rsvpLinkYes: string
+  rsvpLinkNo: string
+  budgetLimit: number
+  description: string
+  title: string
 }
 
 interface EmailResponse {
@@ -43,7 +51,11 @@ const createTransporter = (): Transporter => {
 const generateEmailTemplate = ({
   eventOrganiser,
   exchangeDate,
-  rsvpLink,
+  rsvpLinkYes,
+  rsvpLinkNo,
+  budgetLimit,
+  description,
+  title,
 }: EmailTemplateProps): string => {
   return `
     <body style="font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color: #ffffff;">
@@ -65,12 +77,38 @@ const generateEmailTemplate = ({
           </div>
           
           <div style="background-color: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px;">
-              <div style="font-weight: bold; color: #333333;">Gift Exchange Date</div>
-              <div style="color: #666666;">${exchangeDate.toLocaleDateString()}</div>
+        <h2 style="color: #333333; margin-bottom: 20px;">Event Details</h2>
+        
+        <div style="margin-bottom: 15px;">
+            <div style="font-weight: bold; color: #333333; margin-bottom: 5px;">📅 Gift Exchange Date</div>
+            <div style="color: #666666; font-size: 16px;">${exchangeDate.toLocaleDateString()}</div>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <div style="font-weight: bold; color: #333333; margin-bottom: 5px;">🎯 Event Title</div>
+            <div style="color: #666666; font-size: 16px;">${title}</div>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <div style="font-weight: bold; color: #333333; margin-bottom: 5px;">💰 Budget Limit</div>
+            <div style="color: #666666; font-size: 16px;">$${budgetLimit}</div>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <div style="font-weight: bold; color: #333333; margin-bottom: 5px;">📝 Description</div>
+            <div style="color: #666666; font-size: 16px;">${description}</div>
+        </div>
+    </div>
+          
+         <div style="margin-bottom: 15px; color: #666666;">
+              Please let us know if you can participate in the gift exchange:
           </div>
           
-          <a href="${rsvpLink}" style="display: inline-block; background-color: #008080; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0;">
-              RSVP
+          <a href="${rsvpLinkYes}" style="display: inline-block; background-color: #4CAF50; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 0 10px;">
+              Accept
+          </a>
+          <a href="${rsvpLinkNo}" style="display: inline-block; background-color: #DC3545; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 0 10px;">
+              Refuse
           </a>
           
           <div style="color: #666666; margin: 20px 0; padding: 0 20px;">
@@ -92,15 +130,23 @@ const generateEmailTemplate = ({
 export async function sendGiftExchangeInvitation({
   emailReceiver,
   eventOrganiser,
+  budgetLimit,
+  description,
+  title,
   exchangeDate,
-  rsvpLink,
+  rsvpLinkYes,
+  rsvpLinkNo,
 }: EmailConfig): Promise<EmailResponse> {
   try {
     const transporter = createTransporter()
     const htmlTemplate = generateEmailTemplate({
       eventOrganiser,
       exchangeDate,
-      rsvpLink,
+      rsvpLinkYes,
+      rsvpLinkNo,
+      budgetLimit,
+      description,
+      title,
     })
 
     const info = await transporter.sendMail({

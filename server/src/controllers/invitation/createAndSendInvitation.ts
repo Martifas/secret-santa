@@ -10,6 +10,9 @@ import { z } from 'zod'
 const emailDataSchema = z.object({
   eventOrganiser: z.string(),
   eventDate: z.date(),
+  title: z.string(),
+  budgetLimit: z.number(),
+  description: z.string(),
 })
 
 const invitationInputSchema = eventInvitationSchema
@@ -49,13 +52,18 @@ export default authenticatedProcedure
         status: input.status,
       }
 
-      const invitationId = await repos.invitationRepository.create(invitationData)
+      const invitationId =
+        await repos.invitationRepository.create(invitationData)
 
       const emailResult = await sendGiftExchangeInvitation({
         emailReceiver: input.email,
         eventOrganiser: input.eventOrganiser, // Fallback name
         exchangeDate: input.eventDate, // Use event date if available
-        rsvpLink: `https://giftmeister.eu/rsvp/${invitationId}`, // Construct proper URL
+        rsvpLinkYes: `http://localhost:5173/rsvp/${input.eventId}/${invitationId}/accept`,
+        rsvpLinkNo: `http://localhost:5173/rsvp/${input.eventId}/${invitationId}/refuse`,
+        budgetLimit: input.budgetLimit,
+        title: input.title,
+        description: input.description,
       })
 
       if (!emailResult.success) {
