@@ -10,12 +10,12 @@ const db = await wrapInRollbacks(createTestDatabase())
 const repository = wishlistRepository(db)
 const [userOne] = await insertAll(db, 'user', fakeUser())
 const [wishlistOne] = await insertAll(db, 'wishlist', [
-  fakeWishlist({ userId: userOne.id }),
+  fakeWishlist({ userId: userOne.auth0Id }),
 ])
 
 const fakeWishlistDefault = (
   wishlist: Parameters<typeof fakeWishlist>[0] = {}
-) => fakeWishlist({ userId: userOne.id, ...wishlist })
+) => fakeWishlist({ userId: userOne.auth0Id, ...wishlist })
 
 describe('findById', () => {
   it('should return a wishlist for a specific id', async () => {
@@ -37,7 +37,7 @@ describe('findById', () => {
 })
 describe('find by item name and user id', () => {
   it('should return a wishlist record for a specific item and user', async () => {
-    const foundWishlist = await repository.findByUserIdAndItem(userOne.id, wishlistOne.itemName)
+    const foundWishlist = await repository.findByUserIdAndItem(userOne.auth0Id, wishlistOne.itemName)
     expect(foundWishlist).not.toBeNull()
     if (!foundWishlist) throw new Error('No wishlist found')
 
@@ -68,8 +68,6 @@ describe('update', () => {
       itemName: 'Santa Sculpture',
       description: 'Solid Santa',
       price: 50,
-      isPurchased: false,
-      url: null,
     }
     const updatedWishlist = await repository.update(wishlistOne.id, updates)
     expect(pick(updatedWishlist, wishlistKeysForTesting)).toEqual(

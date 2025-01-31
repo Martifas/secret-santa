@@ -18,19 +18,15 @@ export default authenticatedProcedure
       .pick({
         id: true,
         itemName: true,
-        description: true,
-        url: true,
+        description: true,     
         price: true,
-        priority: true,
-        isPurchased: true,
+     
       })
       .partial({
         itemName: true,
-        description: true,
-        url: true,
-        price: true,
-        priority: true,
-        isPurchased: true,
+        description: true,        
+        price: true,    
+        
       })
   )
   .mutation(
@@ -47,7 +43,7 @@ export default authenticatedProcedure
         })
       }
 
-      if (existingWishlist.userId !== authUser.id) {
+      if (existingWishlist.userId !== authUser.auth0Id) {
         throw new TRPCError({
           code: 'FORBIDDEN',
           message: 'Not authorized to update this wishlist item',

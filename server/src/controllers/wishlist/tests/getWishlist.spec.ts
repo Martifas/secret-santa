@@ -11,11 +11,10 @@ describe('findByUserIdAndItem', () => {
     id: 1,
   })
 
-  const targetUserId = 2
   const existingWishlist = {
     ...fakeWishlist({
       id: 1,
-      userId: targetUserId,
+      userId: TEST_USER.auth0Id,
 
       itemName: 'Bike',
       description: 'Blue mountain bike',
@@ -51,7 +50,7 @@ describe('findByUserIdAndItem', () => {
 
     expect(result).toMatchObject({
       id: expect.any(Number),
-      userId: targetUserId,
+      userId: TEST_USER.auth0Id,
       itemName: 'Bike',
       description: 'Blue mountain bike',
       url: 'https://www.bike.com',

@@ -1,8 +1,5 @@
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
-import {
-  wishlistSchema,
-  type WishlistForMember,
-} from '@server/entities/wishlist'
+import { wishlistSchema } from '@server/entities/wishlist'
 import { wishlistRepository } from '@server/repositories/wishlistRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { TRPCError } from '@trpc/server'
@@ -20,7 +17,7 @@ export default authenticatedProcedure
       updatedAt: true,
     })
   )
-  .mutation(async ({ input, ctx: { repos } }): Promise<WishlistForMember> => {
+  .mutation(async ({ input, ctx: { repos } }): Promise<number> => {
     const existing = await repos.wishlistRepository.findByUserIdAndItem(
       input.userId,
       input.itemName
@@ -33,5 +30,5 @@ export default authenticatedProcedure
     }
 
     const wishlist = await repos.wishlistRepository.create(input)
-    return wishlist
+    return wishlist.id
   })

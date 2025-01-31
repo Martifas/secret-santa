@@ -18,7 +18,7 @@ export function wishlistRepository(db: Database) {
     },
 
     async findByUserIdAndItem(
-      userId: number,
+      userId: string,
       itemName: string
     ): Promise<WishlistRowSelect | null> {
       const result = await db
@@ -30,7 +30,7 @@ export function wishlistRepository(db: Database) {
       return result ?? null
     },
 
-    async create(wishlist: Insertable<Wishlist>): Promise<WishlistForMember> {
+    async create(wishlist: Insertable<Wishlist>): Promise<WishlistRowSelect> {
       return db
         .insertInto('wishlist')
         .values(wishlist)

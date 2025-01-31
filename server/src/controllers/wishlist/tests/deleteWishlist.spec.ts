@@ -15,7 +15,7 @@ describe('remove', () => {
   const baseWishlist = {
     ...fakeWishlist({
       id,
-      userId: TEST_USER.id,
+      userId: TEST_USER.auth0Id,
       eventId,
       itemName: 'Bike',
       description: 'Blue mountain bike',
@@ -47,7 +47,7 @@ describe('remove', () => {
 
     expect(result).toMatchObject({
       id,
-      userId: TEST_USER.id,
+      userId: TEST_USER.auth0Id,
       eventId,
       itemName: 'Bike',
       description: 'Blue mountain bike',
@@ -85,7 +85,7 @@ describe('remove', () => {
   it('should throw FORBIDDEN when user is not the creator', async () => {
     const wishlistByAnotherUser = {
       ...baseWishlist,
-      userId: TEST_USER.id + 1,
+      userId: 'auth0|9999',
     }
 
     const repos = {

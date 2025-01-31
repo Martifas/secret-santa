@@ -89,12 +89,10 @@ export interface Wishlist {
   createdAt: Generated<Timestamp>
   description: string | null
   id: Generated<number>
-  isPurchased: Generated<boolean>
   itemName: string
   price: number | null
   updatedAt: Generated<Timestamp>
-  url: string | null
-  userId: number
+  userId: string
 }
 
 export interface DB {

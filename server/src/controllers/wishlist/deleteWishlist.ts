@@ -32,7 +32,7 @@ export default authenticatedProcedure
         })
       }
 
-      if (existingWishlist.userId !== authUser.id) {
+      if (existingWishlist.userId !== authUser.auth0Id) {
         throw new TRPCError({
           code: 'FORBIDDEN',
           message: 'Not authorized to remove this wishlist item',

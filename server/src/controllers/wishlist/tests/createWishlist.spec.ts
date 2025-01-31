@@ -11,12 +11,10 @@ describe('create', () => {
   })
 
   const newWishlistInput = {
-    userId: TEST_USER.id,
+    userId: TEST_USER.auth0Id,
     itemName: 'Bike',
     description: 'Blue mountain bike',
-    url: 'https://www.bike.com',
     price: 120,
-    isPurchased: false,
   }
 
   const createdWishlist = {
@@ -44,17 +42,7 @@ describe('create', () => {
     const { createWishlist } = createCaller(testContext)
 
     const result = await createWishlist(newWishlistInput)
-    expect(result).toMatchObject({
-      id: expect.any(Number),
-      userId: TEST_USER.id,
-      itemName: 'Bike',
-      description: 'Blue mountain bike',
-      url: 'https://www.bike.com',
-      price: 120,
-      isPurchased: false,
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
-    })
+    expect(result).toEqual(createdWishlist.id)
   })
 
   it('should throw CONFLICT when wishlist item already exists for user and event', async () => {

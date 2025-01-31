@@ -7,10 +7,12 @@ import InsctructionsContainer from '@/components/instructions/InsctructionsConta
 import { trpc } from '@/trpc'
 import { useRouter } from 'vue-router'
 import { useAuth0 } from '@auth0/auth0-vue'
+import { useWishlistStore } from '@/stores/wishlistStore'
 
 const isLoading = ref(false)
 const { user } = useAuth0()
 const router = useRouter()
+const wishlistStore = useWishlistStore()
 
 interface WishlistForm {
   title: string
@@ -33,6 +35,8 @@ async function createWishlist() {
       description: form.value.description,
       userId: user.value.sub,
     })
+
+    wishlistStore.setWishlistDetails(form.value.title, form.value.description)
 
     form.value = {
       title: '',
