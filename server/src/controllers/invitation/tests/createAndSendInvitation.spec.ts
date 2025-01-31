@@ -24,6 +24,9 @@ describe('create', () => {
     status: 'sent',
     eventOrganiser: 'John Doe',
     eventDate,
+    title: 'Birthday party',
+    budgetLimit: 50,
+    description: 'awesome party',
   }
   const createdInvitation = {
     ...fakeEventInvitation({
@@ -66,7 +69,7 @@ describe('create', () => {
     const { createAndSendInvitation } = createCaller(testContext)
 
     const result = await createAndSendInvitation(newInvitationInput)
-    
+
     expect(result).toEqual({
       success: true,
       invitationId: 1,
@@ -78,7 +81,11 @@ describe('create', () => {
       emailReceiver: 'ezys@miskas.lt',
       eventOrganiser: 'John Doe',
       exchangeDate: eventDate,
-      rsvpLink: `https://giftmeister.eu/rsvp/${createdInvitation.id}`,
+      title: newInvitationInput.title,
+      budgetLimit: newInvitationInput.budgetLimit,
+      description: newInvitationInput.description,      
+      rsvpLinkYes: `http://localhost:5173/rsvp/${newInvitationInput.eventId}/${createdInvitation.id}/accept`,
+      rsvpLinkNo: `http://localhost:5173/rsvp/${newInvitationInput.eventId}/${createdInvitation.id}/refuse`,
     })
   })
 
@@ -108,7 +115,9 @@ describe('create', () => {
     const createCaller = createCallerFactory(invitationRouter)
     const { createAndSendInvitation } = createCaller(testContext)
 
-    await expect(createAndSendInvitation(newInvitationInput)).rejects.toThrowError(
+    await expect(
+      createAndSendInvitation(newInvitationInput)
+    ).rejects.toThrowError(
       new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Invitation created but failed to send email',
@@ -116,10 +125,9 @@ describe('create', () => {
       })
     )
 
-    expect(updateSpy).toHaveBeenCalledWith(
-      createdInvitation.id,
-      { status: 'FAILED' }
-    )
+    expect(updateSpy).toHaveBeenCalledWith(createdInvitation.id, {
+      status: 'FAILED',
+    })
   })
 
   it('should throw CONFLICT when invitation already exists for user and event', async () => {
@@ -127,7 +135,9 @@ describe('create', () => {
       ...createdInvitation,
       email: 'existing@miskas.lt',
     }
-    const createSpy = vi.fn().mockRejectedValue(new Error('Should not be called'))
+    const createSpy = vi
+      .fn()
+      .mockRejectedValue(new Error('Should not be called'))
 
     const repos = {
       invitationRepository: {
@@ -142,10 +152,13 @@ describe('create', () => {
     const createCaller = createCallerFactory(invitationRouter)
     const { createAndSendInvitation } = createCaller(testContext)
 
-    await expect(createAndSendInvitation(newInvitationInput)).rejects.toThrowError(
+    await expect(
+      createAndSendInvitation(newInvitationInput)
+    ).rejects.toThrowError(
       new TRPCError({
         code: 'CONFLICT',
-        message: 'An invitation with this name already exists for this event and user',
+        message:
+          'An invitation with this name already exists for this event and user',
       })
     )
 
@@ -170,7 +183,9 @@ describe('create', () => {
     const createCaller = createCallerFactory(invitationRouter)
     const { createAndSendInvitation } = createCaller(testContext)
 
-    await expect(createAndSendInvitation(newInvitationInput)).rejects.toThrowError(
+    await expect(
+      createAndSendInvitation(newInvitationInput)
+    ).rejects.toThrowError(
       new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Failed to process invitation',
@@ -183,7 +198,9 @@ describe('create', () => {
 
   it('should propagate unknown errors from findByEventAndEmail', async () => {
     const unknownError = new Error('Database connection failed')
-    const createSpy = vi.fn().mockRejectedValue(new Error('Should not be called'))
+    const createSpy = vi
+      .fn()
+      .mockRejectedValue(new Error('Should not be called'))
 
     const repos = {
       invitationRepository: {
@@ -200,7 +217,9 @@ describe('create', () => {
     const createCaller = createCallerFactory(invitationRouter)
     const { createAndSendInvitation } = createCaller(testContext)
 
-    await expect(createAndSendInvitation(newInvitationInput)).rejects.toThrowError(
+    await expect(
+      createAndSendInvitation(newInvitationInput)
+    ).rejects.toThrowError(
       new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Failed to process invitation',
