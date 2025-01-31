@@ -1,16 +1,29 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { FwbInput, FwbTextarea } from 'flowbite-vue'
 import { ArrowRightIcon } from '@heroicons/vue/24/outline'
+import ActionButton from '@/components/ActionButton.vue'
+import Container from '@/components/Container.vue'
+import InsctructionsContainer from '@/components/instructions/InsctructionsContainer.vue'
 
-const wishlistTitle = ref('')
-const wishlistDescription = ref('')
+const isLoading = ref(false)
 
-async function createWishlist() {}
+interface WishlistForm {
+  title: string
+  description: string
+}
+
+const form = ref<WishlistForm>({
+  title: '',
+  description: '',
+})
+
+async function createWishlist() {
+  isLoading.value = true
+}
 </script>
 
 <template>
-  <div class="container mx-auto max-w-7xl px-4 py-8">
+  <Container>
     <div class="mt-7 flex gap-6">
       <div class="relative hidden h-[600px] basis-1/2 md:block">
         <img
@@ -30,38 +43,43 @@ async function createWishlist() {}
 
         <form class="space-y-6" @submit.prevent="createWishlist">
           <div class="space-y-4">
-            <FwbInput
-              v-model="wishlistTitle"
+            <label for="title" class="mb-2 block text-sm font-medium text-gray-900"
+              >Enter the title of your wishlist</label
+            >
+            <input
+              type="text"
+              id="title"
+              v-model="form.title"
               placeholder="Title"
-              label="Enter the title of your wishlist"
-              required
-              class="bg-white"
+              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
             />
 
-            <FwbTextarea
-              v-model="wishlistDescription"
+            <label for="description" class="mb-2 block text-sm font-medium text-gray-900"
+              >Enter the description of your wishlist</label
+            >
+
+            <textarea
+              id="description"
+              v-model="form.description"
+              rows="4"
+              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
               placeholder="Description"
-              label="Enter the description of your wishlist"
-              :rows="5"
-              class="bg-white"
-              required
-            />
+            ></textarea>
           </div>
 
-          <div class="flex justify-center text-sm sm:justify-end!">On the next page you can add your gifts.</div>
+          <div class="flex justify-center text-sm sm:justify-end!">
+            On the next page you can add your gifts.
+          </div>
           <div class="flex w-full flex-row justify-center sm:justify-end!">
-            <button
-              type="submit"
-              class="flex rounded-xl sm:px-8 sm:py-4 bg-green-900 px-4 py-2 text-center text-white hover:bg-green-700"
-            >
+            <ActionButton type="submit" :loading="isLoading" variant="primary" size="md">
               Create wishlist
               <ArrowRightIcon class="my-auto ml-2 inline size-5 cursor-pointer" />
-            </button>
+            </ActionButton>
           </div>
         </form>
       </div>
     </div>
-    <div class="mt-8 border-1 border-gray-300 p-8">
+    <InsctructionsContainer>
       <div>
         <h2 class="text-xl font-bold">How to Make Your Wishlist Online</h2>
         <p class="py-2">
@@ -131,6 +149,6 @@ async function createWishlist() {}
         <h2 class="mt-7 text-xl font-bold">Is Creating a Wishlist Free?</h2>
         <p class="py-2">Absolutely! You can set up as many wishlists as you like at no cost.</p>
       </div>
-    </div>
-  </div>
+    </InsctructionsContainer>
+  </Container>
 </template>

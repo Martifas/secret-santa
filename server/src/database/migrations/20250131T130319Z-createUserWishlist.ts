@@ -2,29 +2,22 @@ import { type Kysely, sql } from 'kysely'
 
 export async function up(db: Kysely<any>) {
   await db.schema
-    .createTable('wishlist')
+    .createTable('user_wishlist')
     .addColumn('id', 'integer', (c) =>
       c.primaryKey().generatedAlwaysAsIdentity()
     )
     .addColumn('user_id', 'integer', (c) => c.references('user.id').notNull())
-    .addColumn('item_name', 'text', (c) => c.notNull())
-    .addColumn('description', 'text')
-    .addColumn('url', 'text')
-    .addColumn('price', 'real')
-    .addColumn('is_purchased', 'boolean', (c) => c.defaultTo(false).notNull())
+    .addColumn('wishlist_id', 'integer', (c) => c.references('wishlist.id'))
     .addColumn('created_at', 'timestamptz', (c) =>
       c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )
     .addColumn('updated_at', 'timestamptz', (c) =>
       c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )
-    .addUniqueConstraint('unique_wishlist_item', [
-      'user_id',     
-      'item_name',
-    ])
+    .addUniqueConstraint('unique_user_wishlist', ['user_id', 'wishlist_id'])
     .execute()
 }
 
 export async function down(db: Kysely<any>) {
-  await db.schema.dropTable('wishlist').execute()
+  await db.schema.dropTable('user_wishlist').execute()
 }

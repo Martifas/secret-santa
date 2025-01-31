@@ -7,7 +7,11 @@ import { trpc } from '@/trpc'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { useRouter } from 'vue-router'
 import { useInvitationStore } from '@/stores/invitationStore'
+import ActionButton from '@/components/ActionButton.vue'
+import Container from '@/components/Container.vue'
+import InsctructionsContainer from '@/components/instructions/InsctructionsContainer.vue'
 
+const isLoading = ref(false)
 const { user } = useAuth0()
 const router = useRouter()
 const invitationStore = useInvitationStore()
@@ -27,8 +31,9 @@ const form = ref<ExchangeForm>({
 })
 
 async function createEvent() {
+  isLoading.value = true
   try {
-    console.log('form.value.date:', form.value.date, typeof form.value.date);
+    console.log('form.value.date:', form.value.date, typeof form.value.date)
     if (!user.value?.sub) {
       throw new Error('User not authenticated')
     }
@@ -36,8 +41,6 @@ async function createEvent() {
     if (!form.value.date) {
       throw new Error('Date is required')
     }
-
-    
 
     const createdEventId = await trpc.event.createEvent.mutate({
       createdBy: user.value.sub,
@@ -69,12 +72,14 @@ async function createEvent() {
     } else {
       console.error('Failed to create event:', error)
     }
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
 
 <template>
-  <div class="container mx-auto max-w-7xl px-4 py-8">
+  <Container>
     <div class="mt-7 flex gap-6">
       <div class="relative hidden h-[600px] basis-1/2 md:block">
         <img
@@ -147,19 +152,17 @@ async function createEvent() {
           <div class="flex justify-center text-sm sm:justify-end!">
             On the next page you can add send invitations.
           </div>
+
           <div class="flex w-full flex-row justify-center sm:justify-end!">
-            <button
-              type="submit"
-              class="flex rounded-xl bg-green-900 px-4 py-2 text-center text-white hover:bg-green-700 sm:px-8 sm:py-4"
-            >
+            <ActionButton type="submit" :loading="isLoading" variant="primary" size="md">
               Create gift exchange
               <ArrowRightIcon class="my-auto ml-2 inline size-5 cursor-pointer" />
-            </button>
+            </ActionButton>
           </div>
         </form>
       </div>
     </div>
-    <div class="mt-8 border-1 border-gray-300 p-8">
+    <InsctructionsContainer>
       <div>
         <h2 class="text-xl font-bold">Draw Names with Gift Meister</h2>
         <p class="py-2">
@@ -238,6 +241,6 @@ async function createEvent() {
           Giftlist is here to help at no cost to you.
         </p>
       </div>
-    </div>
-  </div>
+    </InsctructionsContainer>
+  </Container>
 </template>

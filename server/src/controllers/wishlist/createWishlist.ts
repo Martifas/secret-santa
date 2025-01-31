@@ -21,15 +21,14 @@ export default authenticatedProcedure
     })
   )
   .mutation(async ({ input, ctx: { repos } }): Promise<WishlistForMember> => {
-    const existing = await repos.wishlistRepository.findByEventAndUserId(
-      input.eventId,
-      input.userId
+    const existing = await repos.wishlistRepository.findByUserIdAndItem(
+      input.userId,
+      input.itemName
     )
     if (existing) {
       throw new TRPCError({
         code: 'CONFLICT',
-        message:
-          'A wishlist item with this name already exists for this event and user',
+        message: 'A wishlist item with this name already exists for this user',
       })
     }
 

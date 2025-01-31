@@ -1,4 +1,4 @@
-import { fakeEvent, fakeUser, fakeWishlist } from '@server/entities/tests/fakes'
+import { fakeUser, fakeWishlist } from '@server/entities/tests/fakes'
 import { createTestDatabase } from '@server/utils/tests/database'
 import { insertAll, selectAll } from '@server/utils/tests/record'
 import { wrapInRollbacks } from '@server/utils/tests/transactions'
@@ -9,16 +9,13 @@ import { wishlistRepository } from '../wishlistRepository'
 const db = await wrapInRollbacks(createTestDatabase())
 const repository = wishlistRepository(db)
 const [userOne] = await insertAll(db, 'user', fakeUser())
-const [eventOne] = await insertAll(db, 'event', [
-  fakeEvent({ createdBy: userOne.auth0Id }),
-])
 const [wishlistOne] = await insertAll(db, 'wishlist', [
-  fakeWishlist({ userId: userOne.id, eventId: eventOne.id }),
+  fakeWishlist({ userId: userOne.id }),
 ])
 
 const fakeWishlistDefault = (
   wishlist: Parameters<typeof fakeWishlist>[0] = {}
-) => fakeWishlist({ userId: userOne.id, eventId: eventOne.id, ...wishlist })
+) => fakeWishlist({ userId: userOne.id, ...wishlist })
 
 describe('findById', () => {
   it('should return a wishlist for a specific id', async () => {
@@ -38,12 +35,9 @@ describe('findById', () => {
     expect(foundWishlist).toBeNull()
   })
 })
-describe('find by event and user id', () => {
-  it('should return a wishlist for a specific event and user', async () => {
-    const foundWishlist = await repository.findByEventAndUserId(
-      eventOne.id,
-      userOne.id
-    )
+describe('find by item name and user id', () => {
+  it('should return a wishlist record for a specific item and user', async () => {
+    const foundWishlist = await repository.findByUserIdAndItem(userOne.id, wishlistOne.itemName)
     expect(foundWishlist).not.toBeNull()
     if (!foundWishlist) throw new Error('No wishlist found')
 
@@ -75,7 +69,6 @@ describe('update', () => {
       description: 'Solid Santa',
       price: 50,
       isPurchased: false,
-      priority: 1,
       url: null,
     }
     const updatedWishlist = await repository.update(wishlistOne.id, updates)

@@ -6,24 +6,21 @@ import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import wishlistRouter from '..'
 
-describe('findByEventAndUserId', () => {
+describe('findByUserIdAndItem', () => {
   const TEST_USER = fakeUser({
     id: 1,
-
   })
-  const eventId = 100
-  const targetUserId = 2
 
+  const targetUserId = 2
   const existingWishlist = {
     ...fakeWishlist({
       id: 1,
       userId: targetUserId,
-      eventId,
+
       itemName: 'Bike',
       description: 'Blue mountain bike',
       url: 'https://www.bike.com',
       price: 120,
-      priority: 1,
       isPurchased: false,
     }),
     createdAt: new Date(),
@@ -36,9 +33,9 @@ describe('findByEventAndUserId', () => {
         isMember: async () => true,
       } satisfies Partial<UserEventRepository>,
       wishlistRepository: {
-        findByEventAndUserId: async (event, userId) => {
-          expect(event).toBe(eventId)
-          expect(userId).toBe(targetUserId)
+        findById: async (id) => {
+          expect(id).toBe(existingWishlist.id)
+
           return existingWishlist
         },
       } satisfies Partial<WishlistRepository>,
@@ -49,19 +46,16 @@ describe('findByEventAndUserId', () => {
     const { getWishlist } = createCaller(testContext)
 
     const result = await getWishlist({
-      eventId,
-      userId: targetUserId,
+      id: existingWishlist.id,
     })
 
     expect(result).toMatchObject({
       id: expect.any(Number),
       userId: targetUserId,
-      eventId,
       itemName: 'Bike',
       description: 'Blue mountain bike',
       url: 'https://www.bike.com',
       price: 120,
-      priority: 1,
       isPurchased: false,
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date),
@@ -74,7 +68,7 @@ describe('findByEventAndUserId', () => {
         isMember: async () => true,
       } satisfies Partial<UserEventRepository>,
       wishlistRepository: {
-        findByEventAndUserId: async () => null,
+        findById: async () => null,
       } satisfies Partial<WishlistRepository>,
     }
 
@@ -83,8 +77,7 @@ describe('findByEventAndUserId', () => {
     const { getWishlist } = createCaller(testContext)
 
     const result = await getWishlist({
-      eventId,
-      userId: targetUserId,
+      id: existingWishlist.id,
     })
 
     expect(result).toBeNull()
@@ -96,7 +89,7 @@ describe('findByEventAndUserId', () => {
         isMember: async () => false,
       } satisfies Partial<UserEventRepository>,
       wishlistRepository: {
-        findByEventAndUserId: async () => {
+        findById: async () => {
           throw new Error('Should not be called')
         },
       } satisfies Partial<WishlistRepository>,
@@ -106,9 +99,7 @@ describe('findByEventAndUserId', () => {
     const createCaller = createCallerFactory(wishlistRouter)
     const { getWishlist } = createCaller(testContext)
 
-    await expect(
-      getWishlist({ eventId, userId: targetUserId })
-    ).rejects.toThrow(
+    await expect(getWishlist({ id: existingWishlist.id })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
         message: 'Not authorized. Event member access required.',
@@ -125,7 +116,7 @@ describe('findByEventAndUserId', () => {
         },
       } satisfies Partial<UserEventRepository>,
       wishlistRepository: {
-        findByEventAndUserId: async () => {
+        findById: async () => {
           throw new Error('Should not be called')
         },
       } satisfies Partial<WishlistRepository>,
@@ -135,9 +126,9 @@ describe('findByEventAndUserId', () => {
     const createCaller = createCallerFactory(wishlistRouter)
     const { getWishlist } = createCaller(testContext)
 
-    await expect(
-      getWishlist({ eventId, userId: targetUserId })
-    ).rejects.toThrow(unknownError)
+    await expect(getWishlist({ id: existingWishlist.id })).rejects.toThrow(
+      unknownError
+    )
   })
 
   it('should propagate unknown errors from wishlist lookup', async () => {
@@ -147,7 +138,7 @@ describe('findByEventAndUserId', () => {
         isMember: async () => true,
       } satisfies Partial<UserEventRepository>,
       wishlistRepository: {
-        findByEventAndUserId: async () => {
+        findById: async () => {
           throw unknownError
         },
       } satisfies Partial<WishlistRepository>,
@@ -157,8 +148,8 @@ describe('findByEventAndUserId', () => {
     const createCaller = createCallerFactory(wishlistRouter)
     const { getWishlist } = createCaller(testContext)
 
-    await expect(
-      getWishlist({ eventId, userId: targetUserId })
-    ).rejects.toThrow(unknownError)
+    await expect(getWishlist({ id: existingWishlist.id })).rejects.toThrow(
+      unknownError
+    )
   })
 })

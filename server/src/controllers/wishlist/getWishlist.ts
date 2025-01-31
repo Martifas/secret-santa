@@ -15,17 +15,16 @@ export default groupMemberProcedure
     })
   )
   .input(
-    wishlistSchema.pick({
-      eventId: true,
-      userId: true,
+    wishlistSchema.pick({      
+      id: true,
     })
   )
   .query(
     async ({
-      input: { eventId, userId },
+      input: { id },
       ctx: { repos },
     }): Promise<WishlistForMember | null> => {     
 
-      return repos.wishlistRepository.findByEventAndUserId(eventId, userId)
+      return repos.wishlistRepository.findById(id)
     }
   )

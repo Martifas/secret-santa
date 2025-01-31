@@ -19,7 +19,7 @@ const [eventOne] = await insertAll(db, 'event', [
   fakeEvent({ createdBy: userOne.auth0Id }),
 ])
 const [wishlistOne] = await insertAll(db, 'wishlist', [
-  fakeWishlist({ userId: userOne.id, eventId: eventOne.id }),
+  fakeWishlist({ userId: userOne.id }),
 ])
 
 const [userEventOne] = await insertAll(db, 'userEvent', [
@@ -126,7 +126,7 @@ describe('create', () => {
       fakeEvent({ createdBy: newUser.auth0Id }),
     ])
     const [newWishlist] = await insertAll(db, 'wishlist', [
-      fakeWishlist({ userId: newUser.id, eventId: newEvent.id }),
+      fakeWishlist({ userId: newUser.id }),
     ])
 
     const record = fakeUserEventDefault({
