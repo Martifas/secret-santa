@@ -12,11 +12,17 @@
           Quickly add and reserve gifts with convenience!
         </p>
       </div>
-      <div class="text-md mx-auto flex w-40 items-center flex-col mt-20">
-        <router-link :to="{ name: 'Wishlist' }" class="m-2 rounded-sm bg-green-900 p-2 text-center w-3xs text-white hover:bg-green-700">
+      <div class="text-md mx-auto mt-20 flex w-40 flex-col items-center">
+        <router-link
+          :to="{ name: 'Wishlist' }"
+          class="m-2 w-3xs rounded-sm bg-green-900 p-2 text-center text-white hover:bg-green-700"
+        >
           Create Wishlist
         </router-link>
-        <router-link :to="{ name: 'Exchange' }" class="m-2 rounded-sm bg-green-900 p-2 text-center w-3xs text-white hover:bg-green-700">
+        <router-link
+          :to="{ name: 'Exchange' }"
+          class="m-2 w-3xs rounded-sm bg-green-900 p-2 text-center text-white hover:bg-green-700"
+        >
           Create Exchange Event
         </router-link>
       </div>
@@ -26,9 +32,12 @@
     <div class="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div class="order-1 my-auto sm:order-1">
         <div>
-          <h3 class="text-2xl font-bold">Create Your Own</h3>
-          <h3 class="text-2xl font-bold text-green-900">Wishlist</h3>
-          <p>
+          <h3 class="pb-1 text-2xl font-bold">Create Your Own</h3>
+          <router-link :to="{ name: 'Wishlist' }" class="rounded-sm">
+            <h3 class="text-2xl font-bold text-green-900 hover:text-green-700">Wishlist</h3>
+          </router-link>
+
+          <p class="mt-2">
             Happy Giftlist is the ultimate solution for creating your online wishlist. Say goodbye
             to duplicate gifts and save time with our simple, user-friendly tool.
           </p>
@@ -38,14 +47,16 @@
         <img
           src="https://images.unsplash.com/photo-1513885535751-8b9238bd345a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="gifts_pile"
-          class="h-auto w-full max-w-xl rounded-xl max-h-[300px] object-cover"
+          class="h-auto max-h-[300px] w-full max-w-xl rounded-xl object-cover"
         />
       </div>
       <div class="order-3 my-auto sm:order-4">
         <div>
           <h3 class="text-2xl font-bold">Quick and Easy</h3>
-          <h3 class="text-2xl font-bold text-green-900">Draw Names</h3>
-          <p>
+          <router-link :to="{ name: 'Exchange' }" class="rounded-sm">
+            <h3 class="text-2xl font-bold text-green-900 hover:text-green-700">Gift Exchange</h3>
+          </router-link>
+          <p class="mt-2">
             Draw names for your Secret Santa or gift exchange with Happy Giftlist's free online
             Secret Santa Generator. Our user-friendly tool simplifies organizing your group's gift
             exchange, and the best part is, it's completely free!
@@ -56,7 +67,7 @@
         <img
           src="https://images.unsplash.com/photo-1497700003451-e1df943a194b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="second_image"
-          class="h-auto w-full max-w-xl rounded-xl max-h-[300px] object-cover"
+          class="h-auto max-h-[300px] w-full max-w-xl rounded-xl object-cover"
         />
       </div>
     </div>

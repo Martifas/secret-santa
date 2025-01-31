@@ -78,7 +78,9 @@ const navigation = [
             <XMarkIcon v-else class="block size-6" aria-hidden="true" />
           </DisclosureButton>
         </div>
-        <div class="sm:justify-endstart flex flex-1 items-center justify-center sm:justify-start! sm:items-stretch">
+        <div
+          class="sm:justify-endstart flex flex-1 items-center justify-center sm:items-stretch sm:justify-start!"
+        >
           <router-link class="flex items-center" :to="{ name: 'Home' }">
             <img
               class="h-8 w-auto"
@@ -142,37 +144,18 @@ const navigation = [
               <MenuItems
                 class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden"
               >
-                <MenuItem v-slot="{ active }" v-if="user?.name">
+                <MenuItem v-slot="{ active }" v-if="user?.given_name">
                   <span class="block px-4 py-2 text-sm text-gray-700">
-                    {{ user.name }}
+                    {{ user.given_name }}
                   </span>
                 </MenuItem>
-                <MenuItem v-slot="{ active }">
-                  <a
-                    href="#"
-                    :class="[
-                      active ? 'bg-gray-100 outline-hidden' : '',
-                      'block px-4 py-2 text-sm text-gray-700',
-                    ]"
-                    >Your Profile</a
-                  >
-                </MenuItem>
-                <MenuItem v-slot="{ active }">
-                  <a
-                    href="#"
-                    :class="[
-                      active ? 'bg-gray-100 outline-hidden' : '',
-                      'block px-4 py-2 text-sm text-gray-700',
-                    ]"
-                    >Settings</a
-                  >
-                </MenuItem>
+
                 <MenuItem v-slot="{ active }">
                   <button
                     @click="logoutUser"
                     :class="[
                       active ? 'bg-gray-100 outline-hidden' : '',
-                      'block px-4 py-2 text-sm text-gray-700',
+                      'block px-4 py-2 text-sm text-gray-700 hover:text-green-900',
                     ]"
                   >
                     Sign out

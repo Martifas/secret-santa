@@ -48,7 +48,7 @@ async function createEvent() {
       name: form.value.title,
     })
 
-    invitationStore.setEventDetails(form.value.date, user.value?.name || '')
+    invitationStore.setEventDetails(form.value.date, user.value?.given_name || '')
 
     form.value = {
       title: '',
