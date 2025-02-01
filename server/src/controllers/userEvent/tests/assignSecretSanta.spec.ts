@@ -11,10 +11,10 @@ describe('getSecretSanta', () => {
   })
   const eventId = 100
   const eventMembers = [
-    { userId: 1 },
-    { userId: 2 },
-    { userId: 3 },
-    { userId: 4 },
+    { userId: 'auth0|123' },
+    { userId: 'auth0|124' },
+    { userId: 'auth0|125' },
+    { userId: 'auth0|126' },
   ]
 
   it('should successfully assign secret santas when enough members', async () => {
@@ -44,7 +44,7 @@ describe('getSecretSanta', () => {
     const repos = {
       userEventRepository: {
         isEventAdmin: async () => true,
-        getAllEventUsers: async () => [{ userId: 1 }, { userId: 2 }],
+        getAllEventUsers: async () => [{ userId: 'auth0|123' }, { userId: 'auth0|124' }],
         updateSecretSanta: async () => {
           throw new Error('Should not be called')
         },

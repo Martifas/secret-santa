@@ -19,7 +19,7 @@ const [eventOne] = await insertAll(db, 'event', [
 const [invitationOne] = await insertAll(db, 'eventInvitations', [
   fakeEventInvitation({
     eventId: eventOne.id,
-    userId: userOne.id,
+    userId: userOne.auth0Id,
     email: userOne.email,
   }),
 ])
@@ -28,7 +28,7 @@ const fakeInvitationDefault = (
   invitation: Parameters<typeof fakeEventInvitation>[0] = {}
 ) =>
   fakeEventInvitation({
-    userId: userOne.id,
+    userId: userOne.auth0Id,
     eventId: eventOne.id,
     ...invitation,
   })
@@ -74,10 +74,10 @@ describe('find all for user', () => {
       fakeEvent({ createdBy: userTwo.auth0Id }),
     ])
     const [invitationTwo] = await insertAll(db, 'eventInvitations', [
-      fakeEventInvitation({ eventId: eventTwo.id, userId: userTwo.id }),
+      fakeEventInvitation({ eventId: eventTwo.id, userId: userTwo.auth0Id }),
     ])
 
-    const invitations = await repository.findAllForUser(userTwo.id)
+    const invitations = await repository.findAllForUser(userTwo.auth0Id)
 
     expect(invitations).toHaveLength(1)
     expect(invitations).toEqual([
@@ -88,7 +88,7 @@ describe('find all for user', () => {
   it('should return empty array when no events exist', async () => {
     await db.deleteFrom('eventInvitations').execute()
 
-    const invitations = await repository.findAllForUser(userOne.id)
+    const invitations = await repository.findAllForUser(userOne.auth0Id)
 
     expect(invitations).toEqual([])
   })
@@ -140,7 +140,7 @@ describe('remove', () => {
     const [invitationOne] = await insertAll(db, 'eventInvitations', [
       fakeEventInvitation({
         eventId: eventOne.id,
-        userId: userOne.id,
+        userId: userOne.auth0Id,
         email: userOne.email,
       }),
     ])

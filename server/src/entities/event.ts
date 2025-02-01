@@ -5,7 +5,7 @@ import { idSchema } from './shared'
 
 export const eventSchema = z.object({
   id: idSchema,
-  name: z.string().min(1),
+  title: z.string().min(1),
   description: z.string().min(1),
   createdBy: z.string(),
   eventDate: z.coerce.date(),

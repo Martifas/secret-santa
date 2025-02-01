@@ -12,7 +12,7 @@ export default authenticatedProcedure
   .query(
     async ({ ctx: { repos, authUser } }): Promise<InvitationForMember[]> => {
       const events = await repos.invitationRepository.findAllForUser(
-        authUser.id
+        authUser.auth0Id
       )
       return events
     }

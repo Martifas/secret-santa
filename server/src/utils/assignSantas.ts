@@ -4,7 +4,7 @@ export default async function assignSantas(eventMembers: UserIdRowSelect[]) {
   if (eventMembers.length < 2) return []
 
   const availableSantas = [...eventMembers]
-  const assignments: Array<{ member: number; santa: number }> = []
+  const assignments: Array<{ member: string; santa: string }> = []
 
   for (const member of eventMembers) {
     const validSantas = availableSantas.filter(

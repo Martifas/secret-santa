@@ -31,8 +31,8 @@ export interface Event {
   description: string
   eventDate: Timestamp
   id: Generated<number>
-  name: string
   status: string
+  title: string
   updatedAt: Generated<Timestamp>
 }
 
@@ -43,7 +43,7 @@ export interface EventInvitations {
   id: Generated<number>
   status: string
   updatedAt: Generated<Timestamp>
-  userId: number | null
+  userId: string | null
 }
 
 export interface EventRule {
@@ -67,11 +67,12 @@ export interface User {
 export interface UserEvent {
   createdAt: Generated<Timestamp>
   eventId: number
+  eventTitle: string
   id: Generated<number>
   role: string
-  santaForUserId: number | null
+  santaForUserId: string | null
   updatedAt: Generated<Timestamp>
-  userId: number
+  userId: string
   wishlistId: number | null
 }
 

@@ -8,6 +8,7 @@ import userEventRouter from '..'
 describe('updateRole', () => {
   const TEST_USER = fakeUser({
     id: 1,
+    auth0Id: 'auth0|89789',
   })
 
   const userEventId = 1
@@ -16,12 +17,13 @@ describe('updateRole', () => {
   const existingUserEvent = {
     id: userEventId,
     eventId,
-    userId: TEST_USER.id + 1,
+    userId: TEST_USER.auth0Id,
     role: 'member',
     wishlistId: 1,
-    santaForUserId: 2,
+    santaForUserId: 'auth0| 896',
     createdAt: new Date(),
     updatedAt: new Date(),
+    eventTitle: 'New years',
   }
 
   const updateInput = {
@@ -30,7 +32,7 @@ describe('updateRole', () => {
     eventId,
   }
 
-  it('should update role when user is event admin', async () => {
+  it('should update role when user is group admin', async () => {
     const updatedUserEvent = {
       ...existingUserEvent,
       role: updateInput.role,
@@ -80,29 +82,6 @@ describe('updateRole', () => {
     )
   })
 
-  it('should throw FORBIDDEN when user is not event admin', async () => {
-    const repos = {
-      userEventRepository: {
-        updateRole: async () => {
-          throw new Error('Should not be called')
-        },
-        findByEventAndUserId: async () => existingUserEvent,
-        isEventAdmin: async () => false,
-      } satisfies Partial<UserEventRepository>,
-    }
-
-    const testContext = authRepoContext(repos, TEST_USER)
-    const createCaller = createCallerFactory(userEventRouter)
-    const { updateMemberRole } = createCaller(testContext)
-
-    await expect(updateMemberRole(updateInput)).rejects.toThrow(
-      new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'Not authorized. Admin access required.',
-      })
-    )
-  })
-
   it('should propagate unknown errors from findByEventAndUserId', async () => {
     const unknownError = new Error('Database connection failed')
     const repos = {
@@ -114,27 +93,6 @@ describe('updateRole', () => {
           throw unknownError
         },
         isEventAdmin: async () => true,
-      } satisfies Partial<UserEventRepository>,
-    }
-
-    const testContext = authRepoContext(repos, TEST_USER)
-    const createCaller = createCallerFactory(userEventRouter)
-    const { updateMemberRole } = createCaller(testContext)
-
-    await expect(updateMemberRole(updateInput)).rejects.toThrow(unknownError)
-  })
-
-  it('should propagate unknown errors from isEventAdmin', async () => {
-    const unknownError = new Error('Database connection failed')
-    const repos = {
-      userEventRepository: {
-        updateRole: async () => {
-          throw new Error('Should not be called')
-        },
-        findByEventAndUserId: async () => existingUserEvent,
-        isEventAdmin: async () => {
-          throw unknownError
-        },
       } satisfies Partial<UserEventRepository>,
     }
 

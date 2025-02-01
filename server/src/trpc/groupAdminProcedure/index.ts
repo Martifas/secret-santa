@@ -13,7 +13,7 @@ export const groupAdminProcedure = authenticatedProcedure.use(
     const input = rawInput as { eventId: number }
 
     const isAdmin = await ctx.repos.userEventRepository.isEventAdmin(
-      ctx.authUser.id,
+      ctx.authUser.auth0Id,
       input.eventId
     )
 

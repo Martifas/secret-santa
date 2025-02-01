@@ -81,7 +81,7 @@ export const fakeEvent = <T extends Partial<Insertable<Event>>>(
     createdBy: `auth0|${random.guid()}`,
     description: random.paragraph(),
     eventDate: dateWithoutTime,
-    name: random.word(),
+    title: random.word(),
     status: random.pickone(EVENT_STATUS),
     ...overrides,
   } satisfies Insertable<Event>
@@ -98,7 +98,7 @@ export const fakeWishlist = <T extends Partial<Insertable<Wishlist>>>(
     description: random.paragraph(),
     itemName: random.word(),
     price: random.floating({ min: 1, max: 10000, fixed: 2 }),
-    userId: randomId(),
+    userId: `auth0|${random.guid()}`,
     userWishlistId: randomId(),
     ...overrides,
   }) satisfies Insertable<Wishlist>
@@ -114,7 +114,7 @@ export const fakeEventInvitation = <
 ) =>
   ({
     email: random.email(),
-    userId: randomId(),
+    userId: `auth0|${random.guid()}`,
     eventId: randomId(),
     status: random.pickone(INVITATION_STATUS),
     ...overrides,
@@ -153,11 +153,11 @@ export const fakeUserEvent = <T extends Partial<Insertable<UserEvent>>>(
   overrides: T = {} as T
 ) =>
   ({
-    userId: randomId(),
+    userId: `auth0|${random.guid()}`,
     eventId: randomId(),
     role: random.pickone(ROLES),
     wishlistId: randomId(),
-    santaForUserId: randomId(),
+    eventTitle: random.word(),
     ...overrides,
   }) satisfies Insertable<UserEvent>
 

@@ -31,7 +31,7 @@ export function invitationRepository(db: Database) {
         .executeTakeFirst()
       return result ?? null
     },
-    async findAllForUser(userId: number): Promise<InvitationRowSelect[]> {
+    async findAllForUser(userId: string): Promise<InvitationRowSelect[]> {
       return db
         .selectFrom('eventInvitations')
         .select(invitationKeysForMembers)

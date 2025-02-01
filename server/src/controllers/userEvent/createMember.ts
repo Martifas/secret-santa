@@ -28,7 +28,7 @@ export default authenticatedProcedure
       const existingMembership =
         await repos.userEventRepository.findByEventAndUserId(
           input.eventId,
-          authUser.id
+          authUser.auth0Id
         )
 
       if (existingMembership) {

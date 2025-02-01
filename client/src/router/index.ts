@@ -9,6 +9,7 @@ import AboutView from '@/views/AboutView.vue'
 import InvitationView from '@/views/InvitationView.vue'
 import RsvpView from '@/views/RsvpView.vue'
 import WishlistItemView from '@/views/wishlish/WishlistItemView.vue'
+import DashboardView from '@/views/DashboardView.vue'
 
 const routes = [
   {
@@ -41,6 +42,18 @@ const routes = [
         path: '',
         name: 'Exchange',
         component: ExchangeView,
+        beforeEnter: authGuard,
+      },
+    ],
+  },
+  {
+    path: '/dashboard',
+    component: MainLayout,
+    children: [
+      {
+        path: '',
+        name: 'Dashboard',
+        component: DashboardView,
         beforeEnter: authGuard,
       },
     ],

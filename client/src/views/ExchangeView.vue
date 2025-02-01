@@ -47,7 +47,7 @@ async function createEvent() {
       budgetLimit: form.value.budget,
       description: form.value.description,
       status: 'active',
-      name: form.value.title,
+      title: form.value.title,
     })
 
     invitationStore.setEventDetails(form.value.date, user.value?.given_name || '')

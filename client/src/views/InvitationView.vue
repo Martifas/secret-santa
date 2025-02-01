@@ -63,7 +63,7 @@ async function sendInvitations() {
         status: 'sent',
         eventOrganiser: invitationStore.eventOrganiser,
         eventDate: invitationStore.eventDate!,
-        title: eventDetails.name,
+        title: eventDetails.title,
         budgetLimit: eventDetails.budgetLimit,
         description: eventDetails.description,
       })

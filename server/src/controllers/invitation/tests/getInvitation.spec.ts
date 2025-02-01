@@ -15,7 +15,7 @@ describe('findById', () => {
   const baseInvitation = {
     ...fakeEventInvitation({
       id,
-      userId: TEST_USER.id,
+      userId: TEST_USER.auth0Id,
       eventId: 123,
       email: 'test@example.com',
       token: 'token123',
@@ -44,7 +44,7 @@ describe('findById', () => {
 
     expect(result).toMatchObject({
       id,
-      userId: TEST_USER.id,
+      userId: TEST_USER.auth0Id,
       eventId: 123,
       email: 'test@example.com',
       token: 'token123',
@@ -80,7 +80,7 @@ describe('findById', () => {
   it('should throw FORBIDDEN when user is not authorized', async () => {
     const invitationByAnotherUser = {
       ...baseInvitation,
-      userId: TEST_USER.id + 1,
+      userId: 'auth0|852',
     }
 
     const repos = {

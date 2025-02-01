@@ -47,32 +47,6 @@ export function eventRepository(db: Database) {
         .returning(eventKeysForMembers)
         .executeTakeFirstOrThrow()
     },
-
-    async findAllForUser(userAuth0Id: string): Promise<EventRowSelect[]> {
-      return db
-        .selectFrom('event')
-        .leftJoin('userEvent', 'event.id', 'userEvent.eventId')
-        .leftJoin('user', 'userEvent.userId', 'user.id')
-        .select([
-          'event.id',
-          'event.name',
-          'event.description',
-          'event.createdBy',
-          'event.eventDate',
-          'event.budgetLimit',
-          'event.status',
-          'event.createdAt',
-          'event.updatedAt',
-        ])
-        .distinct()
-        .where((eb) =>
-          eb.or([
-            eb('event.createdBy', '=', userAuth0Id),
-            eb('user.auth0Id', '=', userAuth0Id),
-          ])
-        )
-        .execute()
-    },
   }
 }
 

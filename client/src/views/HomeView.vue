@@ -14,6 +14,12 @@
       </div>
       <div class="text-md mx-auto mt-20 flex w-40 flex-col items-center">
         <router-link
+          :to="{ name: 'Dashboard' }"
+          class="m-2 w-3xs rounded-sm bg-green-900 p-2 text-center text-white hover:bg-green-700"
+        >
+          Dashboard
+        </router-link>
+        <router-link
           :to="{ name: 'Wishlist' }"
           class="m-2 w-3xs rounded-sm bg-green-900 p-2 text-center text-white hover:bg-green-700"
         >

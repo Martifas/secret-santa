@@ -13,10 +13,11 @@ describe('create', () => {
   const eventId = 100
   const newUserEventInput = {
     eventId,
-    userId: TEST_USER.id,
+    userId: TEST_USER.auth0Id,
+    eventTitle: "New years party",
     role: 'member',
     wishlistId: 1,
-    santaForUserId: 2,
+    santaForUserId: 'auth0|96258',
   }
 
   const createdUserEvent = {
@@ -45,10 +46,10 @@ describe('create', () => {
     expect(result).toMatchObject({
       id: expect.any(Number),
       eventId,
-      userId: TEST_USER.id,
+      userId: TEST_USER.auth0Id,
       role: 'member',
       wishlistId: expect.any(Number),
-      santaForUserId: expect.any(Number),
+      santaForUserId: 'auth0|96258',
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date),
     })

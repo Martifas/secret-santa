@@ -13,8 +13,8 @@ export const groupMemberProcedure = authenticatedProcedure.use(
     const input = rawInput as { eventId: number }
 
     const isMember = await ctx.repos.userEventRepository.isMember(
-      ctx.authUser.id,
-      input.eventId
+      input.eventId,
+      ctx.authUser.auth0Id
     )
 
     if (!isMember) {

@@ -136,7 +136,6 @@ async function addGiftToList() {
   }
 }
 
-// Move hooks to the end
 onMounted(() => {
   loadWishlistItems()
 })

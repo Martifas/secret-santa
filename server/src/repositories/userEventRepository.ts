@@ -19,9 +19,17 @@ export function userEventRepository(db: Database) {
         .where('eventId', '=', eventId)
         .execute()
     },
+    async findAllForUser(userId: string): Promise<UserEventForMember[]> {
+      const result = await db
+        .selectFrom('userEvent')
+        .select(userEventKeysForMembers)
+        .where('userId', '=', userId)
+        .execute()
+      return result
+    },
     async updateSecretSanta(
-      userId: number,
-      santaForUserId: number
+      userId: string,
+      santaForUserId: string
     ): Promise<SantaUserIdSelect> {
       return db
         .updateTable('userEvent')
@@ -32,7 +40,7 @@ export function userEventRepository(db: Database) {
     },
     async findByEventAndUserId(
       eventId: number,
-      userId: number
+      userId: string
     ): Promise<UserEventRowSelect | null> {
       const result = await db
         .selectFrom('userEvent')
@@ -65,7 +73,7 @@ export function userEventRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async isEventAdmin(userId: number, eventId: number): Promise<boolean> {
+    async isEventAdmin(userId: string, eventId: number): Promise<boolean> {
       const result = await db
         .selectFrom('userEvent')
         .select('id')
@@ -76,7 +84,7 @@ export function userEventRepository(db: Database) {
       return result !== undefined
     },
 
-    async isMember(eventId: number, userId: number): Promise<boolean> {
+    async isMember(eventId: number, userId: string): Promise<boolean> {
       const result = await db
         .selectFrom('userEvent')
         .select('id')

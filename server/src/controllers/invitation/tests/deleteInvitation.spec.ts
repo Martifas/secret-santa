@@ -15,7 +15,7 @@ describe('remove', () => {
     const id = 1
     const invitation = fakeEventInvitation({
       id,
-      userId: TEST_USER.id,
+      userId: TEST_USER.auth0Id,
       eventId: 123,
       email: 'test@example.com',
       token: 'token123',
@@ -52,7 +52,7 @@ describe('remove', () => {
 
     expect(result).toMatchObject({
       id,
-      userId: TEST_USER.id,
+      userId: TEST_USER.auth0Id,
       eventId: 123,
       email: 'test@example.com',
       token: 'token123',
@@ -87,7 +87,7 @@ describe('remove', () => {
 
   it('should throw FORBIDDEN when user is not authorized', async () => {
     const id = 1
-    const otherUserId = 999
+    const otherUserId = 'auth0|412'
     const invitation = fakeEventInvitation({
       id,
       userId: otherUserId,

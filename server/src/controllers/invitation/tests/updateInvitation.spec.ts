@@ -16,7 +16,7 @@ describe('update', () => {
   const baseInvitation = {
     ...fakeEventInvitation({
       id,
-      userId: TEST_USER.id,
+      userId: TEST_USER.auth0Id,
       eventId: 123,
       email: 'test@example.com',
       token: 'token123',
@@ -67,7 +67,7 @@ describe('update', () => {
 
     expect(result).toMatchObject({
       id,
-      userId: TEST_USER.id,
+      userId: TEST_USER.auth0Id,
       eventId: 123,
       email: 'new@example.com',
       token: 'token123',
@@ -110,7 +110,7 @@ describe('update', () => {
     const updates = { status: 'confirmed' }
     const invitationByAnotherUser = {
       ...baseInvitation,
-      userId: TEST_USER.id + 1,
+      userId: 'auth0| 258',
     }
 
     const repos = {

@@ -37,5 +37,13 @@ export function userWishlistRepository(db: Database) {
         .executeTakeFirst()
       return result ?? null
     },
+    async findAllForUser(userId: string): Promise<UserWishlistForMember[]> {
+      const result = await db
+        .selectFrom('userWishlist')
+        .select(userWishlistKeysForMembers)
+        .where('userId', '=', userId)
+        .execute()
+      return result
+    },
   }
 }

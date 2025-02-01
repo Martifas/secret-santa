@@ -29,7 +29,7 @@ describe('update', () => {
 
   it('should update an event with partial data when user is creator', async () => {
     const updates = {
-      name: 'New Year Party',
+      title: 'New Year Party',
       budgetLimit: 100,
     }
 
@@ -61,7 +61,7 @@ describe('update', () => {
 
     expect(result).toMatchObject({
       id,
-      name: 'New Year Party',
+      title: 'New Year Party',
       description: 'Annual office party',
       budgetLimit: 100,
       status: 'draft',
@@ -72,7 +72,7 @@ describe('update', () => {
   })
 
   it('should throw NOT_FOUND when event does not exist', async () => {
-    const updates = { name: 'New Year Party' }
+    const updates = { title: 'New Year Party' }
 
     const repos = {
       eventRepository: {
@@ -96,7 +96,7 @@ describe('update', () => {
   })
 
   it('should throw FORBIDDEN when user is not the creator', async () => {
-    const updates = { name: 'New Year Party' }
+    const updates = { title: 'New Year Party' }
     const eventByAnotherUser = {
       ...baseEvent,
       createdBy: 'auth0|1258',
@@ -124,7 +124,7 @@ describe('update', () => {
   })
 
   it('should propagate unknown errors', async () => {
-    const updates = { name: 'New Year Party' }
+    const updates = { title: 'New Year Party' }
     const unknownError = new Error('Database connection failed')
 
     const repos = {

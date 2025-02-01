@@ -26,7 +26,7 @@ export default groupAdminProcedure
     }): Promise<UserEventForMember> => {
       const userEvent = await repos.userEventRepository.findByEventAndUserId(
         input.id,
-        authUser.id
+        authUser.auth0Id
       )
       if (!userEvent) {
         throw new TRPCError({

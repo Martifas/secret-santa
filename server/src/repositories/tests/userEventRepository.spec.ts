@@ -34,20 +34,20 @@ const [wishlistOne] = await insertAll(db, 'wishlist', [
 
 const [userEventOne] = await insertAll(db, 'userEvent', [
   fakeUserEvent({
-    userId: userOne.id,
+    userId: userOne.auth0Id,
     eventId: eventOne.id,
     wishlistId: wishlistOne.id,
-    santaForUserId: userTwo.id,
+    santaForUserId: userTwo.auth0Id,
   }),
 ])
 const fakeUserEventDefault = (
   userEvent: Parameters<typeof fakeUserEvent>[0] = {}
 ) =>
   fakeUserEvent({
-    userId: userOne.id,
+    userId: userOne.auth0Id,
     eventId: eventOne.id,
     wishlistId: wishlistOne.id,
-    santaForUserId: userTwo.id,
+    santaForUserId: userTwo.auth0Id,
     ...userEvent,
   })
 
@@ -55,7 +55,7 @@ describe('find by event and user id', () => {
   it('should return record for a specific event and user', async () => {
     const foundRecord = await repository.findByEventAndUserId(
       eventOne.id,
-      userOne.id
+      userOne.auth0Id
     )
     expect(foundRecord).not.toBeNull()
     if (!foundRecord) throw new Error('No  record found')
@@ -68,24 +68,27 @@ describe('find by event and user id', () => {
 
 describe('isMember', () => {
   it('should return true when user is a member of event', async () => {
-    const isMember = await repository.isMember(eventOne.id, userOne.id)
+    const isMember = await repository.isMember(eventOne.id, userOne.auth0Id)
     expect(isMember).toBe(true)
   })
 
   it('should return false when user is not a member of event', async () => {
     const [nonMemberUser] = await insertAll(db, 'user', [fakeUser()])
 
-    const isMember = await repository.isMember(eventOne.id, nonMemberUser.id)
+    const isMember = await repository.isMember(
+      eventOne.id,
+      nonMemberUser.auth0Id
+    )
     expect(isMember).toBe(false)
   })
 
   it('should return false for non-existent event', async () => {
-    const isMember = await repository.isMember(99999, userOne.id)
+    const isMember = await repository.isMember(99999, userOne.auth0Id)
     expect(isMember).toBe(false)
   })
 
   it('should return false for non-existent user', async () => {
-    const isMember = await repository.isMember(eventOne.id, 99999)
+    const isMember = await repository.isMember(eventOne.id, 'auth0|128888')
     expect(isMember).toBe(false)
   })
 })
@@ -98,13 +101,17 @@ describe('isEventAdmin', () => {
 
     await insertAll(db, 'userEvent', [
       {
-        userId: newUser.id,
+        userId: newUser.auth0Id,
         eventId: newEvent.id,
         role: 'event_admin',
+        eventTitle: 'New years party',
       },
     ])
 
-    const isEventAdmin = await repository.isEventAdmin(newUser.id, newEvent.id)
+    const isEventAdmin = await repository.isEventAdmin(
+      newUser.auth0Id,
+      newEvent.id
+    )
     expect(isEventAdmin).toBe(true)
   })
 
@@ -112,19 +119,22 @@ describe('isEventAdmin', () => {
     const [nonAdminUser] = await insertAll(db, 'user', [fakeUser()])
 
     const isEventAdmin = await repository.isEventAdmin(
-      eventOne.id,
-      nonAdminUser.id
+      nonAdminUser.auth0Id,
+      eventOne.id
     )
     expect(isEventAdmin).toBe(false)
   })
 
   it('should return false for non-existent event', async () => {
-    const isEventAdmin = await repository.isEventAdmin(99999, userOne.id)
+    const isEventAdmin = await repository.isEventAdmin(userOne.auth0Id, 99999)
     expect(isEventAdmin).toBe(false)
   })
 
   it('should return false for non-existent user', async () => {
-    const isEventAdmin = await repository.isEventAdmin(eventOne.id, 99999)
+    const isEventAdmin = await repository.isEventAdmin(
+      'auth0|99999',
+      eventOne.id
+    )
     expect(isEventAdmin).toBe(false)
   })
 })
@@ -150,7 +160,7 @@ describe('create', () => {
     ])
 
     const record = fakeUserEventDefault({
-      userId: newUser.id,
+      userId: newUser.auth0Id,
       eventId: newEvent.id,
       wishlistId: newWishlist.id,
     })
@@ -210,7 +220,7 @@ describe('getAllEventUsers', () => {
     const [userThree] = await insertAll(db, 'user', fakeUser())
     await insertAll(db, 'userEvent', [
       fakeUserEventDefault({
-        userId: userThree.id,
+        userId: userThree.auth0Id,
         eventId: eventOne.id,
       }),
     ])
@@ -218,7 +228,7 @@ describe('getAllEventUsers', () => {
     const users = await repository.getAllEventUsers(eventOne.id)
     expect(users).toHaveLength(2)
     expect(users).toEqual(
-      expect.arrayContaining([{ userId: userOne.id }, { userId: userThree.id }])
+      expect.arrayContaining([{ userId: userOne.auth0Id }, { userId: userThree.auth0Id }])
     )
   })
 
@@ -232,32 +242,35 @@ describe('updateSecretSanta', () => {
   it('should update santa assignment for a user', async () => {
     const [newSanta] = await insertAll(db, 'user', fakeUser())
 
-    const result = await repository.updateSecretSanta(userOne.id, newSanta.id)
+    const result = await repository.updateSecretSanta(
+      userOne.auth0Id,
+      newSanta.auth0Id
+    )
 
     expect(result).toEqual({
-      santaForUserId: newSanta.id,
+      santaForUserId: newSanta.auth0Id,
     })
 
     const updatedRecord = await db
       .selectFrom('userEvent')
       .select(['santaForUserId', 'updatedAt'])
-      .where('userId', '=', userOne.id)
+      .where('userId', '=', userOne.auth0Id)
       .executeTakeFirst()
 
     expect(updatedRecord).toBeTruthy()
-    expect(updatedRecord?.santaForUserId).toBe(newSanta.id)
+    expect(updatedRecord?.santaForUserId).toBe(newSanta.auth0Id)
     expect(updatedRecord?.updatedAt).toBeInstanceOf(Date)
   })
 
   it('should throw error when updating non-existent user', async () => {
     await expect(
-      repository.updateSecretSanta(99999, userTwo.id)
+      repository.updateSecretSanta(userTwo.auth0Id, 'auth0|0000')
     ).rejects.toThrowError(/no result/i)
   })
 
   it('should throw error when updating with non-existent santa', async () => {
     await expect(
-      repository.updateSecretSanta(userOne.id, 99999)
+      repository.updateSecretSanta(userOne.auth0Id, 'auth0|12458741')
     ).rejects.toThrowError()
   })
 })
