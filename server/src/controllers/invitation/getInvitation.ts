@@ -19,10 +19,7 @@ export default groupAdminProcedure
     })
   )
   .query(
-    async ({
-      input: { id },
-      ctx: { repos },
-    }): Promise<InvitationForMember> => {
+    async ({ input: { id }, ctx: { repos } }): Promise<InvitationForMember> => {
       const invitation = await repos.invitationRepository.findById(id)
 
       if (!invitation) {

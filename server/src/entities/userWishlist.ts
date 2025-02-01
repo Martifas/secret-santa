@@ -21,4 +21,8 @@ export type UserWishlistForMember = Pick<
   (typeof userWishlistKeysForMembers)[number]
 >
 
-export const userWishlistKeysForTesting = ['title', 'userId', 'description'] as const
+export const userWishlistKeysForTesting = [
+  'title',
+  'userId',
+  'description',
+] as const

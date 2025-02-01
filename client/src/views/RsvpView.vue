@@ -4,7 +4,6 @@ defineProps<{
   response: 'accept' | 'refuse'
   eventId: number
 }>()
-
 </script>
 
 <template>

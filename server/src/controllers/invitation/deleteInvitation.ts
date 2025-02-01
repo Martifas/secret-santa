@@ -19,10 +19,7 @@ export default groupAdminProcedure
     })
   )
   .mutation(
-    async ({
-      input: { id },
-      ctx: { repos },
-    }): Promise<InvitationForMember> => {
+    async ({ input: { id }, ctx: { repos } }): Promise<InvitationForMember> => {
       const existingInvitation = await repos.invitationRepository.findById(id)
 
       if (!existingInvitation) {

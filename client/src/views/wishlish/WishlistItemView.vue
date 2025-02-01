@@ -4,14 +4,14 @@ import Container from '@/components/Container.vue'
 import { useWishlistStore } from '@/stores/wishlistStore'
 import { trpc } from '@/trpc'
 import { useAuth0 } from '@auth0/auth0-vue'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { TrashIcon } from '@heroicons/vue/24/outline'
+import type { WishlistForMember } from '@server/entities/wishlistItem' // Add this import
 
 const wishlistStore = useWishlistStore()
 const route = useRoute()
 const { user } = useAuth0()
-
 const wishlistId = parseInt(route.params.id as string, 10)
 
 interface WishlistItemForm {
@@ -24,6 +24,7 @@ interface WishlistItemForm {
   }
 }
 
+const existingWishlistItems = ref<WishlistForMember[]>([])
 const form = ref<WishlistItemForm>({
   name: '',
   description: '',
@@ -31,7 +32,6 @@ const form = ref<WishlistItemForm>({
   errors: {},
 })
 
-const gifts = ref<WishlistItemForm[]>([])
 const isSubmitting = ref(false)
 const showSuccessMessage = ref(false)
 const saveSuccess = ref(false)
@@ -40,6 +40,25 @@ const saveError = ref('')
 const isValid = computed(() => {
   return form.value.name.trim().length > 0 && !form.value.errors.name && !form.value.errors.price
 })
+
+async function loadWishlistItems() {
+  try {
+    if (!user.value?.sub) {
+      console.error('User not authenticated')
+      return
+    }
+
+    const items = await trpc.wishlistItem.getWishlistItem.query({
+      userId: user.value.sub,
+      userWishlistId: wishlistId,
+    })
+
+    existingWishlistItems.value = items ?? []
+  } catch (error) {
+    console.error('Failed to load wishlist items:', error)
+    saveError.value = 'Failed to load items. Please try again.'
+  }
+}
 
 const validateForm = () => {
   form.value.errors = {}
@@ -65,7 +84,26 @@ const handleCancel = () => {
   showSuccessMessage.value = false
 }
 
-async function deleteFromWishlist(){}
+async function deleteFromWishlist(itemToDelete: WishlistForMember) {
+  try {
+    if (!user.value?.sub) {
+      throw new Error('User not authenticated')
+    }
+
+    await trpc.wishlistItem.deleteWishlistItem.mutate({
+      userId: user.value.sub,
+      userWishlistId: wishlistId,
+      itemName: itemToDelete.itemName,
+    })
+
+    await loadWishlistItems()
+    saveSuccess.value = true
+    saveError.value = ''
+  } catch (error) {
+    console.error('Failed to delete gift:', error)
+    saveError.value = 'Failed to delete item. Please try again.'
+  }
+}
 
 async function addGiftToList() {
   if (!validateForm()) return
@@ -79,32 +117,38 @@ async function addGiftToList() {
       throw new Error('User not authenticated')
     }
 
-    const createdWishlistItemId = await trpc.wishlist.createWishlist.mutate({
+    await trpc.wishlistItem.createWishlistItem.mutate({
       itemName: form.value.name,
       description: form.value.description,
       price: form.value.price ?? 0,
       userId: user.value.sub,
+      userWishlistId: wishlistId,
     })
 
-    await trpc.userWishlist.updateUserWishlist.mutate({
-      id: wishlistId,
-      updates: {
-        wishlistId: createdWishlistItemId,
-      },
-    })
-
-    gifts.value.push({ ...form.value })
-
+    await loadWishlistItems()
     saveSuccess.value = true
     saveError.value = ''
     handleCancel()
   } catch (error) {
-    console.error('Failed to add gift:', error)
-    saveError.value = 'Failed to save wishlist. Please try again.'
+    saveError.value = 'Failed to add gift. Please try again.'
   } finally {
     isSubmitting.value = false
   }
 }
+
+// Move hooks to the end
+onMounted(() => {
+  loadWishlistItems()
+})
+
+watch(
+  () => user.value?.sub,
+  (newValue) => {
+    if (newValue) {
+      loadWishlistItems()
+    }
+  }
+)
 </script>
 
 <template>
@@ -206,28 +250,26 @@ async function addGiftToList() {
       </div>
 
       <!-- Added Items List -->
-      <div v-if="gifts.length > 0" class="mt-8">
+      <div v-if="existingWishlistItems.length > 0" class="mt-8">
         <h3 class="mb-4 text-xl font-medium text-gray-900">Added Items</h3>
         <div class="grid gap-4 sm:grid-cols-2">
           <div
-            v-for="(gift, index) in gifts"
-            :key="index"
+            v-for="(item, index) in existingWishlistItems"
+            :key="item.id"
             class="rounded-lg border border-gray-400 bg-green-100 p-4 shadow-sm transition-all hover:shadow-md"
           >
             <div class="flex items-start justify-between">
               <div>
-                <h4 class="font-medium text-gray-900">{{ gift.name }}</h4>
-                <p v-if="gift.description" class="mt-1 text-sm text-gray-600">
-                  {{ gift.description }}
+                <h4 class="font-medium text-gray-900">{{ item.itemName }}</h4>
+                <p v-if="item.description" class="mt-1 text-sm text-gray-600">
+                  {{ item.description }}
                 </p>
-                <p v-if="gift.price" class="mt-2 text-sm font-medium text-gray-900">
-                  €{{ gift.price }}
+                <p v-if="item.price" class="mt-2 text-sm font-medium text-gray-900">
+                  €{{ item.price }}
                 </p>
               </div>
-              <button @click="deleteFromWishlist" class="my-auto">
-                <TrashIcon
-                  class="size-11 rounded-full border-1 bg-white p-1 hover:bg-red-200"
-                ></TrashIcon>
+              <button @click="() => deleteFromWishlist(item)" class="my-auto">
+                <TrashIcon class="size-11 rounded-full border-1 bg-white p-1 hover:bg-red-200" />
               </button>
             </div>
           </div>

@@ -15,7 +15,7 @@ describe('create', () => {
     itemName: 'Bike',
     description: 'Blue mountain bike',
     price: 120,
-    userWishlistId: 1,
+    userWishlistId: 333,
   }
 
   const createdWishlist = {
@@ -30,7 +30,7 @@ describe('create', () => {
   it('should create a new wishlist item when one does not exist', async () => {
     const repos = {
       wishlistRepository: {
-        findByUserIdAndItem: async () => null,
+        findByItemAndUserWishlistId: async () => null,
         create: async (input) => {
           expect(input).toEqual(newWishlistInput)
           return createdWishlist
@@ -40,21 +40,21 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { createWishlist } = createCaller(testContext)
+    const { createWishlistItem } = createCaller(testContext)
 
-    const result = await createWishlist(newWishlistInput)
+    const result = await createWishlistItem(newWishlistInput)
     expect(result).toEqual(createdWishlist.id)
   })
 
-  it('should throw CONFLICT when wishlist item already exists for user and event', async () => {
+  it('should throw CONFLICT when wishlist item already exists with same name and userWishlistId', async () => {
     const existingWishlist = {
       ...createdWishlist,
-      itemName: 'Existing Bike',
+      itemName: 'Bike', // Same name as newWishlistInput
     }
 
     const repos = {
       wishlistRepository: {
-        findByUserIdAndItem: async () => existingWishlist,
+        findByItemAndUserWishlistId: async () => existingWishlist,
         create: async () => {
           throw new Error('Should not be called')
         },
@@ -63,9 +63,9 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { createWishlist } = createCaller(testContext)
+    const { createWishlistItem } = createCaller(testContext)
 
-    await expect(createWishlist(newWishlistInput)).rejects.toThrow(
+    await expect(createWishlistItem(newWishlistInput)).rejects.toThrow(
       new TRPCError({
         code: 'CONFLICT',
         message: 'A wishlist item with this name already exists for this user',
@@ -75,10 +75,9 @@ describe('create', () => {
 
   it('should propagate unknown errors from create', async () => {
     const unknownError = new Error('Database connection failed')
-
     const repos = {
       wishlistRepository: {
-        findByUserIdAndItem: async () => null,
+        findByItemAndUserWishlistId: async () => null,
         create: async () => {
           throw unknownError
         },
@@ -87,17 +86,18 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { createWishlist } = createCaller(testContext)
+    const { createWishlistItem } = createCaller(testContext)
 
-    await expect(createWishlist(newWishlistInput)).rejects.toThrow(unknownError)
+    await expect(createWishlistItem(newWishlistInput)).rejects.toThrow(
+      unknownError
+    )
   })
 
-  it('should propagate unknown errors from findByEventAndUserId', async () => {
+  it('should propagate unknown errors from findByItemAndUserWishlistId', async () => {
     const unknownError = new Error('Database connection failed')
-
     const repos = {
       wishlistRepository: {
-        findByUserIdAndItem: async () => {
+        findByItemAndUserWishlistId: async () => {
           throw unknownError
         },
         create: async () => {
@@ -108,8 +108,10 @@ describe('create', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { createWishlist } = createCaller(testContext)
+    const { createWishlistItem } = createCaller(testContext)
 
-    await expect(createWishlist(newWishlistInput)).rejects.toThrow(unknownError)
+    await expect(createWishlistItem(newWishlistInput)).rejects.toThrow(
+      unknownError
+    )
   })
 })

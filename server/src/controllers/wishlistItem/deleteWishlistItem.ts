@@ -14,27 +14,19 @@ export default authenticatedProcedure
     })
   )
   .input(
-    wishlistSchema
-      .pick({
-        id: true,
-        itemName: true,
-        description: true,     
-        price: true,
-     
-      })
-      .partial({
-        itemName: true,
-        description: true,        
-        price: true,    
-        
-      })
+    wishlistSchema.pick({
+      userWishlistId: true,
+      itemName: true,
+      userId: true,
+    })
   )
   .mutation(
-    async ({
-      input: { id, ...updates },
-      ctx: { repos, authUser },
-    }): Promise<WishlistForMember> => {
-      const existingWishlist = await repos.wishlistRepository.findById(id)
+    async ({ input, ctx: { repos, authUser } }): Promise<WishlistForMember> => {
+      const existingWishlist =
+        await repos.wishlistRepository.findByItemAndUserWishlistId(
+          input.itemName,
+          input.userWishlistId
+        )
 
       if (!existingWishlist) {
         throw new TRPCError({
@@ -46,11 +38,13 @@ export default authenticatedProcedure
       if (existingWishlist.userId !== authUser.auth0Id) {
         throw new TRPCError({
           code: 'FORBIDDEN',
-          message: 'Not authorized to update this wishlist item',
+          message: 'Not authorized to remove this wishlist item',
         })
       }
 
-      const wishlist = await repos.wishlistRepository.update(id, updates)
+      const wishlist = await repos.wishlistRepository.remove(
+        existingWishlist.id
+      )
       return wishlist
     }
   )

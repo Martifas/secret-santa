@@ -10,7 +10,7 @@ const currentYear = new Date().getFullYear()
 </script>
 
 <template>
-  <footer class="border-t border-gray-300 bg-white mt-auto">
+  <footer class="mt-auto border-t border-gray-300 bg-white">
     <div class="mx-auto w-full max-w-screen-xl px-4 py-4">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex flex-col gap-1">
@@ -26,7 +26,7 @@ const currentYear = new Date().getFullYear()
           </router-link>
           <p class="text-sm text-gray-600">Making gift exchanges magical, Secret Santa simple.</p>
         </div>
-        <nav class="flex flex-col sm:flex-row gap-1 sm:gap-3">
+        <nav class="flex flex-col gap-1 sm:flex-row sm:gap-3">
           <router-link
             v-for="item in navigation"
             :key="item.name"

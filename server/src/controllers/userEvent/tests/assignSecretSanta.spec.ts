@@ -102,7 +102,6 @@ describe('getSecretSanta', () => {
     const { assignSecretSanta } = createCaller(testContext)
 
     await expect(assignSecretSanta({ eventId })).rejects.toThrow(unknownError)
-    
   })
 
   it('should throw FORBIDDEN when user is not an admin', async () => {
@@ -120,7 +119,7 @@ describe('getSecretSanta', () => {
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(userEventRouter)
     const { assignSecretSanta } = createCaller(testContext)
-    
+
     await expect(assignSecretSanta({ eventId })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',

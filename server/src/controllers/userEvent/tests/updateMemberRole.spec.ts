@@ -27,7 +27,7 @@ describe('updateRole', () => {
   const updateInput = {
     id: userEventId,
     role: 'event_admin',
-    eventId
+    eventId,
   }
 
   it('should update role when user is event admin', async () => {

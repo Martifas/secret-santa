@@ -5,16 +5,16 @@ import rule from './rule'
 import user from './user'
 import userEvent from './userEvent'
 import userWishlist from './userWishlist'
-import wishlist from './wishlist'
+import wishlistItem from './wishlistItem'
 
 export const appRouter = router({
   event,
-  wishlist,
+  wishlistItem,
   rule,
   user,
   userEvent,
   invitation,
-  userWishlist
+  userWishlist,
 })
 
 export type AppRouter = typeof appRouter

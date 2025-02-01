@@ -1,25 +1,25 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @import '../../../node_modules/flowbite-vue/dist/index.css';
 
 body {
-    font-family: 'Montserrat', sand-serif;
+  font-family: 'Montserrat', sand-serif;
 }
 
 .dp__input {
-    border-radius: 0.5rem !important;
-    border: 1px solid rgb(209 213 219) !important;
-    background-color: rgb(249 250 251) !important;
-    padding: 0.5rem !important;
-    font-size: 0.875rem !important;
-    color: rgb(17 24 39) !important;
-    width: 100% !important;
-  }
-  
-  .dp__input:focus {
-    border-color: rgb(59 130 246) !important;
-    box-shadow: 0 0 0 1px rgb(59 130 246) !important;
-  }
+  border-radius: 0.5rem !important;
+  border: 1px solid rgb(209 213 219) !important;
+  background-color: rgb(249 250 251) !important;
+  padding: 0.5rem !important;
+  font-size: 0.875rem !important;
+  color: rgb(17 24 39) !important;
+  width: 100% !important;
+}
 
-  .dp__input_icon_pad {
-    padding-left: 2.0rem !important;
-  }
+.dp__input:focus {
+  border-color: rgb(59 130 246) !important;
+  box-shadow: 0 0 0 1px rgb(59 130 246) !important;
+}
+
+.dp__input_icon_pad {
+  padding-left: 2rem !important;
+}

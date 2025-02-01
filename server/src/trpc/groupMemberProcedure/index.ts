@@ -2,7 +2,7 @@ import { TRPCError } from '@trpc/server'
 import { authenticatedProcedure } from '../authenticatedProcedure'
 
 export const groupMemberProcedure = authenticatedProcedure.use(
-  async ({ ctx, next, rawInput }) => {  
+  async ({ ctx, next, rawInput }) => {
     if (!ctx.repos?.userEventRepository) {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
@@ -11,7 +11,7 @@ export const groupMemberProcedure = authenticatedProcedure.use(
     }
 
     const input = rawInput as { eventId: number }
-    
+
     const isMember = await ctx.repos.userEventRepository.isMember(
       ctx.authUser.id,
       input.eventId

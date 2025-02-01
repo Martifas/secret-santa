@@ -25,7 +25,7 @@ export function eventRepository(db: Database) {
         .returning('id')
         .executeTakeFirstOrThrow()
 
-      return result.id 
+      return result.id
     },
 
     async update(id: number, updates: EventRowUpdate): Promise<EventForMember> {

@@ -5,9 +5,9 @@ import {
   wishlistSchema,
   type WishlistForMember,
 } from '@server/entities/wishlistItem'
-import { groupMemberProcedure } from '@server/trpc/groupMemberProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
-export default groupMemberProcedure
+export default authenticatedProcedure
   .use(
     provideRepos({
       wishlistRepository,
@@ -15,16 +15,14 @@ export default groupMemberProcedure
     })
   )
   .input(
-    wishlistSchema.pick({      
-      id: true,
+    wishlistSchema.pick({
+      userId: true,
+      userWishlistId: true,
     })
   )
-  .query(
-    async ({
-      input: { id },
-      ctx: { repos },
-    }): Promise<WishlistForMember | null> => {     
-
-      return repos.wishlistRepository.findById(id)
-    }
-  )
+  .query(async ({ input, ctx: { repos } }): Promise<WishlistForMember[]> => {
+    return repos.wishlistRepository.findAllByUserIdAndUserWishlistId(
+      input.userId,
+      input.userWishlistId
+    )
+  })

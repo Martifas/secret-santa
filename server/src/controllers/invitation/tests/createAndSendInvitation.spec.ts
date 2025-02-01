@@ -83,7 +83,7 @@ describe('create', () => {
       exchangeDate: eventDate,
       title: newInvitationInput.title,
       budgetLimit: newInvitationInput.budgetLimit,
-      description: newInvitationInput.description,      
+      description: newInvitationInput.description,
       rsvpLinkYes: `http://localhost:5173/rsvp/${newInvitationInput.eventId}/${createdInvitation.id}/accept`,
       rsvpLinkNo: `http://localhost:5173/rsvp/${newInvitationInput.eventId}/${createdInvitation.id}/refuse`,
     })

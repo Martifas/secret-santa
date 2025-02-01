@@ -1,5 +1,8 @@
 import type { Database, Wishlist } from '@server/database'
-import { wishlistKeys, type WishlistForMember } from '@server/entities/wishlistItem'
+import {
+  wishlistKeys,
+  type WishlistForMember,
+} from '@server/entities/wishlistItem'
 import type {
   WishlistRowSelect,
   WishlistRowUpdate,
@@ -8,24 +11,40 @@ import type { Insertable } from 'kysely'
 
 export function wishlistRepository(db: Database) {
   return {
-    async findById(id: number): Promise<WishlistRowSelect | null> {
-      const result = await db
-        .selectFrom('wishlist')
-        .select(wishlistKeys)
-        .where('id', '=', id)
-        .executeTakeFirst()
-      return result ?? null
-    },
-
-    async findByUserIdAndItem(
+    async findByUserIdAndUserWishlistId(
       userId: string,
-      itemName: string
+      userWishlistId: number
     ): Promise<WishlistRowSelect | null> {
       const result = await db
         .selectFrom('wishlist')
         .select(wishlistKeys)
         .where('userId', '=', userId)
+        .where('userWishlistId', '=', userWishlistId)
+        .executeTakeFirst()
+      return result ?? null
+    },
+    async findAllByUserIdAndUserWishlistId(
+      userId: string,
+      userWishlistId: number
+    ): Promise<WishlistRowSelect[]> {
+      const result = await db
+        .selectFrom('wishlist')
+        .select(wishlistKeys)
+        .where('userId', '=', userId)
+        .where('userWishlistId', '=', userWishlistId)
+        .execute()
+
+      return result
+    },
+    async findByItemAndUserWishlistId(
+      itemName: string,
+      userWishlistId: number
+    ): Promise<WishlistRowSelect | null> {
+      const result = await db
+        .selectFrom('wishlist')
+        .select(wishlistKeys)
         .where('itemName', '=', itemName)
+        .where('userWishlistId', '=', userWishlistId)
         .executeTakeFirst()
       return result ?? null
     },

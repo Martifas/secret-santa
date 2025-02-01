@@ -22,7 +22,4 @@ export type InvitationForMember = Pick<
   (typeof invitationKeysForMembers)[number]
 >
 
-export const invitationKeysForTesting = [
-  'email',  
-  'status'
-] as const
+export const invitationKeysForTesting = ['email', 'status'] as const

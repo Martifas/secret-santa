@@ -13,16 +13,8 @@
     <section class="team-section">
       <h2>Meet Our Team</h2>
       <div class="team-grid">
-        <div 
-          v-for="member in teamMembers" 
-          :key="member.id" 
-          class="team-member"
-        >
-          <img 
-            :src="member.avatar" 
-            :alt="member.name" 
-            loading="lazy"
-          >
+        <div v-for="member in teamMembers" :key="member.id" class="team-member">
+          <img :src="member.avatar" :alt="member.name" loading="lazy" />
           <h3>{{ member.name }}</h3>
           <p class="role">{{ member.role }}</p>
           <p class="bio">{{ member.bio }}</p>
@@ -33,11 +25,7 @@
     <section class="values-section">
       <h2>Our Values</h2>
       <div class="values-grid">
-        <div 
-          v-for="value in companyValues" 
-          :key="value.id" 
-          class="value-card"
-        >
+        <div v-for="value in companyValues" :key="value.id" class="value-card">
           <i :class="value.icon"></i>
           <h3>{{ value.title }}</h3>
           <p>{{ value.description }}</p>
@@ -86,7 +74,8 @@ export default defineComponent({
   setup() {
     const title = 'About Us'
     const subtitle = 'Building the future, one innovation at a time'
-    const mission = 'Our mission is to create innovative solutions that empower businesses and individuals to achieve their full potential in the digital age.'
+    const mission =
+      'Our mission is to create innovative solutions that empower businesses and individuals to achieve their full potential in the digital age.'
 
     const teamMembers: TeamMember[] = [
       {
@@ -94,22 +83,22 @@ export default defineComponent({
         name: 'Sarah Johnson',
         role: 'CEO & Founder',
         bio: 'With over 15 years of experience in tech leadership, Sarah drives our vision forward.',
-        avatar: '/images/team/sarah.jpg'
+        avatar: '/images/team/sarah.jpg',
       },
       {
         id: 2,
         name: 'Michael Chen',
         role: 'CTO',
         bio: 'Michael brings extensive expertise in scalable architecture and emerging technologies.',
-        avatar: '/images/team/michael.jpg'
+        avatar: '/images/team/michael.jpg',
       },
       {
         id: 3,
         name: 'Emma Rodriguez',
         role: 'Head of Design',
         bio: 'Emma leads our design team with a passion for creating beautiful, intuitive experiences.',
-        avatar: '/images/team/emma.jpg'
-      }
+        avatar: '/images/team/emma.jpg',
+      },
     ]
 
     const companyValues: CompanyValue[] = [
@@ -117,26 +106,26 @@ export default defineComponent({
         id: 1,
         title: 'Innovation',
         description: 'We push boundaries and embrace new technologies to solve complex challenges.',
-        icon: 'fas fa-lightbulb'
+        icon: 'fas fa-lightbulb',
       },
       {
         id: 2,
         title: 'Integrity',
         description: 'We maintain the highest standards of honesty and ethical behavior.',
-        icon: 'fas fa-shield-alt'
+        icon: 'fas fa-shield-alt',
       },
       {
         id: 3,
         title: 'Collaboration',
         description: 'We believe in the power of teamwork and diverse perspectives.',
-        icon: 'fas fa-users'
-      }
+        icon: 'fas fa-users',
+      },
     ]
 
     const contactInfo: ContactInfo = {
       address: '123 Innovation Drive, Tech City, TC 12345',
       email: 'hello@company.com',
-      phone: '+1 (555) 123-4567'
+      phone: '+1 (555) 123-4567',
     }
 
     return {
@@ -145,9 +134,9 @@ export default defineComponent({
       mission,
       teamMembers,
       companyValues,
-      contactInfo
+      contactInfo,
     }
-  }
+  },
 })
 </script>
 

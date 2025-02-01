@@ -18,9 +18,9 @@ export default authenticatedProcedure
     })
   )
   .mutation(async ({ input, ctx: { repos } }): Promise<number> => {
-    const existing = await repos.wishlistRepository.findByUserIdAndItem(
-      input.userId,
-      input.itemName
+    const existing = await repos.wishlistRepository.findByItemAndUserWishlistId(
+      input.itemName,
+      input.userWishlistId
     )
     if (existing) {
       throw new TRPCError({

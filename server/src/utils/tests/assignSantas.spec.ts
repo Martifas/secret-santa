@@ -2,8 +2,8 @@ import assignSantas from '@server/utils/assignSantas'
 import type { UserIdRowSelect } from '@server/types/userEvent'
 
 describe('assignSantas', () => {
-  const createMembers = (userIds: number[]): UserIdRowSelect[] => 
-    userIds.map(id => ({ userId: id }))
+  const createMembers = (userIds: number[]): UserIdRowSelect[] =>
+    userIds.map((id) => ({ userId: id }))
 
   it('should assign santas to all members', async () => {
     const members = createMembers([1, 2, 3, 4])

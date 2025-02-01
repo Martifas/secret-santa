@@ -16,7 +16,7 @@ const repositories = {
   ruleRepository,
   userEventRepository,
   userRepository,
-  userWishlistRepository
+  userWishlistRepository,
 }
 
 export type RepositoriesFactories = typeof repositories

@@ -19,7 +19,6 @@ export default authenticatedProcedure
       updates: userWishlistSchema
         .pick({
           title: true,
-          wishlistId: true,
           description: true,
         })
         .partial(),

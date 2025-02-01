@@ -24,17 +24,18 @@ export default groupAdminProcedure
     if (eventMembers.length < 3) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'Not enough members to assign secret santas. Minimum 3 members required.',
+        message:
+          'Not enough members to assign secret santas. Minimum 3 members required.',
       })
     }
 
     const assignments = await assignSantas(eventMembers)
-    
+
     await Promise.all(
-      assignments.map(({ member, santa }) => 
+      assignments.map(({ member, santa }) =>
         repos.userEventRepository.updateSecretSanta(member, santa)
       )
     )
-    
+
     return `Secret santas for all ${assignments.length} members assigned`
   })

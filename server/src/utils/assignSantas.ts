@@ -1,4 +1,4 @@
-import type { UserIdRowSelect } from "@server/types/userEvent";
+import type { UserIdRowSelect } from '@server/types/userEvent'
 
 export default async function assignSantas(eventMembers: UserIdRowSelect[]) {
   if (eventMembers.length < 2) return []

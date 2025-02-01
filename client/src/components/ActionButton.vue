@@ -3,7 +3,7 @@ import { computed } from 'vue'
 
 interface Props {
   loading?: boolean
-   variant?: 'primary' | 'secondary' | 'danger'
+  variant?: 'primary' | 'secondary' | 'danger'
   size?: 'sm' | 'md' | 'lg'
   type?: 'button' | 'submit'
 }

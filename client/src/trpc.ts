@@ -20,7 +20,7 @@ export const trpc = createTRPCProxyClient<AppRouter>({
           if (getAccessTokenFn.value) {
             const token = await getAccessTokenFn.value()
             return {
-              Authorization: `Bearer ${token}`
+              Authorization: `Bearer ${token}`,
             } satisfies HTTPHeaders
           }
           return {}

@@ -21,7 +21,7 @@ describe('logout', () => {
     const mockRes = createMockRes()
     const caller = createCallerFactory(userRouter)({
       db,
-      res: mockRes
+      res: mockRes,
     } as any)
 
     const result = await caller.logout()
@@ -32,7 +32,7 @@ describe('logout', () => {
 
   it('should throw an error when response object is missing', async () => {
     const caller = createCallerFactory(userRouter)({
-      db
+      db,
     } as any)
 
     await expect(caller.logout()).rejects.toThrow('Missing response object')

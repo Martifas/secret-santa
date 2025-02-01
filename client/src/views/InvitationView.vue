@@ -55,7 +55,7 @@ async function sendInvitations() {
         continue
       }
 
-      const eventDetails = await trpc.event.getEvent.query({id: eventId})
+      const eventDetails = await trpc.event.getEvent.query({ id: eventId })
 
       await trpc.invitation.createAndSendInvitation.mutate({
         email: participant.email,
@@ -65,8 +65,7 @@ async function sendInvitations() {
         eventDate: invitationStore.eventDate!,
         title: eventDetails.name,
         budgetLimit: eventDetails.budgetLimit,
-        description: eventDetails.description
-
+        description: eventDetails.description,
       })
     }
     errorMessage.value = ''

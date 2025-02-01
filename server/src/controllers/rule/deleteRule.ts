@@ -17,10 +17,7 @@ export default groupAdminProcedure
       eventId: true,
     })
   )
-  .mutation(
-    async ({ input, ctx: { repos } }): Promise<RuleForMember> => {
-     
-      const rule = await repos.ruleRepository.remove(input.id)
-      return rule
-    }
-  )
+  .mutation(async ({ input, ctx: { repos } }): Promise<RuleForMember> => {
+    const rule = await repos.ruleRepository.remove(input.id)
+    return rule
+  })

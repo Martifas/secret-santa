@@ -8,7 +8,7 @@ export async function up(db: Kysely<any>) {
     )
     .addColumn('event_id', 'integer', (c) => c.references('event.id').notNull())
     .addColumn('user_id', 'integer', (c) => c.references('user.id'))
-    .addColumn('email', 'text', (c) => c.notNull()) 
+    .addColumn('email', 'text', (c) => c.notNull())
     .addColumn('status', 'text', (c) => c.notNull())
     .addColumn('created_at', 'timestamptz', (c) =>
       c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()

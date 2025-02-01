@@ -16,10 +16,7 @@ export default groupAdminProcedure
       eventId: true,
     })
   )
-  .query(
-    async ({ input, ctx: { repos } }): Promise<RuleForMember[]> => {
-      
-      const rules = await repos.ruleRepository.findByEventId(input.eventId)
-      return rules
-    }
-  )
+  .query(async ({ input, ctx: { repos } }): Promise<RuleForMember[]> => {
+    const rules = await repos.ruleRepository.findByEventId(input.eventId)
+    return rules
+  })
