@@ -14,7 +14,7 @@ describe('create', () => {
   const newUserEventInput = {
     eventId,
     userId: TEST_USER.auth0Id,
-    eventTitle: "New years party",
+    eventTitle: 'New years party',
     role: 'member',
     wishlistId: 1,
     santaForUserId: 'auth0|96258',
@@ -28,11 +28,12 @@ describe('create', () => {
   }
 
   it('should create a new user event membership when user is not already a member', async () => {
+    const expectedId = 1
     const repos = {
       userEventRepository: {
         create: async (input) => {
           expect(input).toEqual(newUserEventInput)
-          return createdUserEvent
+          return expectedId
         },
         findByEventAndUserId: async () => null,
       } satisfies Partial<UserEventRepository>,
@@ -43,16 +44,7 @@ describe('create', () => {
     const { createMember } = createCaller(testContext)
 
     const result = await createMember(newUserEventInput)
-    expect(result).toMatchObject({
-      id: expect.any(Number),
-      eventId,
-      userId: TEST_USER.auth0Id,
-      role: 'member',
-      wishlistId: expect.any(Number),
-      santaForUserId: 'auth0|96258',
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
-    })
+    expect(result).toBe(expectedId)
   })
 
   it('should throw BAD_REQUEST when user is already a member', async () => {
