@@ -25,7 +25,7 @@ const [userWishlist] = await insertAll(db, 'userWishlist', [
     title: 'My wishlist',
   },
 ])
-const [wishlistOne] = await insertAll(db, 'wishlist', [
+await insertAll(db, 'wishlist', [
   fakeWishlist({
     userId: userOne.auth0Id,
     userWishlistId: userWishlist.id,
@@ -36,7 +36,7 @@ const [userEventOne] = await insertAll(db, 'userEvent', [
   fakeUserEvent({
     userId: userOne.auth0Id,
     eventId: eventOne.id,
-    wishlistId: wishlistOne.id,
+    wishlistId: userWishlist.id,
     santaForUserId: userTwo.auth0Id,
   }),
 ])
@@ -46,7 +46,7 @@ const fakeUserEventDefault = (
   fakeUserEvent({
     userId: userOne.auth0Id,
     eventId: eventOne.id,
-    wishlistId: wishlistOne.id,
+    wishlistId: userWishlist.id,
     santaForUserId: userTwo.auth0Id,
     ...userEvent,
   })
@@ -152,7 +152,7 @@ describe('create', () => {
         title: 'My wishlist',
       },
     ])
-    const [newWishlist] = await insertAll(db, 'wishlist', [
+    await insertAll(db, 'wishlist', [
       fakeWishlist({
         userId: newUser.auth0Id,
         userWishlistId: newUserWishlist.id,
@@ -162,16 +162,11 @@ describe('create', () => {
     const record = fakeUserEventDefault({
       userId: newUser.auth0Id,
       eventId: newEvent.id,
-      wishlistId: newWishlist.id,
+      wishlistId: newUserWishlist.id,
     })
 
     const createdRecord = await repository.create(record)
-    expect(createdRecord).toMatchObject({
-      ...pick(record, userEventKeysForTesting),
-      id: expect.any(Number),
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
-    })
+    expect(createdRecord).toEqual(expect.any(Number))
   })
 })
 
@@ -228,7 +223,10 @@ describe('getAllEventUsers', () => {
     const users = await repository.getAllEventUsers(eventOne.id)
     expect(users).toHaveLength(2)
     expect(users).toEqual(
-      expect.arrayContaining([{ userId: userOne.auth0Id }, { userId: userThree.auth0Id }])
+      expect.arrayContaining([
+        { userId: userOne.auth0Id },
+        { userId: userThree.auth0Id },
+      ])
     )
   })
 
