@@ -3,7 +3,7 @@ import { wishlistRepository } from '@server/repositories/wishlistRepository'
 import {
   wishlistSchema,
   type WishlistForMember,
-} from '@server/entities/wishlist'
+} from '@server/entities/wishlistItem'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import { TRPCError } from '@trpc/server'
 

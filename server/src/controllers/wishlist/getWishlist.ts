@@ -4,7 +4,7 @@ import { userEventRepository } from '@server/repositories/userEventRepository'
 import {
   wishlistSchema,
   type WishlistForMember,
-} from '@server/entities/wishlist'
+} from '@server/entities/wishlistItem'
 import { groupMemberProcedure } from '@server/trpc/groupMemberProcedure'
 
 export default groupMemberProcedure

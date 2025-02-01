@@ -41,9 +41,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { deleteWishlist } = createCaller(testContext)
+    const { deleteWishlistItem } = createCaller(testContext)
 
-    const result = await deleteWishlist({ id })
+    const result = await deleteWishlistItem({ id })
 
     expect(result).toMatchObject({
       id,
@@ -72,9 +72,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { deleteWishlist } = createCaller(testContext)
+    const { deleteWishlistItem } = createCaller(testContext)
 
-    await expect(deleteWishlist({ id })).rejects.toThrow(
+    await expect(deleteWishlistItem({ id })).rejects.toThrow(
       new TRPCError({
         code: 'NOT_FOUND',
         message: 'Wishlist item not found',
@@ -99,9 +99,9 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { deleteWishlist } = createCaller(testContext)
+    const { deleteWishlistItem } = createCaller(testContext)
 
-    await expect(deleteWishlist({ id })).rejects.toThrow(
+    await expect(deleteWishlistItem({ id })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',
         message: 'Not authorized to remove this wishlist item',
@@ -122,8 +122,8 @@ describe('remove', () => {
 
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(wishlistRouter)
-    const { deleteWishlist } = createCaller(testContext)
+    const { deleteWishlistItem } = createCaller(testContext)
 
-    await expect(deleteWishlist({ id })).rejects.toThrow(unknownError)
+    await expect(deleteWishlistItem({ id })).rejects.toThrow(unknownError)
   })
 })

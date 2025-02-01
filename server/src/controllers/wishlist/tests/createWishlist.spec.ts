@@ -15,6 +15,7 @@ describe('create', () => {
     itemName: 'Bike',
     description: 'Blue mountain bike',
     price: 120,
+    userWishlistId: 1,
   }
 
   const createdWishlist = {

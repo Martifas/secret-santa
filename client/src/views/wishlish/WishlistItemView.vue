@@ -6,6 +6,7 @@ import { trpc } from '@/trpc'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { TrashIcon } from '@heroicons/vue/24/outline'
 
 const wishlistStore = useWishlistStore()
 const route = useRoute()
@@ -63,6 +64,8 @@ const handleCancel = () => {
   }
   showSuccessMessage.value = false
 }
+
+async function deleteFromWishlist(){}
 
 async function addGiftToList() {
   if (!validateForm()) return
@@ -221,6 +224,11 @@ async function addGiftToList() {
                   €{{ gift.price }}
                 </p>
               </div>
+              <button @click="deleteFromWishlist" class="my-auto">
+                <TrashIcon
+                  class="size-11 rounded-full border-1 bg-white p-1 hover:bg-red-200"
+                ></TrashIcon>
+              </button>
             </div>
           </div>
         </div>

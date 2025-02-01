@@ -3,20 +3,34 @@ import { createTestDatabase } from '@server/utils/tests/database'
 import { insertAll, selectAll } from '@server/utils/tests/record'
 import { wrapInRollbacks } from '@server/utils/tests/transactions'
 import { pick } from 'lodash-es'
-import { wishlistKeysForTesting } from '@server/entities/wishlist'
+import { wishlistKeysForTesting } from '@server/entities/wishlistItem'
 import { wishlistRepository } from '../wishlistRepository'
 
 const db = await wrapInRollbacks(createTestDatabase())
 const repository = wishlistRepository(db)
 const [userOne] = await insertAll(db, 'user', fakeUser())
+const [userWishlist] = await insertAll(db, 'userWishlist', [
+  {
+    userId: userOne.auth0Id,
+    description: 'The things I want',
+    title: 'My wishlist',
+  },
+])
 const [wishlistOne] = await insertAll(db, 'wishlist', [
-  fakeWishlist({ userId: userOne.auth0Id }),
+  fakeWishlist({
+    userId: userOne.auth0Id,
+    userWishlistId: userWishlist.id,
+  }),
 ])
 
 const fakeWishlistDefault = (
   wishlist: Parameters<typeof fakeWishlist>[0] = {}
-) => fakeWishlist({ userId: userOne.auth0Id, ...wishlist })
-
+) =>
+  fakeWishlist({
+    userId: userOne.auth0Id,
+    userWishlistId: userWishlist.id,
+    ...wishlist,
+  })
 describe('findById', () => {
   it('should return a wishlist for a specific id', async () => {
     const foundWishlist = await repository.findById(wishlistOne.id)
@@ -37,7 +51,10 @@ describe('findById', () => {
 })
 describe('find by item name and user id', () => {
   it('should return a wishlist record for a specific item and user', async () => {
-    const foundWishlist = await repository.findByUserIdAndItem(userOne.auth0Id, wishlistOne.itemName)
+    const foundWishlist = await repository.findByUserIdAndItem(
+      userOne.auth0Id,
+      wishlistOne.itemName
+    )
     expect(foundWishlist).not.toBeNull()
     if (!foundWishlist) throw new Error('No wishlist found')
 
@@ -50,9 +67,7 @@ describe('find by item name and user id', () => {
 describe('create', () => {
   it('should create a new wishlist', async () => {
     const wishlist = fakeWishlistDefault()
-
     const createdWishlist = await repository.create(wishlist)
-
     expect(createdWishlist).toMatchObject({
       ...pick(wishlist, wishlistKeysForTesting),
       id: expect.any(Number),

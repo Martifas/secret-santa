@@ -1,5 +1,5 @@
 import type { Database, Wishlist } from '@server/database'
-import { wishlistKeys, type WishlistForMember } from '@server/entities/wishlist'
+import { wishlistKeys, type WishlistForMember } from '@server/entities/wishlistItem'
 import type {
   WishlistRowSelect,
   WishlistRowUpdate,

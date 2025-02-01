@@ -99,6 +99,7 @@ export const fakeWishlist = <T extends Partial<Insertable<Wishlist>>>(
     itemName: random.word(),
     price: random.floating({ min: 1, max: 10000, fixed: 2 }),
     userId: randomId(),
+    userWishlistId: randomId(),
     ...overrides,
   }) satisfies Insertable<Wishlist>
 

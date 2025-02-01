@@ -82,7 +82,6 @@ export interface UserWishlist {
   title: string
   updatedAt: Generated<Timestamp>
   userId: string
-  wishlistId: number | null
 }
 
 export interface Wishlist {
@@ -93,6 +92,7 @@ export interface Wishlist {
   price: number | null
   updatedAt: Generated<Timestamp>
   userId: string
+  userWishlistId: number
 }
 
 export interface DB {

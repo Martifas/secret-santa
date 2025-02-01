@@ -1,5 +1,5 @@
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
-import { wishlistSchema } from '@server/entities/wishlist'
+import { wishlistSchema } from '@server/entities/wishlistItem'
 import { wishlistRepository } from '@server/repositories/wishlistRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { TRPCError } from '@trpc/server'

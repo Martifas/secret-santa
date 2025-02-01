@@ -6,7 +6,6 @@ import { idSchema } from './shared'
 export const userWishlistSchema = z.object({
   id: idSchema,
   userId: z.string(),
-  wishlistId: idSchema,
   title: z.string(),
   description: z.string(),
   createdAt: z.date(),

@@ -8,6 +8,7 @@ export const wishlistSchema = z.object({
   userId: z.string(),
   itemName: z.string().min(1),
   description: z.string().nullable().optional(),
+  userWishlistId: idSchema,
   price: z.number().int().nonnegative().nullable().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
