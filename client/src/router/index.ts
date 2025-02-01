@@ -10,6 +10,7 @@ import RsvpView from '@/views/RsvpView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import WishlistItemView from '@/views/wishlist/WishlistItemView.vue'
 import WishlistView from '@/views/wishlist/WishlistView.vue'
+import ExchangeDetailsView from '@/views/ExchangeDetailsView.vue'
 
 const routes = [
   {
@@ -66,6 +67,19 @@ const routes = [
         path: '',
         name: 'Invitation',
         component: InvitationView,
+        beforeEnter: authGuard,
+        prop: true,
+      },
+    ],
+  },
+  {
+    path: '/event/:id',
+    component: MainLayout,
+    children: [
+      {
+        path: '',
+        name: 'ExchangeDetails',
+        component: ExchangeDetailsView,
         beforeEnter: authGuard,
         prop: true,
       },

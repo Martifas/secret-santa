@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { UserEventForMember } from '@server/entities/userEvent'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
 withDefaults(
   defineProps<{
     events: UserEventForMember[]
@@ -19,7 +22,8 @@ withDefaults(
       <div
         v-for="event in events"
         :key="event.id"
-        class="group cursor-pointer space-y-2 rounded-3xl border-1 border-gray-400 p-2"
+        @click="router.push({ name: 'ExchangeDetails', params: { id: event.eventId } })"
+        class="group cursor-pointer space-y-2 rounded-3xl border-1 border-gray-400 p-2 shadow-md shadow-gray-300 transition-colors hover:bg-gray-200"
       >
         <div
           class="aspect-square rounded-lg bg-cover bg-center"

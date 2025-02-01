@@ -113,7 +113,7 @@ async function createEvent() {
               id="title"
               v-model="form.title"
               placeholder="Title"
-              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-md focus:border-blue-500 focus:ring-blue-500"
             />
 
             <label for="description" class="mb-2 block text-sm font-medium text-gray-900"
@@ -124,7 +124,7 @@ async function createEvent() {
               id="description"
               v-model="form.description"
               rows="4"
-              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-md focus:border-blue-500 focus:ring-blue-500"
               placeholder="Description"
             ></textarea>
 
@@ -138,7 +138,7 @@ async function createEvent() {
                   v-model="form.budget"
                   id="budget"
                   placeholder="0"
-                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-md focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
 
@@ -149,6 +149,7 @@ async function createEvent() {
                 <VueDatePicker
                   :enable-time-picker="false"
                   v-model="form.date"
+                  class="shadow-md"
                   :min-date="new Date()"
                 ></VueDatePicker>
               </div>

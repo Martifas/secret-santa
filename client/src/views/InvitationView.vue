@@ -2,10 +2,11 @@
 import { trpc } from '@/trpc'
 import { PlusIcon, TrashIcon, EnvelopeIcon } from '@heroicons/vue/24/outline'
 import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useInvitationStore } from '@/stores/invitationStore'
 
 const route = useRoute()
+const router = useRouter()
 const invitationStore = useInvitationStore()
 const participants = ref([{ email: '' }])
 const errorMessage = ref('')
@@ -67,6 +68,8 @@ async function sendInvitations() {
         budgetLimit: eventDetails.budgetLimit,
         description: eventDetails.description,
       })
+
+      router.push({ name: 'ExchangeDetails', params: { id: eventId } })
     }
     errorMessage.value = ''
   } catch (error: unknown) {
@@ -103,7 +106,7 @@ async function sendInvitations() {
                 name="type_event_owner"
                 v-model="typeEventOwner"
                 value="participating"
-                class="text-green-900"
+                class="text-green-900 shadow-md"
               />
               <label
                 for="participating"
@@ -119,7 +122,7 @@ async function sendInvitations() {
                 name="type_event_owner"
                 v-model="typeEventOwner"
                 value="organising"
-                class="text-green-900"
+                class="text-green-900 shadow-md"
               />
               <label
                 class="ml-2"
@@ -141,7 +144,7 @@ async function sendInvitations() {
                 id="participant"
                 v-model="participant.email"
                 :placeholder="`Friend's ${index + 1} email `"
-                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-md focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
             <div class="flex items-center">
@@ -159,7 +162,7 @@ async function sendInvitations() {
             <button
               @click="addParticipant"
               type="button"
-              class="flex rounded-lg px-4 pb-2 text-center text-green-900 hover:text-green-500"
+              class="flex rounded-lg px-4 pb-2 text-center text-green-900 transition-colors hover:text-green-500"
             >
               Add Person
               <PlusIcon class="my-auto ml-2 inline size-5 flex-none cursor-pointer" />
@@ -167,7 +170,7 @@ async function sendInvitations() {
           </div>
           <button
             type="submit"
-            class="mt-3 -mb-3 flex w-full justify-center rounded-full bg-green-900 py-2 text-white hover:bg-green-700 sm:py-2!"
+            class="mt-3 -mb-3 flex w-full justify-center rounded-full bg-green-900 py-2 text-white shadow-md shadow-green-100 transition-colors hover:bg-green-700 sm:py-2!"
           >
             Send Invitations
             <EnvelopeIcon class="my-auto ml-2 inline size-5 cursor-pointer" />

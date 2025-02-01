@@ -8,7 +8,7 @@ import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 
 const app = createApp(App)
-
+app.use(router)
 app.use(
   createAuth0({
     domain: auth0Config.domain,
@@ -19,10 +19,7 @@ app.use(
     },
   })
 )
-
 app.component('VueDatePicker', VueDatePicker)
-
 const pinia = createPinia()
 app.use(pinia)
-app.use(router)
 app.mount('#app')

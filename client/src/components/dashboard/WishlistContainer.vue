@@ -2,6 +2,7 @@
 import type { UserWishlistForMember } from '@server/entities/userWishlist'
 import { useRouter } from 'vue-router'
 const router = useRouter()
+
 withDefaults(
   defineProps<{
     wishlists: UserWishlistForMember[]
@@ -22,9 +23,9 @@ withDefaults(
         v-for="wishlist in wishlists"
         :key="wishlist.id"
         @click="router.push({ name: 'WishlistItems', params: { id: wishlist.id } })"
-        class="group cursor-pointer border-1 rounded-3xl border-gray-400 p-2 space-y-2"
+        class="group cursor-pointer space-y-2 rounded-3xl border-1 border-gray-400 p-2 shadow-md shadow-gray-300 transition-colors hover:bg-yellow-100"
       >
-        <div 
+        <div
           class="aspect-square rounded-lg bg-cover bg-center"
           :style="{
             backgroundImage: `url(${backgroundImageUrl})`,

@@ -14,15 +14,23 @@ import {
   SparklesIcon,
   GiftIcon,
   ChevronDownIcon,
+  ComputerDesktopIcon,
 } from '@heroicons/vue/24/outline'
 import { useAuth0 } from '@auth0/auth0-vue'
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 import { trpc } from '@/trpc'
+import { useRouter } from 'vue-router'
 
 const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0()
+const router = useRouter()
 
 const login = () => {
-  loginWithRedirect({})
+  const currentRoute = router.currentRoute.value
+  loginWithRedirect({
+    appState: {
+      target: currentRoute.name !== 'Home' ? currentRoute.fullPath : '/',
+    },
+  })
 }
 
 const logoutUser = () => {
@@ -53,10 +61,17 @@ watch(
   { immediate: true }
 )
 
-const navigation = [
-  { name: 'Gift Exchange', to: { name: 'Exchange' }, current: false },
-  { name: 'Create Wishlist', to: { name: 'Wishlist' }, current: false },
+const baseNavigation = [
+  { name: 'Gift Exchange', to: { name: 'Exchange' } },
+  { name: 'Create Wishlist', to: { name: 'Wishlist' } },
 ]
+
+const navigation = computed(() => {
+  if (isAuthenticated.value) {
+    return [{ name: 'Dashboard', to: { name: 'Dashboard' } }, ...baseNavigation]
+  }
+  return baseNavigation
+})
 </script>
 
 <template>
@@ -96,13 +111,13 @@ const navigation = [
                 :key="item.name"
                 :to="item.to"
                 :class="[
-                  item.current ? 'text-green-900 underline' : 'text-black hover:text-green-900',
+                  'text-black hover:text-green-900',
                   'rounded-md px-3 py-2 text-sm font-bold',
                 ]"
-                :aria-current="item.current ? 'page' : undefined"
               >
                 <GiftIcon v-if="item.name === 'Gift Exchange'" class="inline size-6" />
                 <SparklesIcon v-if="item.name === 'Create Wishlist'" class="inline size-6" />
+                <ComputerDesktopIcon v-if="item.name === 'Dashboard'" class="inline size-6" />
                 {{ item.name }}</router-link
               >
             </div>
@@ -185,12 +200,9 @@ const navigation = [
           as="a"
           :to="item.to"
           :class="[
-            item.current
-              ? 'text-green-900 underline'
-              : 'border-t-1 border-black text-black last:border-b-1 hover:text-green-900',
+            'border-t-1 border-black text-black last:border-b-1 hover:text-green-900',
             'block px-3 py-2 text-base font-bold',
           ]"
-          :aria-current="item.current ? 'page' : undefined"
         >
           {{ item.name }}
         </router-link>

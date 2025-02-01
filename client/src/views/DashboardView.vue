@@ -44,7 +44,7 @@ async function loadUserEvents() {
     const events = await trpc.userEvent.getUserEvents.query({
       userId: user.value.sub,
     })
-    console.log('Loaded events:', events)
+
     userEvents.value = events ?? []
   } catch (error) {
     console.error('Failed to load user events:', error)

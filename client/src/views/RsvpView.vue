@@ -1,21 +1,33 @@
 <script setup lang="ts">
+import ActionButton from '@/components/ActionButton.vue'
+import { trpc } from '@/trpc'
+import { useRoute, useRouter } from 'vue-router'
+
 defineProps<{
   id: string
   response: 'accept' | 'refuse'
   eventId: number
 }>()
+
+const route = useRoute()
+const router = useRouter()
 </script>
 
 <template>
   <div class="flex justify-center p-6">
     <div v-if="response === 'accept'" class="max-w-4xl text-center">
-      <p class="mb-4 text-2xl">Welcome to the Gift Exchange!</p>
+      <p class="mb-4 text-3xl font-bold">Welcome to the Gift Exchange!</p>
+      <div class="flex justify-center">
+        <ActionButton @click="router.push({ name: 'ExchangeDetails', params: { id: eventId } })"
+          >Take me to the event!</ActionButton
+        >
+      </div>
       <!-- Additional welcome content can go here -->
     </div>
 
     <div v-else class="max-w-4xl">
       <div class="mb-12 text-center">
-        <p class="mb-4 text-2xl">Thanks for letting us know!</p>
+        <p class="mb-4 justify-center text-3xl">Thanks for letting us know!</p>
         <p class="mb-6">
           While you can't join this time, here are some other ways to join the fun:
         </p>
