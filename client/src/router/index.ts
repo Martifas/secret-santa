@@ -3,13 +3,13 @@ import HealthView from '@/views/HealthView.vue'
 import HomeView from '@/views/HomeView.vue'
 import MainLayout from '@/layout/MainLayout.vue'
 import ExchangeView from '@/views/ExchangeView.vue'
-import WishlistView from '@/views/wishlish/WishlistView.vue'
 import { authGuard } from '@auth0/auth0-vue'
 import AboutView from '@/views/AboutView.vue'
 import InvitationView from '@/views/InvitationView.vue'
 import RsvpView from '@/views/RsvpView.vue'
-import WishlistItemView from '@/views/wishlish/WishlistItemView.vue'
 import DashboardView from '@/views/DashboardView.vue'
+import WishlistItemView from '@/views/wishlist/WishlistItemView.vue'
+import WishlistView from '@/views/wishlist/WishlistView.vue'
 
 const routes = [
   {
@@ -92,6 +92,7 @@ const routes = [
         name: 'WishlistItems',
         component: WishlistItemView,
         props: true,
+        beforeEnter: authGuard,
       },
     ],
   },
