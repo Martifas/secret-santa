@@ -1,4 +1,5 @@
 import type { Database } from '@server/database'
+
 import { userEventKeysForMembers } from '@server/entities/userEvent'
 import type {
   SantaUserIdSelect,
@@ -50,12 +51,13 @@ export function userEventRepository(db: Database) {
         .executeTakeFirst()
       return result ?? null
     },
-    async create(record: Insertable<UserEvent>): Promise<UserEventForMember> {
-      return db
+    async create(record: Insertable<UserEvent>): Promise<number> {
+      const result = await db
         .insertInto('userEvent')
         .values(record)
-        .returning(userEventKeysForMembers)
+        .returning('id')
         .executeTakeFirstOrThrow()
+      return result.id
     },
 
     async updateRole(

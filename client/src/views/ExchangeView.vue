@@ -50,6 +50,13 @@ async function createEvent() {
       title: form.value.title,
     })
 
+    await trpc.userEvent.createUserEvent.mutate({
+      userId: user.value.sub,
+      eventId: createdEventId,
+      eventTitle: form.value.title,
+      role: 'admin',
+    })
+
     invitationStore.setEventDetails(form.value.date, user.value?.given_name || '')
 
     form.value = {

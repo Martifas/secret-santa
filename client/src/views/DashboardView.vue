@@ -43,9 +43,11 @@ async function loadUserEvents() {
     const events = await trpc.userEvent.getUserEvents.query({
       userId: user.value.sub,
     })
-
+    console.log('Loaded events:', events)
     userEvents.value = events ?? []
-  } catch {}
+  } catch (error) {
+    console.error('Failed to load user events:', error)
+  }
 }
 
 onMounted(() => {
@@ -59,30 +61,29 @@ onMounted(() => {
     <div class="mt-7 flex flex-wrap justify-center gap-3">
       <DashboardContainer>
         <DashboardContainerHeading>Your Exchanges</DashboardContainerHeading>
-        <template>
-          <div class="p-1">
-            <div v-if="userEvents.length === 0" class="text-gray-500">
-              You don't have any events yet.
-            </div>
-            <div v-else class="flex justify-center gap-10">
-              <div
-                v-for="event in userEvents"
-                :key="event.id"
-                class="flex aspect-square size-32 place-items-end justify-center rounded-lg bg-cover bg-center p-4 sm:size-40"
-                :style="{
-                  backgroundImage: `url(https://cdn.pixabay.com/photo/2017/10/20/20/37/gift-boxes-2872745_960_720.png)`,
-                }"
-              >
-                <div class="h-15 rounded-lg bg-white p-1">
-                  <h3 class="text-center font-medium text-pretty text-black sm:text-lg">
-                    {{ event.id }}
-                  </h3>
-                </div>
+        <div class="p-1">
+          <div v-if="userEvents.length === 0" class="text-gray-500">
+            You don't have any events yet.
+          </div>
+          <div v-else class="flex justify-center gap-10">
+            <div
+              v-for="event in userEvents"
+              :key="event.id"
+              class="flex aspect-square size-32 place-items-end justify-center rounded-lg bg-cover bg-center p-4 sm:size-40"
+              :style="{
+                backgroundImage: `url(https://cdn.pixabay.com/photo/2017/10/20/20/37/gift-boxes-2872745_960_720.png)`,
+              }"
+            >
+              <div class="h-15 rounded-lg bg-white p-1">
+                <h3 class="text-center font-medium text-pretty text-black sm:text-lg">
+                  {{ event.eventTitle }}
+                </h3>
               </div>
             </div>
           </div>
-        </template>
+        </div>
       </DashboardContainer>
+
       <DashboardContainer>
         <DashboardContainerHeading>Your Wishlists</DashboardContainerHeading>
         <WishlistContainer :wishlists="userWishlists" />
