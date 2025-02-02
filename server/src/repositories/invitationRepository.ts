@@ -31,6 +31,18 @@ export function invitationRepository(db: Database) {
         .executeTakeFirst()
       return result ?? null
     },
+    async findPendingInvitationsForEvent(
+      eventId: number
+    ): Promise<InvitationForMember[]> {
+      const results = await db
+        .selectFrom('eventInvitations')
+        .select(invitationKeysForMembers)
+        .where('eventId', '=', eventId)
+        .where('status', '=', 'sent')
+        .execute()
+
+      return results
+    },
     async findAllForUser(userId: string): Promise<InvitationRowSelect[]> {
       return db
         .selectFrom('eventInvitations')
@@ -38,6 +50,7 @@ export function invitationRepository(db: Database) {
         .where('userId', '=', userId)
         .execute()
     },
+
     async create(invitation: Insertable<EventInvitations>): Promise<number> {
       const result = await db
         .insertInto('eventInvitations')
@@ -60,6 +73,22 @@ export function invitationRepository(db: Database) {
         .where('id', '=', id)
         .returning(invitationKeysForMembers)
         .executeTakeFirstOrThrow()
+    },
+    async updateStatus(
+      id: number,
+      status: string
+    ): Promise<number> {
+      const result = await db
+        .updateTable('eventInvitations')
+        .set({
+          status,
+          updatedAt: new Date(),
+        })
+        .where('id', '=', id)
+        .returning(['id'])
+        .executeTakeFirstOrThrow()
+
+      return result.id
     },
 
     async remove(id: number): Promise<InvitationForMember> {

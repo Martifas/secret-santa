@@ -1,28 +1,75 @@
 <script setup lang="ts">
 import ActionButton from '@/components/ActionButton.vue'
 import { trpc } from '@/trpc'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
-defineProps<{
-  id: string
+const props = defineProps<{
+  id: number
   response: 'accept' | 'refuse'
   eventId: number
 }>()
 
 const route = useRoute()
 const router = useRouter()
+const isLoading = ref(false)
+const error = ref<Error | null>(null)
+const invitationId = parseInt(route.params.id as string, 10)
+
+async function setStatus(status: string) {
+  try {
+    await trpc.invitation.updateInvitationStatus.mutate({ 
+      id: invitationId, 
+      status: status 
+    })
+  } catch (err) {
+    throw new Error(`Failed to set status: ${err instanceof Error ? err.message : String(err)}`)
+  }
+}
+
+async function updateUserInvitationStatus(status: string) {
+  if (isLoading.value) return
+  
+  isLoading.value = true
+  error.value = null
+  
+  try {
+    await setStatus(status)
+    await router.push({
+      name: 'ExchangeDetails',
+      params: { id: props.eventId },
+    })
+  } catch (err) {
+    error.value = err instanceof Error ? err : new Error('Failed to update invitation status')
+    console.error('Failed to update invitation status:', err)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(async () => {
+  if (props.response === 'refuse') {
+    await setStatus('declined')
+  }
+})
 </script>
 
 <template>
   <div class="flex justify-center p-6">
+    <div v-if="error" class="mb-4 rounded-lg bg-red-100 p-4 text-red-700">
+      {{ error.message }}
+    </div>
+    
     <div v-if="response === 'accept'" class="max-w-4xl text-center">
       <p class="mb-4 text-3xl font-bold">Welcome to the Gift Exchange!</p>
       <div class="flex justify-center">
-        <ActionButton @click="router.push({ name: 'ExchangeDetails', params: { id: eventId } })"
-          >Take me to the event!</ActionButton
+        <ActionButton 
+          :disabled="isLoading"
+          @click="updateUserInvitationStatus('accepted')"
         >
+          {{ isLoading ? 'Processing...' : 'Take me to the event!' }}
+        </ActionButton>
       </div>
-      <!-- Additional welcome content can go here -->
     </div>
 
     <div v-else class="max-w-4xl">
@@ -31,15 +78,16 @@ const router = useRouter()
         <p class="mb-6">
           While you can't join this time, here are some other ways to join the fun:
         </p>
-
         <div class="mb-8 flex flex-col items-center gap-4">
           <button
-            class="w-sm rounded-lg bg-green-900 px-4 py-2 text-white hover:bg-green-700 sm:w-lg"
+            :disabled="isLoading"
+            class="w-sm rounded-lg bg-green-900 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50 sm:w-lg"
           >
             Create Your Own Gift Exchange
           </button>
           <button
-            class="w-sm rounded-lg bg-green-900 px-4 py-2 text-white hover:bg-green-700 sm:w-lg"
+            :disabled="isLoading"
+            class="w-sm rounded-lg bg-green-900 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50 sm:w-lg"
           >
             Start Your Wishlist
           </button>
@@ -54,7 +102,7 @@ const router = useRouter()
             for you? It's a great way to bring friends and family together!
           </p>
         </div>
-
+        
         <div>
           <h2 class="pt-7 pb-2 text-xl font-bold">Easy Steps to Get Started</h2>
           <ul class="list-disc space-y-2 pl-5">

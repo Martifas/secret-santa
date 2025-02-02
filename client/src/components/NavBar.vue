@@ -20,6 +20,7 @@ import { useAuth0 } from '@auth0/auth0-vue'
 import { computed, watch } from 'vue'
 import { trpc } from '@/trpc'
 import { useRouter } from 'vue-router'
+import pic from '../assets/profile.png'
 
 const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0()
 const router = useRouter()
@@ -139,8 +140,8 @@ const navigation = computed(() => {
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">Open user menu</span>
                 <img
-                  :src="user?.picture"
-                  :alt="`${user?.name}'s profile picture`"
+                  :src="user?.picture || pic"
+                  @error="($event.target as HTMLImageElement).src = pic"
                   class="m-0.5 size-8 rounded-full"
                   crossorigin="anonymous"
                 />

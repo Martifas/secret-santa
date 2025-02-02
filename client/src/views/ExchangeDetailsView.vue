@@ -5,6 +5,7 @@ import { useAuth0 } from '@auth0/auth0-vue'
 import type { EventForMember } from '@server/entities/event'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import pic from '../assets/profile.png'
 
 const { user } = useAuth0()
 const route = useRoute()
@@ -12,6 +13,8 @@ const eventDetails = ref<EventForMember | null>(null)
 const eventId = parseInt(route.params.id as string, 10)
 const isValidMember = ref<boolean | null>(null)
 const isCreator = ref<boolean | null>(null)
+const pendingInvitations = ref<number | null>(null)
+const eventMembers = ref<{ firstName: string | null; picture: string | null }[] | null>(null)
 
 async function validateMember() {
   try {
@@ -45,6 +48,26 @@ async function validateMember() {
   }
 }
 
+async function getEventMembers() {
+  try {
+    const members = await trpc.user.getUserNameAndPIcByEvent.query({ eventId: eventId })
+    eventMembers.value = members
+  } catch (error) {
+    console.error('Error fetching event members:', error)
+    eventMembers.value = null
+  }
+}
+
+async function getPendingInvitations() {
+  try {
+    const invitations = await trpc.invitation.getPendingInvitations.query({ eventId: eventId })
+    pendingInvitations.value = invitations.length
+  } catch (error) {
+    console.error('Error fetching invitations:', error)
+    eventMembers.value = null
+  }
+}
+
 async function updateInviteesUserEvent() {
   try {
     if (!user.value?.sub || !user.value.email) {
@@ -69,6 +92,8 @@ onMounted(async () => {
   await validateMember()
   if (isValidMember.value) {
     await updateInviteesUserEvent()
+    await getEventMembers()
+    await getPendingInvitations()
   }
 })
 </script>
@@ -148,8 +173,45 @@ onMounted(async () => {
         <div class="flex flex-col gap-6 md:flex-row">
           <!-- Left Container -->
           <div class="w-full md:w-1/2">
-            <div class="flex h-64 items-center justify-center rounded-lg bg-gray-100">
-              <p class="text-gray-500">Left Container Content</p>
+            <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+              <!-- Header -->
+              <div class="border-b border-gray-200 p-6">
+                <h2 class="text-lg font-bold tracking-wide text-gray-900 uppercase">
+                  The Guest List
+                </h2>
+
+                <!-- Stats -->
+                <div class="mt-2 flex space-x-4 text-sm text-gray-600">
+                  <span>{{ eventMembers?.length || 0 }} joined</span>
+                  <span>•</span>
+                  <span>{{ pendingInvitations || 0 }} awaiting reply</span>
+                </div>
+              </div>
+
+              <!-- Members List -->
+              <div class="p-6">
+                <h3 class="mb-4 text-sm font-medium text-gray-900">Joined members</h3>
+
+                <div class="space-y-3">
+                  <div v-if="eventMembers" class="space-y-3">
+                    <div
+                      v-for="(member, index) in eventMembers"
+                      :key="member.firstName || `member-${index}`"
+                      class="flex items-center space-x-3 rounded-lg p-2 hover:bg-gray-50"
+                    >
+                      <img
+                        :src="member.picture || pic"
+                        @error="($event.target as HTMLImageElement).src = pic"
+                        class="h-10 w-10 rounded-full object-cover"
+                      />
+                      <span class="font-medium text-gray-900">{{
+                        member.firstName || 'Unknown User'
+                      }}</span>
+                    </div>
+                  </div>
+                  <div v-else class="py-4 text-center text-gray-500">Loading members...</div>
+                </div>
+              </div>
             </div>
           </div>
 

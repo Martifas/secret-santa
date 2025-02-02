@@ -27,6 +27,17 @@ export function userRepository(db: Database) {
         .executeTakeFirst()
       return user ?? null
     },
+    async findNameAndPicByAuth0Id(auth0Id: string): Promise<{firstName: string | null, picture: string | null}> {
+      const result = await db
+        .selectFrom('user')
+        .select(['firstName', 'picture'])
+        .where('auth0Id', '=', auth0Id)
+        .executeTakeFirst()
+      return {
+        firstName: result?.firstName ?? null,
+        picture: result?.picture ?? null
+      }
+    },
     async findById(id: number): Promise<UserForMember | null> {
       const user = await db
         .selectFrom('user')

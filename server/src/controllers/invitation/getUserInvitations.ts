@@ -11,9 +11,9 @@ export default authenticatedProcedure
   )
   .query(
     async ({ ctx: { repos, authUser } }): Promise<InvitationForMember[]> => {
-      const events = await repos.invitationRepository.findAllForUser(
+      const invitations = await repos.invitationRepository.findAllForUser(
         authUser.auth0Id
       )
-      return events
+      return invitations
     }
   )
