@@ -4,13 +4,14 @@ import { trpc } from '@/trpc'
 import { useAuth0 } from '@auth0/auth0-vue'
 import type { EventForMember } from '@server/entities/event'
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import pic from '../assets/profile.png'
 import ActionButton from '@/components/ActionButton.vue'
 import { NoSymbolIcon, TrashIcon } from '@heroicons/vue/24/outline'
 
 const { user } = useAuth0()
 const route = useRoute()
+const router = useRouter()
 const eventDetails = ref<EventForMember | null>(null)
 const eventId = parseInt(route.params.id as string, 10)
 const isValidMember = ref<boolean | null>(null)
@@ -89,6 +90,15 @@ async function updateInviteesUserEvent() {
     }
   } catch (error) {
     console.error('Error creating user event:', error)
+  }
+}
+
+async function deleteEvent() {
+  try {
+    await trpc.event.removeEvent.mutate({ id: eventId })
+    router.push({ name: 'Dashboard' })
+  } catch (error) {
+    console.error('Error deleting event:', error)
   }
 }
 
@@ -184,7 +194,11 @@ onMounted(async () => {
                   </p>
                 </div>
                 <div v-if="isCreator" class="my-auto w-full sm:w-auto">
-                  <ActionButton variant="danger" size="sm" class="w-full min-w-30 sm:w-auto"
+                  <ActionButton
+                    variant="danger"
+                    size="sm"
+                    @click="deleteEvent"
+                    class="w-full min-w-30 sm:w-auto"
                     >Delete Event</ActionButton
                   >
                 </div>
@@ -303,12 +317,15 @@ onMounted(async () => {
                       <option value="">Select a wishlist...</option>
                     </select>
                   </div>
-                  <div class="space-y-2 flex flex-row justify-between">
+                  <div class="flex flex-row justify-between space-y-2">
                     <h3 class="text-md font-medium text-gray-700">Wishlist for this event:</h3>
                     <p class="text-gray-600">No wishlist selected</p>
                   </div>
-                  <div class="pt-2 flex justify-end">
-                    <ActionButton size="sm" class="w-full sm:w-auto"
+                  <div class="flex justify-end pt-2">
+                    <ActionButton
+                      @click="router.push({ name: 'Wishlist' })"
+                      size="sm"
+                      class="w-full sm:w-auto"
                       >Create New Wishlist</ActionButton
                     >
                   </div>

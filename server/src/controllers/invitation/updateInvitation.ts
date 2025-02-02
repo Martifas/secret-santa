@@ -5,9 +5,9 @@ import {
   type InvitationForMember,
 } from '@server/entities/eventInvitation'
 import { TRPCError } from '@trpc/server'
-import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
-export default groupAdminProcedure
+export default authenticatedProcedure
   .use(
     provideRepos({
       invitationRepository,

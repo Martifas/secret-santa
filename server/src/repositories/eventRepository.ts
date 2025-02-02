@@ -40,12 +40,14 @@ export function eventRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async remove(id: number): Promise<EventForMember> {
-      return db
+    async remove(id: number): Promise<number> {
+      const result = await db
         .deleteFrom('event')
         .where('id', '=', id)
-        .returning(eventKeysForMembers)
+        .returning('id')
         .executeTakeFirstOrThrow()
+
+      return result.id
     },
   }
 }

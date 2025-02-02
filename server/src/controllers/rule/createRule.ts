@@ -2,9 +2,9 @@ import provideRepos from '@server/trpc/provideRepos'
 import { eventRuleSchema, type RuleForMember } from '@server/entities/eventRule'
 import { ruleRepository } from '@server/repositories/ruleRepository'
 import { userEventRepository } from '@server/repositories/userEventRepository'
-import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
-export default groupAdminProcedure
+export default authenticatedProcedure
   .use(
     provideRepos({
       ruleRepository,

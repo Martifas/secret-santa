@@ -5,9 +5,9 @@ import { z } from 'zod'
 import { assertError } from '@server/utils/errors'
 import { TRPCError } from '@trpc/server'
 import { idSchema } from '@server/entities/shared'
-import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
-export default groupAdminProcedure
+export default authenticatedProcedure
   .use(
     provideRepos({
       eventRepository,

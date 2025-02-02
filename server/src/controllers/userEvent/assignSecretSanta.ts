@@ -1,11 +1,11 @@
 import { userEventSchema } from '@server/entities/userEvent'
 import { userEventRepository } from '@server/repositories/userEventRepository'
-import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import provideRepos from '@server/trpc/provideRepos'
 import assignSantas from '@server/utils/assignSantas'
 import { TRPCError } from '@trpc/server'
 
-export default groupAdminProcedure
+export default authenticatedProcedure
   .use(
     provideRepos({
       userEventRepository,

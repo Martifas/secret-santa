@@ -1,8 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TRPCError } from '@trpc/server'
 import { authenticatedProcedure } from '../authenticatedProcedure'
+import provideRepos from '../provideRepos'
+import { userEventRepository } from '@server/repositories/userEventRepository'
 
-export const groupAdminProcedure = authenticatedProcedure.use(
-  async ({ ctx, next, rawInput }) => {
+export const groupAdminProcedure = authenticatedProcedure
+  .use(
+    provideRepos({
+      userEventRepository,
+    })
+  )
+  .use(async ({ ctx, next, rawInput }) => {
     if (!ctx.repos?.userEventRepository) {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
@@ -10,11 +18,19 @@ export const groupAdminProcedure = authenticatedProcedure.use(
       })
     }
 
-    const input = rawInput as { eventId: number }
+    const input = rawInput as { eventId: number | undefined }
+    const eventId = input.eventId || (input as any).id
+
+    if (!eventId) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Event ID not provided',
+      })
+    }
 
     const isAdmin = await ctx.repos.userEventRepository.isEventAdmin(
       ctx.authUser.auth0Id,
-      input.eventId
+      eventId
     )
 
     if (!isAdmin) {
@@ -30,5 +46,4 @@ export const groupAdminProcedure = authenticatedProcedure.use(
         isEventAdmin: true,
       },
     })
-  }
-)
+  })

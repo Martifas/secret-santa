@@ -1,4 +1,3 @@
-import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
 import provideRepos from '@server/trpc/provideRepos'
 import { userEventRepository } from '@server/repositories/userEventRepository'
 import {
@@ -6,8 +5,9 @@ import {
   type UserEventForMember,
 } from '@server/entities/userEvent'
 import { TRPCError } from '@trpc/server'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
-export default groupAdminProcedure
+export default authenticatedProcedure
   .use(
     provideRepos({
       userEventRepository,

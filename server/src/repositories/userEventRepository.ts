@@ -51,6 +51,13 @@ export function userEventRepository(db: Database) {
         .executeTakeFirst()
       return result ?? null
     },
+    async findByEventId(eventId: number): Promise<UserEventForMember[]> {
+      return db
+        .selectFrom('userEvent')
+        .where('eventId', '=', eventId)
+        .selectAll()
+        .execute()
+    },
     async create(record: Insertable<UserEvent>): Promise<number> {
       const result = await db
         .insertInto('userEvent')
@@ -79,7 +86,7 @@ export function userEventRepository(db: Database) {
       const result = await db
         .selectFrom('userEvent')
         .select('id')
-        .where('role', '=', 'event_admin')
+        .where('role', '=', 'admin')
         .where('eventId', '=', eventId)
         .where('userId', '=', userId)
         .executeTakeFirst()
@@ -97,12 +104,14 @@ export function userEventRepository(db: Database) {
       return result !== undefined
     },
 
-    async remove(id: number): Promise<UserEventForMember> {
-      return db
+    async removeByEventId(eventId: number): Promise<number[]> {
+      const result = await db
         .deleteFrom('userEvent')
-        .where('id', '=', id)
-        .returning(userEventKeysForMembers)
-        .executeTakeFirstOrThrow()
+        .where('eventId', '=', eventId)
+        .returning('id')
+        .execute()
+
+      return result.map((row) => row.id)
     },
   }
 }

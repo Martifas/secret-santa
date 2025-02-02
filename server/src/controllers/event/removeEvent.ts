@@ -1,13 +1,17 @@
-import { eventSchema, type EventForMember } from '@server/entities/event'
 import provideRepos from '@server/trpc/provideRepos'
+import { userEventRepository } from '@server/repositories/userEventRepository'
 import { eventRepository } from '@server/repositories/eventRepository'
+import { invitationRepository } from '@server/repositories/invitationRepository'
+import { eventSchema } from '@server/entities/event'
 import { TRPCError } from '@trpc/server'
-import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
+import { groupAdminProcedure } from '@server/trpc/groupdAdminProcedure'
 
 export default groupAdminProcedure
   .use(
     provideRepos({
+      userEventRepository,
       eventRepository,
+      invitationRepository,
     })
   )
   .input(
@@ -16,7 +20,10 @@ export default groupAdminProcedure
     })
   )
   .mutation(
-    async ({ input: { id }, ctx: { repos } }): Promise<EventForMember> => {
+    async ({
+      input: { id },
+      ctx: { repos },
+    }): Promise<{ success: boolean }> => {
       const event = await repos.eventRepository.find(id)
       if (!event) {
         throw new TRPCError({
@@ -25,6 +32,10 @@ export default groupAdminProcedure
         })
       }
 
-      return repos.eventRepository.remove(id)
+      await repos.invitationRepository.removeByEventId(id)
+      await repos.userEventRepository.removeByEventId(id)
+      await repos.eventRepository.remove(id)
+
+      return { success: true }
     }
   )

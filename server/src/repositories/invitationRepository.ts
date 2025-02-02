@@ -74,10 +74,7 @@ export function invitationRepository(db: Database) {
         .returning(invitationKeysForMembers)
         .executeTakeFirstOrThrow()
     },
-    async updateStatus(
-      id: number,
-      status: string
-    ): Promise<number> {
+    async updateStatus(id: number, status: string): Promise<number> {
       const result = await db
         .updateTable('eventInvitations')
         .set({
@@ -91,12 +88,14 @@ export function invitationRepository(db: Database) {
       return result.id
     },
 
-    async remove(id: number): Promise<InvitationForMember> {
-      return db
+    async removeByEventId(eventId: number): Promise<number[]> {
+      const result = await db
         .deleteFrom('eventInvitations')
-        .where('id', '=', id)
-        .returning(invitationKeysForMembers)
-        .executeTakeFirstOrThrow()
+        .where('eventId', '=', eventId)
+        .returning('id')
+        .execute()
+
+      return result.map((row) => row.id)
     },
   }
 }
