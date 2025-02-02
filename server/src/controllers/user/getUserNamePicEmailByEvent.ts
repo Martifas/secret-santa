@@ -21,7 +21,7 @@ export default authenticatedProcedure
     async ({
       input,
       ctx: { repos },
-    }): Promise<{ firstName: string | null; picture: string | null }[]> => {
+    }): Promise<{ firstName: string | null; picture: string | null; email: string | null }[]> => {
       const userIds = await repos.userEventRepository.getAllEventUsers(
         input.eventId
       )
@@ -34,12 +34,13 @@ export default authenticatedProcedure
 
       const userInfos = await Promise.all(
         userIds.map(async (user) => {
-          const userInfo = await repos.userRepository.findNameAndPicByAuth0Id(
+          const userInfo = await repos.userRepository.findNamePicEmailByAuth0Id(
             user.userId
           )
           return {
             firstName: userInfo?.firstName ?? 'Unknown User',
             picture: userInfo?.picture ?? null,
+            email: userInfo?.email ?? null,
           }
         })
       )

@@ -6,6 +6,8 @@ import type { EventForMember } from '@server/entities/event'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import pic from '../assets/profile.png'
+import ActionButton from '@/components/ActionButton.vue'
+import { NoSymbolIcon, TrashIcon } from '@heroicons/vue/24/outline'
 
 const { user } = useAuth0()
 const route = useRoute()
@@ -14,7 +16,9 @@ const eventId = parseInt(route.params.id as string, 10)
 const isValidMember = ref<boolean | null>(null)
 const isCreator = ref<boolean | null>(null)
 const pendingInvitations = ref<number | null>(null)
-const eventMembers = ref<{ firstName: string | null; picture: string | null }[] | null>(null)
+const eventMembers = ref<
+  { firstName: string | null; picture: string | null; email: string | null }[] | null
+>(null)
 
 async function validateMember() {
   try {
@@ -50,7 +54,7 @@ async function validateMember() {
 
 async function getEventMembers() {
   try {
-    const members = await trpc.user.getUserNameAndPIcByEvent.query({ eventId: eventId })
+    const members = await trpc.user.getUserNamePicEmailByEvent.query({ eventId: eventId })
     eventMembers.value = members
   } catch (error) {
     console.error('Error fetching event members:', error)
@@ -113,22 +117,30 @@ onMounted(async () => {
       <!-- Loading state -->
       <div
         v-else-if="isValidMember === null"
-        class="rounded-xl border border-gray-200 bg-white p-6 text-center shadow-lg"
+        class="border-gray-00 rounded-xl border bg-white p-6 text-center shadow-lg"
       >
         <p class="text-gray-500">Validating access...</p>
       </div>
 
       <!-- Event details (only shown if user is validated) -->
       <div v-else>
-        <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-lg">
+        <div class="mb-6 rounded-xl border-1 border-gray-200 bg-white shadow-lg">
           <div v-if="!eventDetails" class="p-6 text-center text-gray-500">No event details!</div>
           <div v-else class="flex flex-col">
             <!-- Status and Dates Row -->
-            <div
-              class="flex flex-col divide-y divide-gray-200 md:flex-row md:divide-x md:divide-y-0"
-            >
+            <div class="flex flex-col sm:flex-row">
+              <div
+                class="flex-1 border-b-1 border-gray-200 p-6 transition-colors hover:bg-gray-50 sm:border-0 sm:border-r-1"
+              >
+                <div class="space-y-2">
+                  <h3 class="text-sm font-bold tracking-wide uppercase">Title</h3>
+                  <p class="text-lg font-medium text-gray-900">{{ eventDetails.title }}</p>
+                </div>
+              </div>
               <!-- Draw Status -->
-              <div class="flex-1 p-6 transition-colors hover:bg-gray-50">
+              <div
+                class="flex-1 border-b-1 border-gray-200 p-6 transition-colors hover:bg-gray-50 sm:border-0 sm:border-r-1"
+              >
                 <div class="space-y-2">
                   <h3 class="text-sm font-bold tracking-wide uppercase">Your Draw</h3>
                   <p class="text-lg font-medium text-gray-900">Not Drawn Yet</p>
@@ -136,7 +148,9 @@ onMounted(async () => {
               </div>
 
               <!-- Exchange Date -->
-              <div class="flex-1 p-6 transition-colors hover:bg-gray-50">
+              <div
+                class="flex-1 border-b-1 border-gray-200 p-6 transition-colors hover:bg-gray-50 sm:border-0 sm:border-r-1"
+              >
                 <div class="space-y-2">
                   <h3 class="text-sm font-bold tracking-wide uppercase">Exchange Date</h3>
                   <p class="text-lg font-medium text-gray-900">
@@ -162,9 +176,19 @@ onMounted(async () => {
 
             <!-- Message Box -->
             <div class="border-t border-gray-200 p-6">
-              <p class="text-base text-gray-600">
-                {{ eventDetails.description }} - {{ user?.given_name }}
-              </p>
+              <div class="flex flex-col space-y-4 sm:flex-row">
+                <div class="w-full">
+                  <h3 class="text-sm font-bold tracking-wide uppercase">Description</h3>
+                  <p class="text-gray-600">
+                    {{ eventDetails.description }} - {{ user?.given_name }}
+                  </p>
+                </div>
+                <div v-if="isCreator" class="my-auto w-full sm:w-auto">
+                  <ActionButton variant="danger" size="sm" class="w-full min-w-30 sm:w-auto"
+                    >Delete Event</ActionButton
+                  >
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -176,40 +200,84 @@ onMounted(async () => {
             <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
               <!-- Header -->
               <div class="border-b border-gray-200 p-6">
-                <h2 class="text-lg font-bold tracking-wide text-gray-900 uppercase">
+                <h2 class="font-bold tracking-wide text-gray-900 uppercase sm:text-lg">
                   The Guest List
                 </h2>
 
                 <!-- Stats -->
-                <div class="mt-2 flex space-x-4 text-sm text-gray-600">
-                  <span>{{ eventMembers?.length || 0 }} joined</span>
-                  <span>•</span>
-                  <span>{{ pendingInvitations || 0 }} awaiting reply</span>
+                <div class="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:space-y-0">
+                  <div class="flex space-x-1 text-gray-600">
+                    <span class="my-auto text-sm text-nowrap sm:text-lg"
+                      >{{ eventMembers?.length || 0 }} joined</span
+                    >
+                    <span class="my-auto text-sm sm:text-lg">•</span>
+                    <span class="my-auto text-sm text-nowrap sm:text-lg"
+                      >{{ pendingInvitations || 0 }} awaiting reply</span
+                    >
+                  </div>
+                  <div v-if="isCreator" class="w-full sm:w-auto">
+                    <ActionButton size="sm" class="w-full sm:w-auto">Invite</ActionButton>
+                  </div>
                 </div>
               </div>
 
               <!-- Members List -->
-              <div class="p-6">
-                <h3 class="mb-4 text-sm font-medium text-gray-900">Joined members</h3>
+              <div class="border-b border-gray-200 p-6">
+                <h3 class="text-md mb-4 font-bold tracking-wide text-gray-900 uppercase sm:text-lg">
+                  Joined members
+                </h3>
 
                 <div class="space-y-3">
                   <div v-if="eventMembers" class="space-y-3">
                     <div
                       v-for="(member, index) in eventMembers"
                       :key="member.firstName || `member-${index}`"
-                      class="flex items-center space-x-3 rounded-lg p-2 hover:bg-gray-50"
+                      class="flex items-center justify-between rounded-lg p-2 text-lg"
                     >
-                      <img
-                        :src="member.picture || pic"
-                        @error="($event.target as HTMLImageElement).src = pic"
-                        class="h-10 w-10 rounded-full object-cover"
-                      />
-                      <span class="font-medium text-gray-900">{{
-                        member.firstName || 'Unknown User'
-                      }}</span>
+                      <div class="flex items-center space-x-3">
+                        <img
+                          :src="member.picture || pic"
+                          @error="($event.target as HTMLImageElement).src = pic"
+                          class="h-10 w-10 rounded-full object-cover"
+                        />
+                        <span class="font-medium text-gray-900">{{
+                          member.firstName || 'Unknown User'
+                        }}</span>
+                      </div>
+                      <span v-if="isCreator && member.email !== user?.email" title="Delete member">
+                        <TrashIcon class="size-8 cursor-pointer text-gray-800 hover:text-red-500" />
+                      </span>
+                      <span
+                        v-else-if="!isCreator && member.email === user?.email"
+                        title="Leave event"
+                      >
+                        <NoSymbolIcon
+                          class="size-8 cursor-pointer text-gray-800 hover:text-red-500"
+                        />
+                      </span>
                     </div>
                   </div>
                   <div v-else class="py-4 text-center text-gray-500">Loading members...</div>
+                </div>
+              </div>
+              <!-- Draw Status Section -->
+              <div class="p-6">
+                <div
+                  v-if="eventMembers && eventMembers.length < 3"
+                  class="rounded-lg bg-yellow-50 p-4 text-center text-yellow-700"
+                >
+                  <p>
+                    Not enough members to start Secret Santa assignment. Need at least 3
+                    participants.
+                  </p>
+                </div>
+                <div
+                  v-else-if="eventMembers && eventMembers.length >= 3"
+                  class="flex w-full justify-center sm:w-auto"
+                >
+                  <ActionButton size="sm" class="w-full sm:w-auto">
+                    Draw Names for Secret Santa
+                  </ActionButton>
                 </div>
               </div>
             </div>
@@ -217,8 +285,46 @@ onMounted(async () => {
 
           <!-- Right Container -->
           <div class="w-full md:w-1/2">
-            <div class="flex h-64 items-center justify-center rounded-lg bg-gray-100">
-              <p class="text-gray-500">Right Container Content</p>
+            <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+              <!-- Your Wishlist Section -->
+              <div class="border-b border-gray-200 p-6">
+                <h2 class="mb-4 font-bold tracking-wide text-gray-900 uppercase sm:text-lg">
+                  Your Wishlist
+                </h2>
+                <div class="space-y-4">
+                  <div class="flex flex-col space-y-2">
+                    <label for="wishlist-select" class="text-sm font-medium text-gray-700"
+                      >Select Wishlist</label
+                    >
+                    <select
+                      id="wishlist-select"
+                      class="rounded-lg border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
+                    >
+                      <option value="">Select a wishlist...</option>
+                    </select>
+                  </div>
+                  <div class="space-y-2 flex flex-row justify-between">
+                    <h3 class="text-md font-medium text-gray-700">Wishlist for this event:</h3>
+                    <p class="text-gray-600">No wishlist selected</p>
+                  </div>
+                  <div class="pt-2 flex justify-end">
+                    <ActionButton size="sm" class="w-full sm:w-auto"
+                      >Create New Wishlist</ActionButton
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Your Draw Wishlist Section -->
+              <div class="p-6">
+                <h2 class="mb-4 font-bold tracking-wide text-gray-900 uppercase sm:text-lg">
+                  Your Draw Wishlist
+                </h2>
+                <div class="rounded-lg bg-gray-50 p-4 text-center text-gray-600">
+                  <p>No wishlist available yet</p>
+                  <p class="text-sm">Wishlists will be revealed after the draw</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

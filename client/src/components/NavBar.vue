@@ -83,7 +83,7 @@ const navigation = computed(() => {
   >
     <div class="container mx-auto max-w-7xl">
       <div class="relative flex h-16 items-center justify-center">
-        <div class="absolute inset-y-0 left-0 flex items-center px-4 sm:hidden">
+        <div class="absolute inset-y-0 left-0 flex items-center px-4 md:hidden">
           <!-- Mobile menu button-->
           <DisclosureButton
             class="relative inline-flex items-center justify-center rounded-md border-1 p-1 text-black hover:bg-green-900 hover:text-white focus:outline-hidden focus:ring-inset"
@@ -94,9 +94,7 @@ const navigation = computed(() => {
             <XMarkIcon v-else class="block size-6" aria-hidden="true" />
           </DisclosureButton>
         </div>
-        <div
-          class="sm:justify-endstart flex flex-1 items-center justify-center sm:items-stretch sm:justify-start!"
-        >
+        <div class="flex flex-1 items-center justify-center sm:items-stretch md:justify-start!">
           <router-link class="flex items-center" :to="{ name: 'Home' }">
             <img
               class="h-8 w-auto"
@@ -105,7 +103,7 @@ const navigation = computed(() => {
             />
           </router-link>
 
-          <div class="hidden sm:ml-6 sm:block">
+          <div class="hidden sm:ml-6 md:block">
             <div class="flex space-x-4">
               <router-link
                 v-for="item in navigation"
