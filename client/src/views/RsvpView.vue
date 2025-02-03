@@ -107,8 +107,7 @@ onMounted(async () => {
           <h2 class="pt-7 pb-2 text-xl font-bold">Easy Steps to Get Started</h2>
           <ul class="list-disc space-y-2 pl-5">
             <li><b>Pick a date:</b> Choose a time that works best for your group</li>
-            <li><b>Invite your people:</b> We'll help you send out invitations</li>
-            <li><b>Set the rules:</b> Budget, theme, or keep it simple - it's up to you!</li>
+            <li><b>Invite your people:</b> We'll help you send out invitations</li>         
             <li><b>Let the matching begin:</b> We'll handle the random assignments</li>
           </ul>
         </div>
