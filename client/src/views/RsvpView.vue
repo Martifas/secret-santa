@@ -18,21 +18,31 @@ const invitationId = parseInt(route.params.id as string, 10)
 
 async function setStatus(status: string) {
   try {
-    await trpc.invitation.updateInvitationStatus.mutate({ 
-      id: invitationId, 
-      status: status 
+    await trpc.invitation.updateInvitationStatus.mutate({
+      id: invitationId,
+      status: status,
     })
   } catch (err) {
     throw new Error(`Failed to set status: ${err instanceof Error ? err.message : String(err)}`)
   }
 }
 
+async function deleteDeclinedInvitation(invitationId: number) {
+  try {
+    await trpc.invitation.deleteInvitation.mutate({ id: invitationId })
+  } catch (err) {
+    throw new Error(
+      `Failed to delete invitation: ${err instanceof Error ? err.message : String(err)}`
+    )
+  }
+}
+
 async function updateUserInvitationStatus(status: string) {
   if (isLoading.value) return
-  
+
   isLoading.value = true
   error.value = null
-  
+
   try {
     await setStatus(status)
     await router.push({
@@ -50,6 +60,7 @@ async function updateUserInvitationStatus(status: string) {
 onMounted(async () => {
   if (props.response === 'refuse') {
     await setStatus('declined')
+    await deleteDeclinedInvitation(invitationId)
   }
 })
 </script>
@@ -59,14 +70,11 @@ onMounted(async () => {
     <div v-if="error" class="mb-4 rounded-lg bg-red-100 p-4 text-red-700">
       {{ error.message }}
     </div>
-    
+
     <div v-if="response === 'accept'" class="max-w-4xl text-center">
       <p class="mb-4 text-3xl font-bold">Welcome to the Gift Exchange!</p>
       <div class="flex justify-center">
-        <ActionButton 
-          :disabled="isLoading"
-          @click="updateUserInvitationStatus('accepted')"
-        >
+        <ActionButton :disabled="isLoading" @click="updateUserInvitationStatus('accepted')">
           {{ isLoading ? 'Processing...' : 'Take me to the event!' }}
         </ActionButton>
       </div>
@@ -102,12 +110,12 @@ onMounted(async () => {
             for you? It's a great way to bring friends and family together!
           </p>
         </div>
-        
+
         <div>
           <h2 class="pt-7 pb-2 text-xl font-bold">Easy Steps to Get Started</h2>
           <ul class="list-disc space-y-2 pl-5">
             <li><b>Pick a date:</b> Choose a time that works best for your group</li>
-            <li><b>Invite your people:</b> We'll help you send out invitations</li>         
+            <li><b>Invite your people:</b> We'll help you send out invitations</li>
             <li><b>Let the matching begin:</b> We'll handle the random assignments</li>
           </ul>
         </div>

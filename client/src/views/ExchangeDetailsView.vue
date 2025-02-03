@@ -12,13 +12,23 @@ import { NoSymbolIcon, TrashIcon } from '@heroicons/vue/24/outline'
 const { user } = useAuth0()
 const route = useRoute()
 const router = useRouter()
+const showDeleteEventPrompt = ref(false)
+const showKickMemberPrompt = ref(false)
+const showLeaveEventPrompt = ref(false)
+const selectedMemberToKick = ref<{ auth0Id: string | null; firstName: string | null } | null>(null)
 const eventDetails = ref<EventForMember | null>(null)
 const eventId = parseInt(route.params.id as string, 10)
 const isValidMember = ref<boolean | null>(null)
 const isCreator = ref<boolean | null>(null)
 const pendingInvitations = ref<number | null>(null)
 const eventMembers = ref<
-  { firstName: string | null; picture: string | null; email: string | null }[] | null
+  | {
+      firstName: string | null
+      picture: string | null
+      email: string | null
+      auth0Id: string | null
+    }[]
+  | null
 >(null)
 
 async function validateMember() {
@@ -53,6 +63,24 @@ async function validateMember() {
   }
 }
 
+async function confirmDeleteEvent() {
+  showDeleteEventPrompt.value = false
+  await deleteEvent()
+}
+
+async function confirmKickMember() {
+  if (selectedMemberToKick.value?.auth0Id) {
+    await kickMember(selectedMemberToKick.value.auth0Id)
+    showKickMemberPrompt.value = false
+    await getEventMembers()
+  }
+}
+
+async function confirmLeaveEvent(userId: string | null) {
+  showLeaveEventPrompt.value = false
+  await leaveEvent(userId)
+}
+
 async function getEventMembers() {
   try {
     const members = await trpc.user.getUserNamePicEmailByEvent.query({ eventId: eventId })
@@ -73,7 +101,7 @@ async function getPendingInvitations() {
   }
 }
 
-async function updateInviteesUserEvent() {
+async function updateInviteesRecords() {
   try {
     if (!user.value?.sub || !user.value.email) {
       console.error('User not authenticated')
@@ -87,9 +115,11 @@ async function updateInviteesUserEvent() {
         eventTitle: eventDetails.value.title,
         role: 'member',
       })
+
+      await trpc.invitation.updateInvitation.mutate({ eventId: eventId, email: user.value.email })
     }
   } catch (error) {
-    console.error('Error creating user event:', error)
+    console.error('Error updating details:', error)
   }
 }
 
@@ -102,10 +132,34 @@ async function deleteEvent() {
   }
 }
 
+async function kickMember(userId: string | null) {
+  try {
+    if (!userId) {
+      console.error('Cannot delete member: userId is null')
+      return
+    }
+    await trpc.userEvent.removeMember.mutate({ userId: userId, eventId: eventId })
+  } catch (error) {
+    console.error('Error removing member:', error)
+  }
+}
+async function leaveEvent(userId: string | null) {
+  try {
+    if (!userId) {
+      console.error('Cannot delete member: userId is null')
+      return
+    }
+    await trpc.userEvent.leaveEvent.mutate({ userId: userId, eventId: eventId })
+    router.push({ name: 'Dashboard' })
+  } catch (error) {
+    console.error('Error leaving:', error)
+  }
+}
+
 onMounted(async () => {
   await validateMember()
   if (isValidMember.value) {
-    await updateInviteesUserEvent()
+    await updateInviteesRecords()
     await getEventMembers()
     await getPendingInvitations()
   }
@@ -197,7 +251,7 @@ onMounted(async () => {
                   <ActionButton
                     variant="danger"
                     size="sm"
-                    @click="deleteEvent"
+                    @click="showDeleteEventPrompt = true"
                     class="w-full min-w-30 sm:w-auto"
                     >Delete Event</ActionButton
                   >
@@ -258,14 +312,23 @@ onMounted(async () => {
                           member.firstName || 'Unknown User'
                         }}</span>
                       </div>
-                      <span v-if="isCreator && member.email !== user?.email" title="Delete member">
-                        <TrashIcon class="size-8 cursor-pointer text-gray-800 hover:text-red-500" />
+                      <span v-if="isCreator && member.email !== user?.email" title="kickMember">
+                        <TrashIcon
+                          @click="
+                            () => {
+                              selectedMemberToKick = member
+                              showKickMemberPrompt = true
+                            }
+                          "
+                          class="size-8 cursor-pointer text-gray-800 hover:text-red-500"
+                        />
                       </span>
                       <span
                         v-else-if="!isCreator && member.email === user?.email"
                         title="Leave event"
                       >
                         <NoSymbolIcon
+                          @click="showLeaveEventPrompt = true"
                           class="size-8 cursor-pointer text-gray-800 hover:text-red-500"
                         />
                       </span>
@@ -347,5 +410,89 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+    <!-- Delete Event Confirmation -->
+    <Teleport to="body">
+      <div
+        v-if="showDeleteEventPrompt"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      >
+        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+          <h3 class="mb-4 text-lg font-semibold">Delete Event</h3>
+          <p class="mb-6 text-gray-600">
+            Are you sure you want to delete this event? This action cannot be undone.
+          </p>
+          <div class="flex justify-end space-x-3">
+            <button
+              @click="showDeleteEventPrompt = false"
+              class="rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-100"
+            >
+              Cancel
+            </button>
+            <button
+              @click="confirmDeleteEvent"
+              class="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Kick Member Confirmation -->
+    <Teleport to="body">
+      <div
+        v-if="showKickMemberPrompt"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      >
+        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+          <h3 class="mb-4 text-lg font-semibold">Remove Member</h3>
+          <p class="mb-6 text-gray-600">
+            Are you sure you want to remove {{ selectedMemberToKick?.firstName }} from this event?
+          </p>
+          <div class="flex justify-end space-x-3">
+            <button
+              @click="showKickMemberPrompt = false"
+              class="rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-100"
+            >
+              Cancel
+            </button>
+            <button
+              @click="confirmKickMember"
+              class="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Leave Event Confirmation -->
+    <Teleport to="body">
+      <div
+        v-if="showLeaveEventPrompt"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      >
+        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+          <h3 class="mb-4 text-lg font-semibold">Leave Event</h3>
+          <p class="mb-6 text-gray-600">Are you sure you want to leave this event?</p>
+          <div class="flex justify-end space-x-3">
+            <button
+              @click="showLeaveEventPrompt = false"
+              class="rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-100"
+            >
+              Cancel
+            </button>
+            <button
+              @click="confirmLeaveEvent(user?.sub ?? null)"
+              class="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+            >
+              Leave
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </Container>
 </template>

@@ -7,7 +7,6 @@ import deleteInvitation from './deleteInvitation'
 import getPendingInvitations from './getPendingInvitations'
 import updateInvitationStatus from './updateInvitationStatus'
 
-
 export default router({
   createAndSendInvitation,
   deleteInvitation,
@@ -15,6 +14,5 @@ export default router({
   getUserInvitations,
   getInvitation,
   getPendingInvitations,
-  updateInvitationStatus
-
+  updateInvitationStatus,
 })

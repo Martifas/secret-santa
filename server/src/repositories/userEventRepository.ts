@@ -99,6 +99,7 @@ export function userEventRepository(db: Database) {
         .select('id')
         .where('eventId', '=', eventId)
         .where('userId', '=', userId)
+        .where('role', '=', 'member')
         .executeTakeFirst()
 
       return result !== undefined
@@ -112,6 +113,19 @@ export function userEventRepository(db: Database) {
         .execute()
 
       return result.map((row) => row.id)
+    },
+    async removeUserByEventId(
+      eventId: number,
+      userId: string
+    ): Promise<number | null> {
+      const result = await db
+        .deleteFrom('userEvent')
+        .where('eventId', '=', eventId)
+        .where('userId', '=', userId)
+        .returning('id')
+        .execute()
+
+      return result[0]?.id ?? null
     },
   }
 }

@@ -3,10 +3,10 @@ import { userEventRepository } from '@server/repositories/userEventRepository'
 import { invitationRepository } from '@server/repositories/invitationRepository'
 import { userEventSchema } from '@server/entities/userEvent'
 import { TRPCError } from '@trpc/server'
-import { groupAdminProcedure } from '@server/trpc/groupdAdminProcedure'
 import { logger } from '@server/logger'
+import { groupMemberProcedure } from '@server/trpc/groupMemberProcedure'
 
-export default groupAdminProcedure
+export default groupMemberProcedure
   .use(
     provideRepos({
       userEventRepository,
@@ -29,16 +29,7 @@ export default groupAdminProcedure
         })
       }
       try {
-        const userEvent = await repos.userEventRepository.findByEventAndUserId(
-          input.eventId,
-          input.userId
-        )
-        if (!userEvent) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'User event membership not found',
-          })
-        }
+        
 
         const removeUserEventId =
           await repos.userEventRepository.removeUserByEventId(

@@ -5,7 +5,7 @@ import assignSecretSanta from './assignSecretSanta'
 import getUserEvents from './getUserEvents'
 import createUserEvent from './createUserEvent'
 import removeUserEventForAllMembers from './removeUserEventForAllMembers'
-import isEventAdmin from './isEventAdmin'
+import leaveEvent from './leaveEvent'
 
 export default router({
   createMember,
@@ -14,5 +14,5 @@ export default router({
   getUserEvents,
   createUserEvent,
   removeUserEventForAllMembers,
-  isEventAdmin
+  leaveEvent
 })

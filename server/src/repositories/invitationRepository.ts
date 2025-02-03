@@ -88,6 +88,16 @@ export function invitationRepository(db: Database) {
       return result.id
     },
 
+    async removeById(id: number): Promise<number> {
+      const [result] = await db
+        .deleteFrom('eventInvitations')
+        .where('id', '=', id)
+        .returning('id')
+        .execute()
+
+      return result.id
+    },
+
     async removeByEventId(eventId: number): Promise<number[]> {
       const result = await db
         .deleteFrom('eventInvitations')
@@ -96,6 +106,19 @@ export function invitationRepository(db: Database) {
         .execute()
 
       return result.map((row) => row.id)
+    },
+    async removeUserByEventId(
+      eventId: number,
+      userId: string
+    ): Promise<number | null> {
+      const result = await db
+        .deleteFrom('eventInvitations')
+        .where('eventId', '=', eventId)
+        .where('userId', '=', userId)
+        .returning('id')
+        .execute()
+
+      return result[0]?.id ?? null
     },
   }
 }

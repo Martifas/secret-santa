@@ -21,7 +21,14 @@ export default authenticatedProcedure
     async ({
       input,
       ctx: { repos },
-    }): Promise<{ firstName: string | null; picture: string | null; email: string | null }[]> => {
+    }): Promise<
+      {
+        firstName: string | null
+        picture: string | null
+        email: string | null
+        auth0Id: string | null
+      }[]
+    > => {
       const userIds = await repos.userEventRepository.getAllEventUsers(
         input.eventId
       )
@@ -41,6 +48,7 @@ export default authenticatedProcedure
             firstName: userInfo?.firstName ?? 'Unknown User',
             picture: userInfo?.picture ?? null,
             email: userInfo?.email ?? null,
+            auth0Id: user.userId ?? null,
           }
         })
       )
