@@ -27,11 +27,11 @@ export function userRepository(db: Database) {
         .executeTakeFirst()
       return user ?? null
     },
-    async findNamePicEmailByAuth0Id(auth0Id: string): Promise<{firstName: string | null, picture: string | null, email: string | null}> {
+    async findNamePicEmailByAuth0Id(userId: string): Promise<{firstName: string | null, picture: string | null, email: string | null}> {
       const result = await db
         .selectFrom('user')
         .select(['firstName', 'picture', 'email'])
-        .where('auth0Id', '=', auth0Id)
+        .where('auth0Id', '=', userId)
         .executeTakeFirst()
       return {
         firstName: result?.firstName ?? null,

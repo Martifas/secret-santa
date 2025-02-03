@@ -1,8 +1,12 @@
+<script setup lang="ts">
+import Container from '@/components/Container.vue'
+</script>
+
 <template>
   <Container>
-    <div class="flex flex-col justify-center rounded-lg bg-white p-8 shadow-lg md:flex-row">
+    <div class="flex flex-col justify-around rounded-lg bg-white p-8 shadow-lg md:flex-row">
       <div
-        class="h-full w-full hidden sm:block max-w-[500px] overflow-hidden rounded-lg object-cover object-center"
+        class="hidden h-full w-full max-w-[500px] overflow-hidden rounded-lg object-cover object-center sm:block"
       >
         <img
           src="https://images.unsplash.com/photo-1507208773393-40d9fc670acf?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -10,7 +14,7 @@
           class="rounded-lg shadow-md"
         />
       </div>
-      <div class="mt-6 my-auto md:ml-8 md:w-1/2 max-w-[300px]">
+      <div class="my-auto mt-6 max-w-[300px] md:ml-8 md:w-1/2">
         <h2 class="text-3xl font-bold text-gray-900">Our Story</h2>
         <h3 class="mt-2 text-xl text-gray-700">The Joy of Giving and Receiving Gifts</h3>
         <p class="mt-4 text-gray-600">
@@ -32,7 +36,3 @@
     </div>
   </Container>
 </template>
-
-<script lang="ts">
-import Container from '@/components/Container.vue'
-</script>

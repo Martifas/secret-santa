@@ -21,29 +21,32 @@ export default groupMemberProcedure
     async ({
       input: { eventId },
       ctx: { repos, authUser },
-    }): Promise<string | null> => {
-      const santaId = await repos.userEventRepository.findSanta(
-        eventId,
-        authUser.auth0Id
+    }): Promise<{ firstName: string | null; santeeId: string }> => {
+      const santeeId = await repos.userEventRepository.findBySantaId(
+        authUser.auth0Id,
+        eventId
       )
 
-      if (!santaId) {
+      if (!santeeId) {
         throw new TRPCError({
           code: 'NOT_FOUND',
-          message: 'No santa assignment found for this event',
+          message: 'No santees assigned for this user this event',
         })
       }
 
-      const santaName =
-        await repos.userRepository.findNamePicEmailByAuth0Id(santaId)
+      const santaAssignment =
+        await repos.userRepository.findNamePicEmailByAuth0Id(santeeId)
 
-      if (!santaName) {
+      if (!santaAssignment) {
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'No santa name found',
         })
       }
 
-      return santaName.firstName
+      return {
+        firstName: santaAssignment.firstName,
+        santeeId: santeeId,
+      }
     }
   )

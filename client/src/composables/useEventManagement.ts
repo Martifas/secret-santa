@@ -8,7 +8,8 @@ export function useEventManagement(eventId: number) {
   const eventDetails = ref<EventForMember | null>(null)
   const isValidMember = ref<boolean | null>(null)
   const isCreator = ref<boolean | null>(null)
-  const secretSantaName = ref<string | null>('')
+  const secretSantaAssignmentName = ref<string | null>('')
+  const secretSantaAssignmentId = ref<string | null>('')
 
   const validateMember = async () => {
     try {
@@ -50,10 +51,11 @@ export function useEventManagement(eventId: number) {
     }
   }
 
-  const getSecretSanta = async () => {
+  const getSecretSantaAssignment = async () => {
     try {
-      const santa = await trpc.userEvent.getSecretSanta.query({ eventId })
-      secretSantaName.value = santa
+      const result = await trpc.userEvent.getSantee.query({ eventId })
+      secretSantaAssignmentName.value = result.firstName
+      secretSantaAssignmentId.value = result.santeeId
     } catch (error) {
       console.error('Error getting secret santa:', error)
     }
@@ -98,10 +100,11 @@ export function useEventManagement(eventId: number) {
     eventDetails,
     isValidMember,
     isCreator,
-    secretSantaName,
+    secretSantaAssignmentName,
+    secretSantaAssignmentId,
     validateMember,
     drawSecretSantas,
-    getSecretSanta,
+    getSecretSantaAssignment,
     deleteEvent,
     updateInviteesRecords
   }

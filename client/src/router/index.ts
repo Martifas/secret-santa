@@ -4,13 +4,14 @@ import HomeView from '@/views/HomeView.vue'
 import MainLayout from '@/layout/MainLayout.vue'
 import ExchangeView from '@/views/ExchangeView.vue'
 import { authGuard } from '@auth0/auth0-vue'
-import AboutView from '@/views/AboutView.vue'
 import InvitationView from '@/views/InvitationView.vue'
 import RsvpView from '@/views/RsvpView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import WishlistItemView from '@/views/wishlist/WishlistItemView.vue'
 import WishlistView from '@/views/wishlist/WishlistView.vue'
 import ExchangeDetailsView from '@/views/ExchangeDetailsView.vue'
+import AboutView from '@/views/AboutView.vue';
+import WishlistForGuests from '@/views/wishlist/WishlistForGuests.vue'
 
 const routes = [
   {
@@ -67,6 +68,19 @@ const routes = [
         path: '',
         name: 'Invitation',
         component: InvitationView,
+        beforeEnter: authGuard,
+        prop: true,
+      },
+    ],
+  },
+  {
+    path: '/wishlistdetailed/:id',
+    component: MainLayout,
+    children: [
+      {
+        path: '',
+        name: 'WishlistDetailed',
+        component: WishlistForGuests,
         beforeEnter: authGuard,
         prop: true,
       },

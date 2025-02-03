@@ -1,10 +1,14 @@
 import { ref, watch } from 'vue'
 import { trpc } from '@/trpc'
 
-export function useWishlist(eventId: number) {
+export function useWishlist(
+  eventId: number,
+  userId: string | undefined,
+) {
   const userWishlists = ref<{ title: string; id: number }[]>([])
   const selectedWishlistTitle = ref<string>('')
   const currentWishlistId = ref<number | null>(null)
+
 
   watch(selectedWishlistTitle, async (newTitle) => {
     const selectedWishlist = userWishlists.value.find((wishlist) => wishlist.title === newTitle)
@@ -27,8 +31,9 @@ export function useWishlist(eventId: number) {
   }
 
   const getInitialWishlist = async () => {
+    if (!userId) return
     try {
-      const userEvent = await trpc.userEvent.getUserEvent.query({ eventId })
+      const userEvent = await trpc.userEvent.getUserEvent.query({ eventId, userId })
       if (userEvent?.wishlistId) {
         const wishlist = await trpc.userWishlist.getUserWishlist.query({ id: userEvent.wishlistId })
         if (wishlist) {
@@ -41,11 +46,13 @@ export function useWishlist(eventId: number) {
     }
   }
 
+
+
   return {
     userWishlists,
     selectedWishlistTitle,
-    currentWishlistId,
+    currentWishlistId, 
     getUserWishlists,
-    getInitialWishlist
+    getInitialWishlist,
   }
 }

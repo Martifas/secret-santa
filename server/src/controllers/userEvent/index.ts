@@ -5,9 +5,9 @@ import assignSecretSanta from './assignSecretSanta'
 import getUserEvents from './getUserEvents'
 import createUserEvent from './createUserEvent'
 import removeUserEventForAllMembers from './removeUserEventForAllMembers'
-import getSecretSanta from './getSecretSanta'
 import updateWishlistId from './updateWishlistId'
 import getUserEvent from './getUserEvent'
+import getSantee from './getSantee'
 
 export default router({
   createMember,
@@ -16,7 +16,7 @@ export default router({
   getUserEvents,
   createUserEvent,
   removeUserEventForAllMembers,
-  getSecretSanta,
   updateWishlistId,
-  getUserEvent
+  getUserEvent,
+  getSantee
 })

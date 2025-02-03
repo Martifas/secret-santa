@@ -1,4 +1,7 @@
-import { userEventSchema, type UserEventForMember } from '@server/entities/userEvent'
+import {
+  userEventSchema,
+  type UserEventForMember,
+} from '@server/entities/userEvent'
 import { userEventRepository } from '@server/repositories/userEventRepository'
 import { groupMemberProcedure } from '@server/trpc/groupMemberProcedure'
 import provideRepos from '@server/trpc/provideRepos'
@@ -13,14 +16,18 @@ export default groupMemberProcedure
   .input(
     userEventSchema.pick({
       eventId: true,
+      userId: true,
     })
   )
   .query(
     async ({
-      input: { eventId },
-      ctx: { repos, authUser },
+      input: { eventId, userId },
+      ctx: { repos },
     }): Promise<UserEventForMember> => {
-      const result = await repos.userEventRepository.findByEventAndUserId(eventId, authUser.auth0Id)
+      const result = await repos.userEventRepository.findByEventAndUserId(
+        eventId,
+        userId
+      )
 
       if (!result) {
         throw new TRPCError({

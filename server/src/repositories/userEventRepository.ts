@@ -69,6 +69,15 @@ export function userEventRepository(db: Database) {
         .selectAll()
         .execute()
     },
+    async findBySantaId(userId: string, eventId: number): Promise<string | null> {
+      const result = await db
+        .selectFrom('userEvent')
+        .select('userId')
+        .where('santaForUserId', '=', userId)
+        .where('eventId', '=', eventId)
+        .executeTakeFirst()
+      return result?.userId ?? null
+    },
     async create(record: Insertable<UserEvent>): Promise<number> {
       const result = await db
         .insertInto('userEvent')

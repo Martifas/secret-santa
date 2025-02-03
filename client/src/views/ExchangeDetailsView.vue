@@ -8,17 +8,21 @@ import { useEventManagement } from '@/composables/useEventManagement'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth0 } from '@auth0/auth0-vue'
-import { NoSymbolIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { TrashIcon } from '@heroicons/vue/24/outline'
 import pic from '../assets/profile.png'
 import { trpc } from '@/trpc'
+import { useSanteeStore } from '@/stores/santeeStore'
 
 const { user } = useAuth0()
 const route = useRoute()
 const router = useRouter()
 const eventId = parseInt(route.params.id as string, 10)
+const santeeStore = useSanteeStore()
 
 const showInvitePopup = ref(false)
 const inviteEmail = ref('')
+const santeeWishlistTitle = ref<string>('')
+const santeeWishlistId = ref<number>(0)
 
 const errorMessages = ref({
   kick: '',
@@ -31,10 +35,11 @@ const {
   eventDetails,
   isValidMember,
   isCreator,
-  secretSantaName,
+  secretSantaAssignmentName,
+  secretSantaAssignmentId,
   validateMember,
   drawSecretSantas,
-  getSecretSanta,
+  getSecretSantaAssignment,
   deleteEvent,
   updateInviteesRecords,
 } = useEventManagement(eventId)
@@ -54,7 +59,7 @@ const {
   currentWishlistId,
   getUserWishlists,
   getInitialWishlist,
-} = useWishlist(eventId)
+} = useWishlist(eventId, user.value?.sub)
 
 const {
   eventMembers,
@@ -65,7 +70,7 @@ const {
 } = useEventMembers(eventId)
 
 async function handleDrawButtonClick() {
-  if (secretSantaName.value) {
+  if (secretSantaAssignmentName.value) {
     openModal('redraw')
   } else {
     openModal('draw')
@@ -76,7 +81,7 @@ async function confirmDrawNames() {
   try {
     closeModal('draw')
     await drawSecretSantas()
-    await getSecretSanta()
+    await getSecretSantaAssignment()
     errorMessages.value.draw = ''
   } catch (error) {
     errorMessages.value.draw = 'Failed to draw names. Please try again.'
@@ -87,7 +92,7 @@ async function confirmReDrawNames() {
   try {
     closeModal('redraw')
     await drawSecretSantas()
-    await getSecretSanta()
+    await getSecretSantaAssignment()
     errorMessages.value.draw = ''
   } catch (error) {
     errorMessages.value.draw = 'Failed to redraw names. Please try again.'
@@ -115,8 +120,6 @@ async function confirmKickMember() {
   }
 }
 
-
-
 async function kickMember(userId: string | null) {
   try {
     if (!userId) {
@@ -130,7 +133,29 @@ async function kickMember(userId: string | null) {
   }
 }
 
+async function getSanteeWishlist() {
+  if (!secretSantaAssignmentId?.value) {
+    return
+  }
 
+  try {
+    santeeStore.setSanteeDetails(secretSantaAssignmentId.value)
+    const userEvent = await trpc.userEvent.getUserEvent.query({
+      eventId,
+      userId: secretSantaAssignmentId.value,
+    })
+
+    if (userEvent?.wishlistId) {
+      const wishlist = await trpc.userWishlist.getUserWishlist.query({ id: userEvent.wishlistId })
+      if (wishlist) {
+        santeeWishlistTitle.value = wishlist.title
+        santeeWishlistId.value = userEvent.wishlistId
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching santee wishlist:', error)
+  }
+}
 
 async function sendInvitations(email: string) {
   try {
@@ -159,15 +184,18 @@ async function sendInvitations(email: string) {
 
 onMounted(async () => {
   await validateMember()
+
   if (isValidMember.value) {
     await Promise.all([
+      getSecretSantaAssignment(),
       updateInviteesRecords(),
       getEventMembers(),
       getPendingInvitations(),
       getUserWishlists(),
       getInitialWishlist(),
-      getSecretSanta(),
     ])
+
+    await getSanteeWishlist()
   }
 })
 </script>
@@ -213,7 +241,7 @@ onMounted(async () => {
               >
                 <div class="space-y-2">
                   <h3 class="text-sm font-bold tracking-wide uppercase">Your Draw</h3>
-                  <div v-if="secretSantaName">{{ secretSantaName }}</div>
+                  <div v-if="secretSantaAssignmentName">{{ secretSantaAssignmentName }}</div>
                   <div v-else><p class="text-lg font-medium text-gray-900">Not Drawn Yet</p></div>
                 </div>
               </div>
@@ -354,7 +382,10 @@ onMounted(async () => {
                 </div>
                 <div
                   v-else-if="
-                    isCreator && eventMembers && eventMembers.length >= 3 && !secretSantaName
+                    isCreator &&
+                    eventMembers &&
+                    eventMembers.length >= 3 &&
+                    !secretSantaAssignmentName
                   "
                   class="flex w-full justify-center sm:w-auto"
                 >
@@ -364,7 +395,10 @@ onMounted(async () => {
                 </div>
                 <div
                   v-else-if="
-                    isCreator && eventMembers && eventMembers.length >= 3 && secretSantaName
+                    isCreator &&
+                    eventMembers &&
+                    eventMembers.length >= 3 &&
+                    secretSantaAssignmentName
                   "
                   class="flex w-full justify-center sm:w-auto"
                 >
@@ -391,26 +425,26 @@ onMounted(async () => {
                 <h2 class="mb-4 font-bold tracking-wide text-gray-900 uppercase sm:text-lg">
                   Your Wishlist
                 </h2>
+                <div class="flex flex-col space-y-2">
+                  <label for="wishlist-select" class="text-sm font-medium text-gray-700"
+                    >Select Wishlist</label
+                  >
+                  <select
+                    id="wishlist-select"
+                    v-model="selectedWishlistTitle"
+                    class="rounded-lg border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
+                  >
+                    <option value="">Select a wishlist...</option>
+                    <option
+                      v-for="wishlist in userWishlists"
+                      :key="wishlist.title"
+                      :value="wishlist.title"
+                    >
+                      {{ wishlist.title }}
+                    </option>
+                  </select>
+                </div>
                 <div class="space-y-4">
-                  <div class="flex flex-col space-y-2">
-                    <label for="wishlist-select" class="text-sm font-medium text-gray-700"
-                      >Select Wishlist</label
-                    >
-                    <select
-                      id="wishlist-select"
-                      v-model="selectedWishlistTitle"
-                      class="rounded-lg border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
-                    >
-                      <option value="">Select a wishlist...</option>
-                      <option
-                        v-for="wishlist in userWishlists"
-                        :key="wishlist.title"
-                        :value="wishlist.title"
-                      >
-                        {{ wishlist.title }}
-                      </option>
-                    </select>
-                  </div>
                   <div class="flex flex-col space-y-4">
                     <div class="flex justify-between">
                       <h3 class="text-md font-medium text-gray-700">Wishlist for this event:</h3>
@@ -445,15 +479,39 @@ onMounted(async () => {
                   </div>
                 </div>
               </div>
-
               <!-- Draw Wishlist Section -->
-              <div class="p-6">
+              <div class="border-b border-gray-200 p-6">
                 <h2 class="mb-4 font-bold tracking-wide text-gray-900 uppercase sm:text-lg">
                   Your Draw Wishlist
                 </h2>
-                <div class="rounded-lg bg-gray-50 p-4 text-center text-gray-600">
-                  <p>No wishlist available yet</p>
-                  <p class="text-sm">Wishlists will be revealed after the draw</p>
+                <div class="space-y-4">
+                  <div class="flex flex-col space-y-4">
+                    <div class="flex justify-between">
+                      <h3 class="text-md font-medium text-gray-700">
+                        {{ secretSantaAssignmentName }} wishlist for this event:
+                      </h3>
+                      <p class="text-gray-600">
+                        {{ santeeWishlistTitle || 'No wishlist selected' }}
+                      </p>
+                    </div>
+
+                    <div class="flex justify-around space-x-4">
+                      <ActionButton
+                        variant="information"
+                        v-if="currentWishlistId"
+                        @click="
+                          router.push({
+                            name: 'WishlistDetailed',
+                            params: { id: santeeWishlistId },
+                          })
+                        "
+                        class="w-full sm:w-auto"
+                        size="sm"
+                      >
+                        View Selected Wishlist
+                      </ActionButton>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
