@@ -57,8 +57,8 @@ export default authenticatedProcedure
 
       const emailResult = await sendGiftExchangeInvitation({
         emailReceiver: input.email,
-        eventOrganiser: input.eventOrganiser, // Fallback name
-        exchangeDate: input.eventDate, // Use event date if available
+        eventOrganiser: input.eventOrganiser,
+        exchangeDate: input.eventDate,
         rsvpLinkYes: `http://localhost:5173/rsvp/${input.eventId}/${invitationId}/accept`,
         rsvpLinkNo: `http://localhost:5173/rsvp/${input.eventId}/${invitationId}/refuse`,
         budgetLimit: input.budgetLimit,

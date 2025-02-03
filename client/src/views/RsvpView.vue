@@ -3,6 +3,7 @@ import ActionButton from '@/components/ActionButton.vue'
 import { trpc } from '@/trpc'
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import InsctructionsContainer from '@/components/InsctructionsContainer.vue'
 
 const props = defineProps<{
   id: number
@@ -66,7 +67,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex justify-center p-6">
+  <div class="flex justify-around p-6">
     <div v-if="error" class="mb-4 rounded-lg bg-red-100 p-4 text-red-700">
       {{ error.message }}
     </div>
@@ -78,6 +79,87 @@ onMounted(async () => {
           {{ isLoading ? 'Processing...' : 'Take me to the event!' }}
         </ActionButton>
       </div>
+      <InsctructionsContainer class="text-start">
+        <div class="text-start">
+          <h2 className="text-xl font-bold">Welcome to Your Secret Santa Adventure!</h2>
+          <p className="py-2">
+            You're about to join a magical gift exchange experience. Before you proceed, here's what
+            you can expect in your Secret Santa journey.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="pt-7 text-xl font-bold">What Happens Next</h2>
+          <p className="py-2">
+            Once you click the button above, you'll be taken to your event dashboard where you can:
+          </p>
+          <ul className="list-disc space-y-2 pl-5">
+            <li><b>Set Up Your Profile:</b> Help others get to know you better</li>
+            <li><b>Create Your Wishlist:</b> Share gift ideas that you'd love to receive</li>
+            <li><b>View Event Details:</b> See important dates, budget, and other participants</li>
+            <li><b>Wait for the Draw:</b> The event organizer will assign Secret Santas soon!</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="mt-7 text-xl font-bold">Getting Ready</h2>
+          <p className="py-2">
+            Here are some tips to make the most of your Secret Santa experience:
+          </p>
+          <ul className="list-disc space-y-2 pl-5">
+            <li><b>Check Your Calendar:</b> Mark the exchange date and set reminders</li>
+            <li>
+              <b>Note the Budget:</b> Keep the specified budget in mind when creating your wishlist
+            </li>
+            <li>
+              <b>Think About Interests:</b> Start considering what kinds of gifts you'd like to
+              receive
+            </li>
+            <li>
+              <b>Stay Active:</b> Regular visits to the platform ensure you don't miss any updates
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="mt-7 text-xl font-bold">Creating Your First Wishlist</h2>
+          <p className="py-2">
+            After joining, you'll want to create your wishlist. Here are some suggestions:
+          </p>
+          <ul className="list-disc space-y-2 pl-5">
+            <li>
+              <b>Variety is Key:</b> Include items at different price points within the budget
+            </li>
+            <li>
+              <b>Be Specific:</b> Add details about colors, sizes, or specific models you prefer
+            </li>
+            <li><b>Include Links:</b> Share links to specific items when possible</li>
+            <li><b>Add Alternatives:</b> Give your Secret Santa multiple options to choose from</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="mt-7 text-xl font-bold">The Secret Santa Code</h2>
+          <p className="py-2">
+            Remember these golden rules for a successful Secret Santa experience:
+          </p>
+          <ul className="list-disc space-y-2 pl-5">
+            <li><b>Keep the Secret:</b> Don't reveal who you're buying for</li>
+            <li><b>Stay Within Budget:</b> Respect the set budget limits</li>
+            <li><b>Be Thoughtful:</b> Put care into selecting your gift</li>
+            <li><b>Have Fun:</b> Enjoy the mystery and excitement of Secret Santa!</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="mt-7 text-xl font-bold">Ready to Begin?</h2>
+          <p className="py-2">
+            Click the "Take me to the event!" button above to start your Secret Santa adventure. The
+            event organizer and platform are here to help if you need any assistance along the way.
+            Let the gift-giving journey begin!
+          </p>
+        </div>
+      </InsctructionsContainer>
     </div>
 
     <div v-else class="max-w-4xl">

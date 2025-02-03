@@ -88,7 +88,7 @@ onMounted(() => {
 
       <!-- Empty State -->
       <div v-else class="mt-8 rounded-lg border border-gray-200 bg-gray-50 p-8 text-center">
-        <p class="text-gray-600">No items added yet! Stay tuned in for updates.</p>
+        <p class="text-gray-600 text-lg">No items added yet! Stay tuned for updates.</p>
       </div>
     </div>
     <InsctructionsContainer>

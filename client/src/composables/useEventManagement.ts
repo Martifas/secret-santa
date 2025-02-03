@@ -43,11 +43,13 @@ export function useEventManagement(eventId: number) {
     }
   }
 
-  const drawSecretSantas = async () => {
+  async function drawSecretSantas() {
     try {
-      await trpc.userEvent.assignSecretSanta.mutate({ eventId })
+      const response = await trpc.userEvent.assignSecretSanta.mutate({ eventId })
+      return response
     } catch (error) {
       console.error('Error drawing names:', error)
+      throw error
     }
   }
 
@@ -86,9 +88,9 @@ export function useEventManagement(eventId: number) {
           role: 'member',
         })
 
-        await trpc.invitation.updateInvitation.mutate({ 
-          eventId, 
-          email: user.value.email 
+        await trpc.invitation.updateInvitation.mutate({
+          eventId,
+          email: user.value.email,
         })
       }
     } catch (error) {
@@ -106,6 +108,6 @@ export function useEventManagement(eventId: number) {
     drawSecretSantas,
     getSecretSantaAssignment,
     deleteEvent,
-    updateInviteesRecords
+    updateInviteesRecords,
   }
 }

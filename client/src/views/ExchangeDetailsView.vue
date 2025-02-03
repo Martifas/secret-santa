@@ -13,6 +13,7 @@ import pic from '../assets/profile.png'
 import { trpc } from '@/trpc'
 import { useSanteeStore } from '@/stores/santeeStore'
 import { useGiftRecommendation } from '@/composables/useGiftRecommendation'
+import InsctructionsContainer from '@/components/InsctructionsContainer.vue'
 
 const { user } = useAuth0()
 const route = useRoute()
@@ -24,6 +25,7 @@ const showInvitePopup = ref(false)
 const inviteEmail = ref('')
 const santeeWishlistTitle = ref<string>('')
 const santeeWishlistId = ref<number>(0)
+const successMessage = ref('')
 
 const errorMessages = ref({
   kick: '',
@@ -92,9 +94,15 @@ async function handleDrawButtonClick() {
 async function confirmDrawNames() {
   try {
     closeModal('draw')
-    await drawSecretSantas()
-    await getSecretSantaAssignment()
-    errorMessages.value.draw = ''
+    const result = await drawSecretSantas()
+    if (result) {
+      await getSecretSantaAssignment()
+      errorMessages.value.draw = ''
+      successMessage.value = `${result.message} and emails were sent successfully!`
+      setTimeout(() => {
+        successMessage.value = ''
+      }, 5000)
+    }
   } catch (error) {
     errorMessages.value.draw = 'Failed to draw names. Please try again.'
   }
@@ -103,9 +111,15 @@ async function confirmDrawNames() {
 async function confirmReDrawNames() {
   try {
     closeModal('redraw')
-    await drawSecretSantas()
-    await getSecretSantaAssignment()
-    errorMessages.value.draw = ''
+    const result = await drawSecretSantas()
+    if (result) {
+      await getSecretSantaAssignment()
+      errorMessages.value.draw = ''
+      successMessage.value = `${result.message} and emails were sent successfully!`
+      setTimeout(() => {
+        successMessage.value = ''
+      }, 5000)
+    }
   } catch (error) {
     errorMessages.value.draw = 'Failed to redraw names. Please try again.'
   }
@@ -425,6 +439,13 @@ onMounted(async () => {
                   Get ready for secret santa assignment!
                 </div>
               </div>
+              <!-- Success Message -->
+              <div
+                v-if="successMessage"
+                class="mt-4 rounded-lg bg-green-50 p-4 text-center text-green-700 transition-opacity duration-500"
+              >
+                {{ successMessage }}
+              </div>
             </div>
           </div>
 
@@ -532,8 +553,131 @@ onMounted(async () => {
             </div>
           </div>
         </div>
+        <InsctructionsContainer>
+          <div>
+            <h2 className="text-xl font-bold">Welcome to Your Secret Santa Event!</h2>
+            <p className="py-2">
+              Welcome to your personalized Secret Santa dashboard! This space is designed to help
+              you manage your gift-giving experience while keeping the holiday spirit alive. Whether
+              you're an organizer or participant, you'll find everything you need to make this
+              exchange memorable.
+            </p>
+          </div>
+          <div>
+            <h2 className="pt-7 text-xl font-bold">Event Details & Navigation</h2>
+            <p className="py-2">
+              The dashboard provides comprehensive information about your Secret Santa event. Take a
+              moment to familiarize yourself with these key features:
+            </p>
+            <ul className="list-disc space-y-2 pl-5">
+              <li>
+                <b>Event Information:</b> View important details like exchange date, budget limit,
+                and event description.
+              </li>
+              <li><b>Guest List:</b> See all participants and their status in the event.</li>
+              <li>
+                <b>Your Assignment:</b> Once names are drawn, you'll see your giftee's name here.
+              </li>
+              <li>
+                <b>Wishlist Management:</b> Create and manage your own wishlist, and view your
+                giftee's when available.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h2 className="mt-7 text-xl font-bold">Creating Your Wishlist</h2>
+            <p className="py-2">
+              Make it easier for your Secret Santa by creating a detailed wishlist. Here are some
+              tips for an effective wishlist:
+            </p>
+            <ul className="list-disc space-y-2 pl-5">
+              <li>
+                <b>Be Specific:</b> Include details about colors, sizes, or specific models you
+                prefer.
+              </li>
+              <li>
+                <b>Price Range:</b> Add items at various price points within the budget limit.
+              </li>
+              <li>
+                <b>Multiple Options:</b> Give your Secret Santa choices by listing several items.
+              </li>
+              <li><b>Keep it Updated:</b> Regularly review and update your wishlist as needed.</li>
+            </ul>
+          </div>
+          <div>
+            <h2 className="mt-7 text-xl font-bold">For Event Organizers</h2>
+            <p className="py-2">
+              If you're the event organizer, you have additional responsibilities and features
+              available:
+            </p>
+            <ul className="list-disc space-y-2 pl-5">
+              <li><b>Participant Management:</b> Invite new members and manage the guest list.</li>
+              <li><b>Name Drawing:</b> Initiate the Secret Santa draw when ready.</li>            
+              <li><b>Support:</b> Assist participants with any questions or concerns.</li>
+            </ul>
+          </div>
+          <div>
+            <h2 className="mt-7 text-xl font-bold">Gift Recommendations</h2>
+            <p className="py-2">Need inspiration for your gift? Try these approaches:</p>
+            <ul className="list-disc space-y-2 pl-5">
+              <li>
+                <b>Use Recommendations:</b> Click the 'Gift recommendation' button to get
+                personalized suggestions.
+              </li>
+              <li>
+                <b>Consider Interests:</b> Look at your giftee's wishlist for clues about their
+                preferences.
+              </li>
+              <li>
+                <b>Think Creative:</b> Sometimes the best gifts are thoughtful rather than
+                expensive.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h2 className="mt-7 text-xl font-bold">Important Reminders</h2>
+            <p className="py-2">
+              Keep these key points in mind for a successful Secret Santa experience:
+            </p>
+            <ul className="list-disc space-y-2 pl-5">
+              <li>
+                <b>Deadlines:</b> Pay attention to the exchange date and ensure your gift is ready
+                on time.
+              </li>
+              <li><b>Budget:</b> Stick to the specified budget limit for fairness.</li>
+              <li>
+                <b>Privacy:</b> Maintain the surprise by keeping your giftee assignment
+                confidential.
+              </li>
+              <li>
+                <b>Communication:</b> Use the event organizer as a point of contact if needed.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h2 className="mt-7 text-xl font-bold">Technical Support</h2>
+            <p className="py-2">Encountering issues with the platform? Here's what you can do:</p>
+            <ul className="list-disc space-y-2 pl-5">
+              <li><b>Check Access:</b> Ensure you're properly logged in to view all features.</li>
+              <li><b>Refresh Data:</b> Try refreshing the page if information seems outdated.</li>
+              <li>
+                <b>Contact Support:</b> Reach out to the event organizer for assistance with
+                technical issues.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h2 className="mt-7 text-xl font-bold">Need Help?</h2>
+            <p className="py-2">
+              If you have any questions about the event, technical issues, or need assistance, don't
+              hesitate to contact the event organizer. They're here to ensure everyone has a great
+              Secret Santa experience!
+            </p>
+          </div>
+        </InsctructionsContainer>
       </div>
     </div>
+
     <!-- Delete Event Confirmation -->
     <Teleport to="body">
       <div
