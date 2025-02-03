@@ -9,7 +9,7 @@ import { useRouter } from 'vue-router'
 import { useInvitationStore } from '@/stores/invitationStore'
 import ActionButton from '@/components/ActionButton.vue'
 import Container from '@/components/Container.vue'
-import InsctructionsContainer from '@/components/instructions/InsctructionsContainer.vue'
+import InsctructionsContainer from '@/components/InsctructionsContainer.vue'
 
 const isLoading = ref(false)
 const { user } = useAuth0()

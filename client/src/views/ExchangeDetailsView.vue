@@ -12,6 +12,7 @@ import { TrashIcon } from '@heroicons/vue/24/outline'
 import pic from '../assets/profile.png'
 import { trpc } from '@/trpc'
 import { useSanteeStore } from '@/stores/santeeStore'
+import { useGiftRecommendation } from '@/composables/useGiftRecommendation'
 
 const { user } = useAuth0()
 const route = useRoute()
@@ -30,6 +31,17 @@ const errorMessages = ref({
   draw: '',
   invite: '',
 })
+
+const {
+  showGiftPrompt,
+  interest,
+  errorMessage,
+  recommendation,
+  isLoading,
+  openGiftPrompt,
+  closeGiftPrompt,
+  getGiftRecommendation,
+} = useGiftRecommendation()
 
 const {
   eventDetails,
@@ -446,9 +458,9 @@ onMounted(async () => {
                 </div>
                 <div class="space-y-4">
                   <div class="flex flex-col space-y-4">
-                    <div class="flex justify-between">
+                    <div class="flex justify-center gap-10 pt-3">
                       <h3 class="text-md font-medium text-gray-700">Wishlist for this event:</h3>
-                      <p class="text-gray-600">
+                      <p class="pr-1 text-gray-600">
                         {{ selectedWishlistTitle || 'No wishlist selected' }}
                       </p>
                     </div>
@@ -486,9 +498,9 @@ onMounted(async () => {
                 </h2>
                 <div class="space-y-4">
                   <div class="flex flex-col space-y-4">
-                    <div class="flex justify-between">
+                    <div class="flex justify-center gap-10 pt-3">
                       <h3 class="text-md font-medium text-gray-700">
-                        {{ secretSantaAssignmentName }} wishlist for this event:
+                        {{ secretSantaAssignmentName }}'s' wishlist for this event:
                       </h3>
                       <p class="text-gray-600">
                         {{ santeeWishlistTitle || 'No wishlist selected' }}
@@ -510,6 +522,9 @@ onMounted(async () => {
                       >
                         View Selected Wishlist
                       </ActionButton>
+                      <ActionButton variant="primary" @click="openGiftPrompt"
+                        >Gift recommendation</ActionButton
+                      >
                     </div>
                   </div>
                 </div>
@@ -639,6 +654,54 @@ onMounted(async () => {
             </ActionButton>
             <ActionButton @click="sendInvitations(inviteEmail)" variant="information">
               Send
+            </ActionButton>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+    <Teleport to="body">
+      <div
+        v-if="showGiftPrompt"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      >
+        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+          <h3 class="mb-4 text-lg font-semibold">Get Gift Recommendation</h3>
+
+          <div class="mb-4">
+            <label for="interest" class="mb-2 block text-sm font-medium text-gray-700">
+              What are their interests?
+            </label>
+            <input
+              id="interest"
+              type="text"
+              v-model="interest"
+              class="w-full rounded-lg border border-gray-300 p-2"
+              placeholder="Enter an interest (e.g., racing, cooking)"
+            />
+            <p v-if="errorMessage" class="mt-2 text-sm text-red-600">
+              {{ errorMessage }}
+            </p>
+          </div>
+
+          <div v-if="recommendation" class="mb-4 rounded-lg bg-gray-50 p-4">
+            <h4 class="font-medium text-gray-900">Recommendation:</h4>
+            <p class="mt-2 text-gray-600">{{ recommendation.gift }}</p>
+            <p class="mt-1 text-sm text-gray-500">
+              Price Range: {{ recommendation['price range'] }}
+            </p>
+          </div>
+
+          <div class="flex justify-end space-x-3">
+            <ActionButton @click="closeGiftPrompt" variant="secondary">
+              {{ recommendation ? 'Close' : 'Cancel' }}
+            </ActionButton>
+            <ActionButton
+              v-if="!recommendation"
+              @click="getGiftRecommendation(`€${eventDetails?.budgetLimit}`)"
+              variant="information"
+              :disabled="isLoading"
+            >
+              {{ isLoading ? 'Loading...' : 'Submit' }}
             </ActionButton>
           </div>
         </div>
