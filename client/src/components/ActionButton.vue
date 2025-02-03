@@ -3,7 +3,7 @@ import { computed } from 'vue'
 
 interface Props {
   loading?: boolean
-  variant?: 'primary' | 'secondary' | 'danger'
+  variant?: 'primary' | 'secondary' | 'danger' | 'information'
   size?: 'sm' | 'md' | 'lg'
   type?: 'button' | 'submit'
 }
@@ -27,6 +27,7 @@ const sizeClasses = computed(() => {
 const variantClasses = computed(() => {
   const variants = {
     primary: 'bg-green-900 transition-color shadow-sm shadow-green-900 hover:bg-green-700 text-white',
+    information: 'bg-blue-900 transition-color shadow-sm shadow-blue-900 hover:bg-blue-700 text-white',
     secondary: 'bg-gray-500 hover:bg-gray-600 text-white',
     danger: 'bg-red-900 hover:bg-red-700 text-white shadow-sm shadow-red-900',
   }

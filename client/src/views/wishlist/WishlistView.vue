@@ -83,24 +83,26 @@ async function createWishlist() {
         <form class="space-y-6" @submit.prevent="createWishlist">
           <div class="space-y-4">
             <label for="title" class="mb-2 block text-sm font-medium text-gray-900"
-              >Enter the title of your wishlist</label
+              >Enter the title of your wishlist<span class="text-red-500">*</span></label
             >
             <input
               type="text"
               id="title"
               v-model="form.title"
               placeholder="Title"
+              required
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-md focus:border-blue-500 focus:ring-blue-500"
             />
 
             <label for="description" class="mb-2 block text-sm font-medium text-gray-900"
-              >Enter the description of your wishlist</label
+              >Enter the description of your wishlist<span class="text-red-500">*</span></label
             >
 
             <textarea
               id="description"
               v-model="form.description"
               rows="4"
+              required
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-md focus:border-blue-500 focus:ring-blue-500"
               placeholder="Description"
             ></textarea>

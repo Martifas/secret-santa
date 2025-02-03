@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { trpc } from '@/trpc'
 import { useAuth0 } from '@auth0/auth0-vue'
@@ -19,23 +19,31 @@ const router = useRouter()
 
 const userWishlists = ref<UserWishlistForMember[]>([])
 const userEvents = ref<UserEventForMember[]>([])
+const isLoadingWishlists = ref(true)
+const isLoadingEvents = ref(true)
+
+const isLoading = computed(() => isLoadingWishlists.value || isLoadingEvents.value)
 
 async function loadUserWishlists() {
   try {
+    isLoadingWishlists.value = true
     if (!user.value?.sub) {
       console.error('User not authenticated')
       return
     }
 
-    const wishlists = await trpc.userWishlist.getUserWishlists.query({
-      userId: user.value.sub,
-    })
-
+    const wishlists = await trpc.userWishlist.getUserWishlists.query()
     userWishlists.value = wishlists ?? []
-  } catch {}
+  } catch (error) {
+    console.error('Failed to load wishlists:', error)
+  } finally {
+    isLoadingWishlists.value = false
+  }
 }
+
 async function loadUserEvents() {
   try {
+    isLoadingEvents.value = true
     if (!user.value?.sub) {
       console.error('User not authenticated')
       return
@@ -44,10 +52,11 @@ async function loadUserEvents() {
     const events = await trpc.userEvent.getUserEvents.query({
       userId: user.value.sub,
     })
-
     userEvents.value = events ?? []
   } catch (error) {
     console.error('Failed to load user events:', error)
+  } finally {
+    isLoadingEvents.value = false
   }
 }
 
@@ -59,7 +68,22 @@ onMounted(() => {
 
 <template>
   <Container>
-    <div class="mt-7 flex flex-col flex-wrap gap-6 sm:flex-row">
+    <div v-if="isLoading" class="flex h-48 items-center justify-center">
+      <div class="text-center">
+        <div
+          class="border-primary inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-r-transparent align-[-0.125em]"
+          role="status"
+        >
+          <span
+            class="!absolute !-m-px !h-px !w-px !overflow-hidden !border-0 !p-0 !whitespace-nowrap ![clip:rect(0,0,0,0)]"
+            >Loading...</span
+          >
+        </div>
+        <div class="mt-2 text-gray-600">Loading your dashboard...</div>
+      </div>
+    </div>
+
+    <div v-else class="mt-7 flex flex-col flex-wrap gap-6 sm:flex-row">
       <div class="w-full min-w-[300px] sm:flex-1">
         <DashboardContainer>
           <DashboardContainerHeading>Your Exchanges</DashboardContainerHeading>
@@ -84,6 +108,7 @@ onMounted(() => {
         </DashboardContainer>
       </div>
     </div>
+
     <InsctructionsContainer>
       <div>
         <h2 class="text-xl font-bold">Welcome to Your Gift Meister Dashboard</h2>

@@ -1,167 +1,173 @@
 <script setup lang="ts">
 import Container from '@/components/Container.vue'
-import { trpc } from '@/trpc'
-import { useAuth0 } from '@auth0/auth0-vue'
-import type { EventForMember } from '@server/entities/event'
+import ActionButton from '@/components/ActionButton.vue'
+import { useModalStates } from '@/composables/useModalStates'
+import { useWishlist } from '@/composables/useWishlist'
+import { useEventMembers } from '@/composables/useEventMembers'
+import { useEventManagement } from '@/composables/useEventManagement'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import pic from '../assets/profile.png'
-import ActionButton from '@/components/ActionButton.vue'
+import { useAuth0 } from '@auth0/auth0-vue'
 import { NoSymbolIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import pic from '../assets/profile.png'
+import { trpc } from '@/trpc'
 
 const { user } = useAuth0()
 const route = useRoute()
 const router = useRouter()
-const showDeleteEventPrompt = ref(false)
-const showKickMemberPrompt = ref(false)
-const showLeaveEventPrompt = ref(false)
-const selectedMemberToKick = ref<{ auth0Id: string | null; firstName: string | null } | null>(null)
-const eventDetails = ref<EventForMember | null>(null)
 const eventId = parseInt(route.params.id as string, 10)
-const isValidMember = ref<boolean | null>(null)
-const isCreator = ref<boolean | null>(null)
-const pendingInvitations = ref<number | null>(null)
-const eventMembers = ref<
-  | {
-      firstName: string | null
-      picture: string | null
-      email: string | null
-      auth0Id: string | null
-    }[]
-  | null
->(null)
 
-async function validateMember() {
+const showInvitePopup = ref(false)
+const inviteEmail = ref('')
+
+const errorMessages = ref({
+  kick: '',
+  delete: '',
+  draw: '',
+  invite: '',
+})
+
+const {
+  eventDetails,
+  isValidMember,
+  isCreator,
+  secretSantaName,
+  validateMember,
+  drawSecretSantas,
+  getSecretSanta,
+  deleteEvent,
+  updateInviteesRecords,
+} = useEventManagement(eventId)
+
+const {
+  showDrawNamesPrompt,
+  showReDrawNamesPrompt,
+  showDeleteEventPrompt,
+  showKickMemberPrompt,
+  openModal,
+  closeModal,
+} = useModalStates()
+
+const {
+  userWishlists,
+  selectedWishlistTitle,
+  currentWishlistId,
+  getUserWishlists,
+  getInitialWishlist,
+} = useWishlist(eventId)
+
+const {
+  eventMembers,
+  selectedMemberToKick,
+  pendingInvitations,
+  getEventMembers,
+  getPendingInvitations,
+} = useEventMembers(eventId)
+
+async function handleDrawButtonClick() {
+  if (secretSantaName.value) {
+    openModal('redraw')
+  } else {
+    openModal('draw')
+  }
+}
+
+async function confirmDrawNames() {
   try {
-    if (!user.value?.sub || !user.value.email) {
-      console.error('User not authenticated')
-      isValidMember.value = false
-      isCreator.value = false
-      return
-    }
-
-    const event = await trpc.event.getEvent.query({ id: eventId })
-    eventDetails.value = event ?? null
-
-    if (event.createdBy === user.value.sub) {
-      isValidMember.value = true
-      isCreator.value = true
-      return
-    } else {
-      isCreator.value = false
-    }
-
-    const validation = await trpc.invitation.getInvitation.query({
-      eventId: eventId,
-      email: user.value.email,
-    })
-    isValidMember.value = !!validation
+    closeModal('draw')
+    await drawSecretSantas()
+    await getSecretSanta()
+    errorMessages.value.draw = ''
   } catch (error) {
-    console.error('Validation error:', error)
-    isValidMember.value = false
-    isCreator.value = false
+    errorMessages.value.draw = 'Failed to draw names. Please try again.'
+  }
+}
+
+async function confirmReDrawNames() {
+  try {
+    closeModal('redraw')
+    await drawSecretSantas()
+    await getSecretSanta()
+    errorMessages.value.draw = ''
+  } catch (error) {
+    errorMessages.value.draw = 'Failed to redraw names. Please try again.'
   }
 }
 
 async function confirmDeleteEvent() {
-  showDeleteEventPrompt.value = false
-  await deleteEvent()
+  try {
+    closeModal('delete')
+    const success = await deleteEvent()
+    if (success) {
+      errorMessages.value.delete = ''
+      router.push({ name: 'Dashboard' })
+    }
+  } catch (error) {
+    errorMessages.value.delete = 'Failed to delete event. Please try again.'
+  }
 }
 
 async function confirmKickMember() {
   if (selectedMemberToKick.value?.auth0Id) {
     await kickMember(selectedMemberToKick.value.auth0Id)
-    showKickMemberPrompt.value = false
+    closeModal('kick')
     await getEventMembers()
   }
 }
 
-async function confirmLeaveEvent(userId: string | null) {
-  showLeaveEventPrompt.value = false
-  await leaveEvent(userId)
-}
 
-async function getEventMembers() {
-  try {
-    const members = await trpc.user.getUserNamePicEmailByEvent.query({ eventId: eventId })
-    eventMembers.value = members
-  } catch (error) {
-    console.error('Error fetching event members:', error)
-    eventMembers.value = null
-  }
-}
-
-async function getPendingInvitations() {
-  try {
-    const invitations = await trpc.invitation.getPendingInvitations.query({ eventId: eventId })
-    pendingInvitations.value = invitations.length
-  } catch (error) {
-    console.error('Error fetching invitations:', error)
-    eventMembers.value = null
-  }
-}
-
-async function updateInviteesRecords() {
-  try {
-    if (!user.value?.sub || !user.value.email) {
-      console.error('User not authenticated')
-      return
-    }
-
-    if (isValidMember.value && !isCreator.value && eventDetails.value) {
-      await trpc.userEvent.createUserEvent.mutate({
-        userId: user.value.sub,
-        eventId: eventId,
-        eventTitle: eventDetails.value.title,
-        role: 'member',
-      })
-
-      await trpc.invitation.updateInvitation.mutate({ eventId: eventId, email: user.value.email })
-    }
-  } catch (error) {
-    console.error('Error updating details:', error)
-  }
-}
-
-async function deleteEvent() {
-  try {
-    await trpc.event.removeEvent.mutate({ id: eventId })
-    router.push({ name: 'Dashboard' })
-  } catch (error) {
-    console.error('Error deleting event:', error)
-  }
-}
 
 async function kickMember(userId: string | null) {
   try {
     if (!userId) {
-      console.error('Cannot delete member: userId is null')
+      errorMessages.value.kick = 'Cannot remove member: Invalid user'
       return
     }
-    await trpc.userEvent.removeMember.mutate({ userId: userId, eventId: eventId })
+    await trpc.userEvent.removeMember.mutate({ userId, eventId })
+    errorMessages.value.kick = ''
   } catch (error) {
-    console.error('Error removing member:', error)
+    errorMessages.value.kick = 'Failed to remove member. Please try again.'
   }
 }
-async function leaveEvent(userId: string | null) {
+
+
+
+async function sendInvitations(email: string) {
   try {
-    if (!userId) {
-      console.error('Cannot delete member: userId is null')
-      return
-    }
-    await trpc.userEvent.leaveEvent.mutate({ userId: userId, eventId: eventId })
-    router.push({ name: 'Dashboard' })
+    const eventDetails = await trpc.event.getEvent.query({ id: eventId })
+    const creator = eventMembers.value?.find((member) => member.auth0Id === eventDetails.createdBy)
+
+    await trpc.invitation.createAndSendInvitation.mutate({
+      email: email,
+      eventId: eventId,
+      status: 'sent',
+      eventOrganiser: creator?.firstName || 'Event Organizer',
+      eventDate: eventDetails.eventDate,
+      title: eventDetails.title,
+      budgetLimit: eventDetails.budgetLimit,
+      description: eventDetails.description,
+    })
+
+    showInvitePopup.value = false
+    inviteEmail.value = ''
+    errorMessages.value.invite = ''
+    await getPendingInvitations()
   } catch (error) {
-    console.error('Error leaving:', error)
+    errorMessages.value.invite = 'Failed to send invitation. Please try again.'
   }
 }
 
 onMounted(async () => {
   await validateMember()
   if (isValidMember.value) {
-    await updateInviteesRecords()
-    await getEventMembers()
-    await getPendingInvitations()
+    await Promise.all([
+      updateInviteesRecords(),
+      getEventMembers(),
+      getPendingInvitations(),
+      getUserWishlists(),
+      getInitialWishlist(),
+      getSecretSanta(),
+    ])
   }
 })
 </script>
@@ -207,7 +213,8 @@ onMounted(async () => {
               >
                 <div class="space-y-2">
                   <h3 class="text-sm font-bold tracking-wide uppercase">Your Draw</h3>
-                  <p class="text-lg font-medium text-gray-900">Not Drawn Yet</p>
+                  <div v-if="secretSantaName">{{ secretSantaName }}</div>
+                  <div v-else><p class="text-lg font-medium text-gray-900">Not Drawn Yet</p></div>
                 </div>
               </div>
 
@@ -284,7 +291,13 @@ onMounted(async () => {
                     >
                   </div>
                   <div v-if="isCreator" class="w-full sm:w-auto">
-                    <ActionButton size="sm" class="w-full sm:w-auto">Invite</ActionButton>
+                    <ActionButton
+                      size="sm"
+                      class="w-full sm:w-auto"
+                      @click="showInvitePopup = true"
+                    >
+                      Invite
+                    </ActionButton>
                   </div>
                 </div>
               </div>
@@ -323,15 +336,6 @@ onMounted(async () => {
                           class="size-8 cursor-pointer text-gray-800 hover:text-red-500"
                         />
                       </span>
-                      <span
-                        v-else-if="!isCreator && member.email === user?.email"
-                        title="Leave event"
-                      >
-                        <NoSymbolIcon
-                          @click="showLeaveEventPrompt = true"
-                          class="size-8 cursor-pointer text-gray-800 hover:text-red-500"
-                        />
-                      </span>
                     </div>
                   </div>
                   <div v-else class="py-4 text-center text-gray-500">Loading members...</div>
@@ -349,12 +353,30 @@ onMounted(async () => {
                   </p>
                 </div>
                 <div
-                  v-else-if="eventMembers && eventMembers.length >= 3"
+                  v-else-if="
+                    isCreator && eventMembers && eventMembers.length >= 3 && !secretSantaName
+                  "
                   class="flex w-full justify-center sm:w-auto"
                 >
-                  <ActionButton size="sm" class="w-full sm:w-auto">
+                  <ActionButton @click="handleDrawButtonClick" size="sm" class="w-full sm:w-auto">
                     Draw Names for Secret Santa
                   </ActionButton>
+                </div>
+                <div
+                  v-else-if="
+                    isCreator && eventMembers && eventMembers.length >= 3 && secretSantaName
+                  "
+                  class="flex w-full justify-center sm:w-auto"
+                >
+                  <ActionButton @click="handleDrawButtonClick" size="sm" class="w-full sm:w-auto">
+                    Re-Draw Names for Secret Santa
+                  </ActionButton>
+                </div>
+                <div
+                  v-else-if="!isCreator && eventMembers && eventMembers.length >= 3"
+                  class="flex w-full justify-center sm:w-auto"
+                >
+                  Get ready for secret santa assignment!
                 </div>
               </div>
             </div>
@@ -364,6 +386,7 @@ onMounted(async () => {
           <div class="w-full md:w-1/2">
             <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
               <!-- Your Wishlist Section -->
+
               <div class="border-b border-gray-200 p-6">
                 <h2 class="mb-4 font-bold tracking-wide text-gray-900 uppercase sm:text-lg">
                   Your Wishlist
@@ -375,27 +398,55 @@ onMounted(async () => {
                     >
                     <select
                       id="wishlist-select"
+                      v-model="selectedWishlistTitle"
                       class="rounded-lg border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
                     >
                       <option value="">Select a wishlist...</option>
+                      <option
+                        v-for="wishlist in userWishlists"
+                        :key="wishlist.title"
+                        :value="wishlist.title"
+                      >
+                        {{ wishlist.title }}
+                      </option>
                     </select>
                   </div>
-                  <div class="flex flex-row justify-between space-y-2">
-                    <h3 class="text-md font-medium text-gray-700">Wishlist for this event:</h3>
-                    <p class="text-gray-600">No wishlist selected</p>
-                  </div>
-                  <div class="flex justify-end pt-2">
-                    <ActionButton
-                      @click="router.push({ name: 'Wishlist' })"
-                      size="sm"
-                      class="w-full sm:w-auto"
-                      >Create New Wishlist</ActionButton
-                    >
+                  <div class="flex flex-col space-y-4">
+                    <div class="flex justify-between">
+                      <h3 class="text-md font-medium text-gray-700">Wishlist for this event:</h3>
+                      <p class="text-gray-600">
+                        {{ selectedWishlistTitle || 'No wishlist selected' }}
+                      </p>
+                    </div>
+
+                    <div class="flex justify-around space-x-4">
+                      <ActionButton
+                        variant="information"
+                        v-if="currentWishlistId"
+                        @click="
+                          router.push({
+                            name: 'WishlistItems',
+                            params: { id: currentWishlistId },
+                          })
+                        "
+                        class="w-full sm:w-auto"
+                        size="sm"
+                      >
+                        View Selected Wishlist
+                      </ActionButton>
+                      <ActionButton
+                        @click="router.push({ name: 'Wishlist' })"
+                        size="sm"
+                        class="w-full sm:w-auto"
+                      >
+                        Create New Wishlist
+                      </ActionButton>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Your Draw Wishlist Section -->
+              <!-- Draw Wishlist Section -->
               <div class="p-6">
                 <h2 class="mb-4 font-bold tracking-wide text-gray-900 uppercase sm:text-lg">
                   Your Draw Wishlist
@@ -421,19 +472,14 @@ onMounted(async () => {
           <p class="mb-6 text-gray-600">
             Are you sure you want to delete this event? This action cannot be undone.
           </p>
+          <p v-if="errorMessages.delete" class="mb-4 text-sm text-red-600">
+            {{ errorMessages.delete }}
+          </p>
           <div class="flex justify-end space-x-3">
-            <button
-              @click="showDeleteEventPrompt = false"
-              class="rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-100"
-            >
+            <ActionButton @click="showDeleteEventPrompt = false" variant="secondary">
               Cancel
-            </button>
-            <button
-              @click="confirmDeleteEvent"
-              class="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-            >
-              Delete
-            </button>
+            </ActionButton>
+            <ActionButton @click="confirmDeleteEvent" variant="danger"> Delete </ActionButton>
           </div>
         </div>
       </div>
@@ -450,46 +496,92 @@ onMounted(async () => {
           <p class="mb-6 text-gray-600">
             Are you sure you want to remove {{ selectedMemberToKick?.firstName }} from this event?
           </p>
+          <p v-if="errorMessages.kick" class="mb-4 text-sm text-red-600">
+            {{ errorMessages.kick }}
+          </p>
           <div class="flex justify-end space-x-3">
-            <button
-              @click="showKickMemberPrompt = false"
-              class="rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-100"
-            >
+            <ActionButton @click="showKickMemberPrompt = false" variant="secondary">
               Cancel
-            </button>
-            <button
-              @click="confirmKickMember"
-              class="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-            >
-              Remove
-            </button>
+            </ActionButton>
+            <ActionButton @click="confirmKickMember" variant="danger"> Remove </ActionButton>
           </div>
         </div>
       </div>
     </Teleport>
 
-    <!-- Leave Event Confirmation -->
+    <!-- Draw Names Confirmation -->
     <Teleport to="body">
       <div
-        v-if="showLeaveEventPrompt"
+        v-if="showDrawNamesPrompt"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       >
         <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
-          <h3 class="mb-4 text-lg font-semibold">Leave Event</h3>
-          <p class="mb-6 text-gray-600">Are you sure you want to leave this event?</p>
+          <h3 class="mb-4 text-lg font-semibold">Draw Names for Secret Santa</h3>
+          <p class="mb-6 text-gray-600">
+            Are you sure you want to proceed with the Secret Santa draw? This will assign each
+            participant their gift recipient.
+          </p>
+          <p v-if="errorMessages.draw" class="mb-4 text-sm text-red-600">
+            {{ errorMessages.draw }}
+          </p>
           <div class="flex justify-end space-x-3">
-            <button
-              @click="showLeaveEventPrompt = false"
-              class="rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-100"
-            >
+            <ActionButton @click="showDrawNamesPrompt = false" variant="secondary">
               Cancel
-            </button>
-            <button
-              @click="confirmLeaveEvent(user?.sub ?? null)"
-              class="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-            >
-              Leave
-            </button>
+            </ActionButton>
+            <ActionButton @click="confirmDrawNames" variant="primary"> Draw Names </ActionButton>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Re-Draw Names Confirmation -->
+    <Teleport to="body">
+      <div
+        v-if="showReDrawNamesPrompt"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      >
+        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+          <h3 class="mb-4 text-lg font-semibold">Re-Draw Names for Secret Santa</h3>
+          <p class="mb-6 text-gray-600">
+            Are you sure you want to re-draw the Secret Santa assignments? This will reset all
+            current assignments and create new ones.
+          </p>
+          <div class="flex justify-end space-x-3">
+            <ActionButton variant="secondary" @click="showReDrawNamesPrompt = false">
+              Cancel
+            </ActionButton>
+            <ActionButton variant="primary" @click="confirmReDrawNames">
+              Re-Draw Names
+            </ActionButton>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+    <!--Invite Popup -->
+    <Teleport to="body">
+      <div
+        v-if="showInvitePopup"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      >
+        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+          <div class="mb-4">
+            <input
+              type="email"
+              v-model="inviteEmail"
+              class="w-full rounded-lg border border-gray-300 p-2"
+              placeholder="Enter email address"
+            />
+            <p v-if="errorMessages.invite" class="mt-2 text-sm text-red-600">
+              {{ errorMessages.invite }}
+            </p>
+          </div>
+          <div class="flex justify-end space-x-3">
+            <ActionButton @click="showInvitePopup = false" variant="secondary">
+              Cancel
+            </ActionButton>
+            <ActionButton @click="sendInvitations(inviteEmail)" variant="information">
+              Send
+            </ActionButton>
           </div>
         </div>
       </div>

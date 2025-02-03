@@ -5,7 +5,7 @@ import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import invitationRouter from '..'
 import type { UserEventRepository } from '@server/repositories/userEventRepository'
-import { sendGiftExchangeInvitation } from '@server/utils/sendEmail'
+import { sendGiftExchangeInvitation } from '@server/services/sendEmail'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 vi.mock('@server/utils/sendEmail', () => ({

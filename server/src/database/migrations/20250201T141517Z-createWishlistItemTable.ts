@@ -21,7 +21,7 @@ export async function up(db: Kysely<any>) {
     .addColumn('updated_at', 'timestamptz', (c) =>
       c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )
-    .addUniqueConstraint('unique_wishlist_item', ['user_id', 'item_name'])
+    .addUniqueConstraint('unique_wishlist_item', ['user_wishlist_id', 'item_name'])
     .execute()
 }
 

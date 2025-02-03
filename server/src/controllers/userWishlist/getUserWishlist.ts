@@ -2,7 +2,10 @@ import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import provideRepos from '@server/trpc/provideRepos'
 import { TRPCError } from '@trpc/server'
 import { userWishlistRepository } from '@server/repositories/userWishlistRepository'
-import { type UserWishlistForMember } from '@server/entities/userWishlist'
+import {
+  userWishlistSchema,
+  type UserWishlistForMember,
+} from '@server/entities/userWishlist'
 
 export default authenticatedProcedure
   .use(
@@ -10,11 +13,14 @@ export default authenticatedProcedure
       userWishlistRepository,
     })
   )
+  .input(
+    userWishlistSchema.pick({
+      id: true,
+    })
+  )
   .query(
-    async ({ ctx: { repos, authUser } }): Promise<UserWishlistForMember[]> => {
-      const result = await repos.userWishlistRepository.findAllForUser(
-        authUser.auth0Id
-      )
+    async ({input, ctx: { repos } }): Promise<UserWishlistForMember> => {
+      const result = await repos.userWishlistRepository.find(input.id)
       if (!result) {
         throw new TRPCError({
           code: 'NOT_FOUND',

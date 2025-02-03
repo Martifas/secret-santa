@@ -1,13 +1,10 @@
 import provideRepos from '@server/trpc/provideRepos'
 import { userEventRepository } from '@server/repositories/userEventRepository'
-import {
-  userEventSchema,
-  type UserEventForMember,
-} from '@server/entities/userEvent'
+import { userEventSchema } from '@server/entities/userEvent'
 import { TRPCError } from '@trpc/server'
-import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
+import { groupMemberProcedure } from '@server/trpc/groupMemberProcedure'
 
-export default groupAdminProcedure
+export default groupMemberProcedure
   .use(
     provideRepos({
       userEventRepository,
@@ -15,18 +12,14 @@ export default groupAdminProcedure
   )
   .input(
     userEventSchema.pick({
-      id: true,
-      role: true,
       eventId: true,
+      wishlistId: true,
     })
   )
   .mutation(
-    async ({
-      input,
-      ctx: { repos, authUser },
-    }): Promise<UserEventForMember> => {
+    async ({ input, ctx: { repos, authUser } }): Promise<number | null> => {
       const userEvent = await repos.userEventRepository.findByEventAndUserId(
-        input.id,
+        input.eventId,
         authUser.auth0Id
       )
 
@@ -37,8 +30,9 @@ export default groupAdminProcedure
         })
       }
 
-      return repos.userEventRepository.updateRole(input.id, {
-        role: input.role,
-      })
+      return repos.userEventRepository.updateWishlistId(
+        userEvent.id,
+        input.wishlistId
+      )
     }
   )

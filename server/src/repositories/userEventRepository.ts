@@ -4,7 +4,6 @@ import { userEventKeysForMembers } from '@server/entities/userEvent'
 import type {
   SantaUserIdSelect,
   UserEventRowSelect,
-  UserEventRowUpdate,
   UserIdRowSelect,
 } from '@server/types/userEvent'
 import type { Insertable } from 'kysely'
@@ -30,14 +29,26 @@ export function userEventRepository(db: Database) {
     },
     async updateSecretSanta(
       userId: string,
-      santaForUserId: string
+      santaForUserId: string,
+      eventId: number
     ): Promise<SantaUserIdSelect> {
       return db
         .updateTable('userEvent')
         .set({ santaForUserId: santaForUserId, updatedAt: new Date() })
         .where('userId', '=', userId)
+        .where('eventId', '=', eventId)
         .returning(['santaForUserId'])
         .executeTakeFirstOrThrow()
+    },
+    async findSanta(eventId: number, userId: string): Promise<string | null> {
+      const result = await db
+        .selectFrom('userEvent')
+        .where('eventId', '=', eventId)
+        .where('userId', '=', userId)
+        .select('santaForUserId')
+        .executeTakeFirstOrThrow()
+
+      return result.santaForUserId
     },
     async findByEventAndUserId(
       eventId: number,
@@ -67,19 +78,20 @@ export function userEventRepository(db: Database) {
       return result.id
     },
 
-    async updateRole(
+    async updateWishlistId(
       id: number,
-      updates: UserEventRowUpdate
-    ): Promise<UserEventForMember> {
-      return db
+      wishlistId: number
+    ): Promise<number | null> {
+      const result = await db
         .updateTable('userEvent')
         .set({
-          ...updates,
+          wishlistId: wishlistId,
           updatedAt: new Date(),
         })
         .where('id', '=', id)
-        .returning(userEventKeysForMembers)
+        .returning('id')
         .executeTakeFirstOrThrow()
+      return result.id
     },
 
     async isEventAdmin(userId: string, eventId: number): Promise<boolean> {
@@ -99,9 +111,8 @@ export function userEventRepository(db: Database) {
         .select('id')
         .where('eventId', '=', eventId)
         .where('userId', '=', userId)
-        .where('role', '=', 'member')
+        .where('role', 'in', ['member', 'admin'])
         .executeTakeFirst()
-
       return result !== undefined
     },
 

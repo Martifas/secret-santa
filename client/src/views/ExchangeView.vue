@@ -16,7 +16,7 @@ const { user } = useAuth0()
 const router = useRouter()
 const invitationStore = useInvitationStore()
 
-interface ExchangeForm {
+type ExchangeForm = {
   title: string
   description: string
   budget: number
@@ -106,24 +106,26 @@ async function createEvent() {
         <form class="space-y-6" @submit.prevent="createEvent">
           <div class="space-y-4">
             <label for="date" class="mb-2 block text-sm font-medium text-gray-900"
-              >Enter a title</label
+              >Enter a title<span class="text-red-500">*</span></label
             >
             <input
               type="text"
               id="title"
               v-model="form.title"
               placeholder="Title"
+              required
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-md focus:border-blue-500 focus:ring-blue-500"
             />
 
             <label for="description" class="mb-2 block text-sm font-medium text-gray-900"
-              >Enter a description</label
+              >Enter a description<span class="text-red-500">*</span></label
             >
 
             <textarea
               id="description"
               v-model="form.description"
               rows="4"
+              required
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-md focus:border-blue-500 focus:ring-blue-500"
               placeholder="Description"
             ></textarea>
@@ -131,12 +133,13 @@ async function createEvent() {
             <div class="flex flex-col gap-2 sm:flex-row">
               <div class="flex-1">
                 <label for="budget" class="mb-2 block text-sm font-medium text-gray-900"
-                  >Budget</label
+                  >Budget<span class="text-red-500">*</span></label
                 >
                 <input
                   type="number"
                   v-model="form.budget"
                   id="budget"
+                  required
                   placeholder="0"
                   class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-md focus:border-blue-500 focus:ring-blue-500"
                 />
@@ -144,12 +147,13 @@ async function createEvent() {
 
               <div class="flex-1">
                 <label for="date" class="mb-2 block text-sm font-medium text-gray-900"
-                  >Select date</label
+                  >Select date<span class="text-red-500">*</span></label
                 >
                 <VueDatePicker
                   :enable-time-picker="false"
                   v-model="form.date"
                   class="shadow-md"
+                  required
                   :min-date="new Date()"
                 ></VueDatePicker>
               </div>

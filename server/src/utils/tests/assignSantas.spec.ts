@@ -1,4 +1,4 @@
-import assignSantas from '@server/utils/assignSantas'
+import assignSantas from '@server/services/assignSantas'
 import type { UserIdRowSelect } from '@server/types/userEvent'
 
 describe('assignSantas', () => {

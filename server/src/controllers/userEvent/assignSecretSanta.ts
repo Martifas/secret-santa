@@ -1,8 +1,9 @@
 import { userEventSchema } from '@server/entities/userEvent'
 import { userEventRepository } from '@server/repositories/userEventRepository'
+import assignSantas from '@server/services/assignSantas'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import provideRepos from '@server/trpc/provideRepos'
-import assignSantas from '@server/utils/assignSantas'
+
 import { TRPCError } from '@trpc/server'
 
 export default authenticatedProcedure
@@ -16,7 +17,7 @@ export default authenticatedProcedure
       eventId: true,
     })
   )
-  .query(async ({ input, ctx: { repos } }): Promise<string> => {
+  .mutation(async ({ input, ctx: { repos } }): Promise<string> => {
     const eventMembers = await repos.userEventRepository.getAllEventUsers(
       input.eventId
     )
@@ -33,7 +34,7 @@ export default authenticatedProcedure
 
     await Promise.all(
       assignments.map(({ member, santa }) =>
-        repos.userEventRepository.updateSecretSanta(member, santa)
+        repos.userEventRepository.updateSecretSanta(member, santa,input.eventId)
       )
     )
 

@@ -7,14 +7,16 @@ import { useAuth0 } from '@auth0/auth0-vue'
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { TrashIcon } from '@heroicons/vue/24/outline'
-import type { WishlistForMember } from '@server/entities/wishlistItem' // Add this import
+import type { WishlistForMember } from '@server/entities/wishlistItem'
 
 const wishlistStore = useWishlistStore()
 const route = useRoute()
 const { user } = useAuth0()
 const wishlistId = parseInt(route.params.id as string, 10)
+const isLoadingItems = ref(true)
+const isDeletingItem = ref<number | null>(null)
 
-interface WishlistItemForm {
+type WishlistItemForm = {
   name: string
   description: string
   price: number | null
@@ -38,11 +40,16 @@ const saveSuccess = ref(false)
 const saveError = ref('')
 
 const isValid = computed(() => {
-  return form.value.name.trim().length > 0 && !form.value.errors.name && !form.value.errors.price
+  return (
+    form.value.name.trim().toLowerCase().length > 0 &&
+    !form.value.errors.name &&
+    !form.value.errors.price
+  )
 })
 
 async function loadWishlistItems() {
   try {
+    isLoadingItems.value = true
     if (!user.value?.sub) {
       console.error('User not authenticated')
       return
@@ -57,6 +64,8 @@ async function loadWishlistItems() {
   } catch (error) {
     console.error('Failed to load wishlist items:', error)
     saveError.value = 'Failed to load items. Please try again.'
+  } finally {
+    isLoadingItems.value = false
   }
 }
 
@@ -86,6 +95,7 @@ const handleCancel = () => {
 
 async function deleteFromWishlist(itemToDelete: WishlistForMember) {
   try {
+    isDeletingItem.value = itemToDelete.id
     if (!user.value?.sub) {
       throw new Error('User not authenticated')
     }
@@ -102,6 +112,8 @@ async function deleteFromWishlist(itemToDelete: WishlistForMember) {
   } catch (error) {
     console.error('Failed to delete gift:', error)
     saveError.value = 'Failed to delete item. Please try again.'
+  } finally {
+    isDeletingItem.value = null
   }
 }
 
@@ -157,7 +169,23 @@ watch(
       <p class="max-w-2xl text-lg text-gray-600">{{ wishlistStore.wishlistDescription }}</p>
     </div>
 
-    <div class="mx-auto max-w-3xl">
+    <!-- Loading State -->
+    <div v-if="isLoadingItems" class="flex h-48 items-center justify-center">
+      <div class="text-center">
+        <div
+          class="border-primary inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-r-transparent align-[-0.125em]"
+          role="status"
+        >
+          <span
+            class="!absolute !-m-px !h-px !w-px !overflow-hidden !border-0 !p-0 !whitespace-nowrap ![clip:rect(0,0,0,0)]"
+            >Loading...</span
+          >
+        </div>
+        <div class="mt-2 text-gray-600">Loading wishlist items...</div>
+      </div>
+    </div>
+
+    <div v-else class="mx-auto max-w-3xl">
       <div class="mb-6 rounded-lg border border-gray-400 bg-blue-50 p-6 shadow-sm">
         <h2 class="mb-4 text-center text-xl font-medium text-gray-900">Add Gift</h2>
 
@@ -267,8 +295,23 @@ watch(
                   €{{ item.price }}
                 </p>
               </div>
-              <button @click="() => deleteFromWishlist(item)" class="my-auto">
-                <TrashIcon class="size-11 rounded-full border-1 bg-white p-1 hover:bg-red-200" />
+              <button
+                @click="() => deleteFromWishlist(item)"
+                class="my-auto"
+                :disabled="isDeletingItem === item.id"
+              >
+                <div
+                  v-if="isDeletingItem === item.id"
+                  class="size-11 rounded-full border-1 bg-white p-2"
+                >
+                  <div
+                    class="border-primary h-full w-full animate-spin rounded-full border-2 border-solid border-r-transparent"
+                  ></div>
+                </div>
+                <TrashIcon
+                  v-else
+                  class="size-11 rounded-full border-1 bg-white p-1 hover:bg-red-200"
+                />
               </button>
             </div>
           </div>
