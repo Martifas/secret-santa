@@ -101,7 +101,7 @@ onMounted(() => {
           <DashboardContainerHeading>Your Wishlists</DashboardContainerHeading>
           <WishlistContainer :wishlists="userWishlists" />
           <div class="flex justify-center pt-5">
-            <ActionButton type="button" @click="router.push({ name: '' })" class="items"
+            <ActionButton type="button" @click="router.push({ name: 'Wishlist' })" class="items"
               >Create New Wishlist</ActionButton
             >
           </div>

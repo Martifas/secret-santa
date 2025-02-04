@@ -6,6 +6,8 @@ interface GiftRecommendation {
 }
 
 export function useGiftRecommendation() {
+
+  const API_KEY = import.meta.env.VITE_GIFT_RECOMMMENDATION_PUBLIC_KEY
   const showGiftPrompt = ref(false)
   const interest = ref('')
   const errorMessage = ref('')
@@ -40,12 +42,12 @@ export function useGiftRecommendation() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer sk-17c4f2e94891fae6423fde005b9064d74372a564'
+          Authorization: `Bearer ${API_KEY}`,
         },
         body: JSON.stringify({
           interest: interest.value.toLowerCase(),
-          budget: budget
-        })
+          budget: budget,
+        }),
       })
 
       if (!response.ok) {
@@ -70,6 +72,6 @@ export function useGiftRecommendation() {
     isLoading,
     openGiftPrompt,
     closeGiftPrompt,
-    getGiftRecommendation
+    getGiftRecommendation,
   }
 }

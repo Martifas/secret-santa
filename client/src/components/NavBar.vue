@@ -50,8 +50,8 @@ watch(
         await trpc.user.userSync.mutate({
           auth0Id: authUser.value.sub,
           email: authUser.value.email,
-          firstName: authUser.value.given_name || '',
-          lastName: authUser.value.family_name || '',
+          firstName: authUser.value.given_name || authUser.value.username.split('@')[0],
+          lastName: authUser.value.given_name || authUser.value.username.split('@')[0],
           picture: authUser.value.picture || '',
         })
       } catch (error) {
@@ -82,6 +82,11 @@ const navigation = computed(() => {
     v-slot="{ open }"
   >
     <div class="container mx-auto max-w-7xl">
+      <div
+        v-if="!isLoading && isAuthenticated && user"
+        data-test="auth-ready"
+        style="display: none"
+      ></div>
       <div class="relative flex h-16 items-center justify-center">
         <div class="absolute inset-y-0 left-0 flex items-center px-4 md:hidden">
           <!-- Mobile menu button-->

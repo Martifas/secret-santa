@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useGiftRecommendation } from '../useGiftRecommendation'
 
+const API_KEY = import.meta.env.VITE_GIFT_RECOMMMENDATION_PUBLIC_KEY
+
 describe('useGiftRecommendation', () => {
   const mockRecommendation = {
     gift: 'Vintage Record Player',
@@ -47,7 +49,7 @@ describe('useGiftRecommendation', () => {
     it('should set showGiftPrompt to false and reset other values', () => {
       const { showGiftPrompt, interest, errorMessage, recommendation, closeGiftPrompt } =
         useGiftRecommendation()
- 
+
       showGiftPrompt.value = true
       interest.value = 'music'
       errorMessage.value = 'some error'
@@ -92,7 +94,7 @@ describe('useGiftRecommendation', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer sk-17c4f2e94891fae6423fde005b9064d74372a564',
+          Authorization: `Bearer ${API_KEY}`,
         },
         body: JSON.stringify({
           interest: 'music',

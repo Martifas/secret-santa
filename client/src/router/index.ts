@@ -10,7 +10,7 @@ import DashboardView from '@/views/DashboardView.vue'
 import WishlistItemView from '@/views/wishlist/WishlistItemView.vue'
 import WishlistView from '@/views/wishlist/WishlistView.vue'
 import ExchangeDetailsView from '@/views/ExchangeDetailsView.vue'
-import AboutView from '@/views/AboutView.vue';
+import AboutView from '@/views/AboutView.vue'
 import WishlistForGuests from '@/views/wishlist/WishlistForGuests.vue'
 
 const routes = [
