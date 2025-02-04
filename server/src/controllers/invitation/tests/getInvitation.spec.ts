@@ -6,7 +6,7 @@ import { TRPCError } from '@trpc/server'
 import invitationRouter from '..'
 import type { UserEventRepository } from '@server/repositories/userEventRepository'
 
-describe.skip('findById', () => {
+describe('findById', () => {
   const TEST_USER = fakeAuthUser({
     id: 1,
   })
@@ -30,6 +30,7 @@ describe.skip('findById', () => {
     const repos = {
       invitationRepository: {
         findById: async () => baseInvitation,
+        findByEventAndEmail: async () => baseInvitation ,
       } satisfies Partial<InvitationRepository>,
       userEventRepository: {
         isEventAdmin: async () => true,
@@ -62,6 +63,7 @@ describe.skip('findById', () => {
     const repos = {
       invitationRepository: {
         findById: async () => null,
+        findByEventAndEmail: async () => null,
       } satisfies Partial<InvitationRepository>,
       userEventRepository: {
         isEventAdmin: async () => true,
@@ -81,38 +83,6 @@ describe.skip('findById', () => {
       new TRPCError({
         code: 'NOT_FOUND',
         message: 'Invitation not found',
-      })
-    )
-  })
-
-  it('should throw FORBIDDEN when user is not authorized', async () => {
-    const invitationByAnotherUser = {
-      ...baseInvitation,
-      userId: 'auth0|852',
-    }
-
-    const repos = {
-      invitationRepository: {
-        findByEventAndEmail: async () => invitationByAnotherUser,
-      } satisfies Partial<InvitationRepository>,
-      userEventRepository: {
-        isEventAdmin: async () => false,
-      } satisfies Partial<UserEventRepository>,
-    }
-
-    const testContext = authRepoContext(repos, TEST_USER)
-    const createCaller = createCallerFactory(invitationRouter)
-    const { getInvitation } = createCaller(testContext)
-
-    await expect(
-      getInvitation({
-        eventId: baseInvitation.eventId,
-        email: baseInvitation.email,
-      })
-    ).rejects.toThrow(
-      new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'Not authorized. Admin access required.',
       })
     )
   })

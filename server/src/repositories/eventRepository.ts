@@ -1,9 +1,6 @@
 import type { Database, Event } from '@server/database'
-import {
-  eventKeysForMembers,
-  type EventForMember,
-} from '@server/entities/event'
-import type { EventRowSelect, EventRowUpdate } from '@server/types/event'
+import { eventKeysForMembers } from '@server/entities/event'
+import type { EventRowSelect } from '@server/types/event'
 import type { Insertable } from 'kysely'
 
 export function eventRepository(db: Database) {
@@ -26,18 +23,6 @@ export function eventRepository(db: Database) {
         .executeTakeFirstOrThrow()
 
       return result.id
-    },
-
-    async update(id: number, updates: EventRowUpdate): Promise<EventForMember> {
-      return db
-        .updateTable('event')
-        .set({
-          ...updates,
-          updatedAt: new Date(),
-        })
-        .where('id', '=', id)
-        .returning(eventKeysForMembers)
-        .executeTakeFirstOrThrow()
     },
 
     async remove(id: number): Promise<number> {

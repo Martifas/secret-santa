@@ -15,7 +15,7 @@ export default authenticatedProcedure
       const result = await repos.userWishlistRepository.findAllForUser(
         authUser.auth0Id
       )
-      if (!result) {
+      if (!result || result.length === 0) {
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'No wishlists found for this user',

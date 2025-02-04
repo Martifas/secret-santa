@@ -5,14 +5,18 @@ import { authRepoContext } from '@server/utils/tests/context'
 import { TRPCError } from '@trpc/server'
 import invitationRouter from '..'
 import type { UserEventRepository } from '@server/repositories/userEventRepository'
-import { sendGiftExchangeInvitation } from '@server/services/sendEmail'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import 'dotenv/config'
 
-vi.mock('@server/utils/sendEmail', () => ({
+vi.mock('@server/services/sendEmail', () => ({
   sendGiftExchangeInvitation: vi.fn(),
 }))
 
-describe('create', () => {
+import { sendGiftExchangeInvitation } from '@server/services/sendEmail'
+
+const { env } = process
+
+describe('createAndSendInvitation', () => {
   const TEST_USER = fakeAuthUser({
     id: 1,
   })
@@ -41,10 +45,10 @@ describe('create', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(sendGiftExchangeInvitation).mockResolvedValue({
+    vi.mocked(sendGiftExchangeInvitation).mockImplementation(async () => ({
       success: true,
       messageId: 'test-message-id',
-    })
+    }))
   })
 
   it('should create a new invitation and send email when successful', async () => {
@@ -84,17 +88,17 @@ describe('create', () => {
       title: newInvitationInput.title,
       budgetLimit: newInvitationInput.budgetLimit,
       description: newInvitationInput.description,
-      rsvpLinkYes: `http://localhost:5173/rsvp/${newInvitationInput.eventId}/${createdInvitation.id}/accept`,
-      rsvpLinkNo: `http://localhost:5173/rsvp/${newInvitationInput.eventId}/${createdInvitation.id}/refuse`,
+      rsvpLinkYes: `${env.HOST_URL}/rsvp/${newInvitationInput.eventId}/${createdInvitation.id}/accept`,
+      rsvpLinkNo: `${env.HOST_URL}/rsvp/${newInvitationInput.eventId}/${createdInvitation.id}/refuse`,
     })
   })
 
   it('should update invitation status and throw when email sending fails', async () => {
     const emailErrorMessage = 'Failed to send email'
-    vi.mocked(sendGiftExchangeInvitation).mockResolvedValue({
+    vi.mocked(sendGiftExchangeInvitation).mockImplementation(async () => ({
       success: false,
       error: emailErrorMessage,
-    })
+    }))
 
     const updateSpy = vi.fn().mockImplementation(async (id, data) => ({
       ...createdInvitation,

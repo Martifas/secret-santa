@@ -3,7 +3,6 @@ import {
   userWishlistKeysForMembers,
   type UserWishlistForMember,
 } from '@server/entities/userWishlist'
-import type { UserWishlistRowUpdate } from '@server/types/userWishlist'
 import type { Insertable } from 'kysely'
 
 export function userWishlistRepository(db: Database) {
@@ -20,15 +19,6 @@ export function userWishlistRepository(db: Database) {
       return result.id
     },
 
-    async update(id: number, updates: UserWishlistRowUpdate): Promise<number> {
-      const result = await db
-        .updateTable('userWishlist')
-        .set({ ...updates, updatedAt: new Date() })
-        .where('id', '=', id)
-        .returning('id')
-        .executeTakeFirstOrThrow()
-      return result.id
-    },
     async find(id: number): Promise<UserWishlistForMember | null> {
       const result = await db
         .selectFrom('userWishlist')
@@ -48,3 +38,5 @@ export function userWishlistRepository(db: Database) {
     },
   }
 }
+
+export type UserWishlistRepository = ReturnType<typeof userWishlistRepository>

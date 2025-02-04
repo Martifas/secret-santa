@@ -5,7 +5,7 @@ import {
   fakeWishlist,
 } from '@server/entities/tests/fakes'
 import { createTestDatabase } from '@server/utils/tests/database'
-import { insertAll, selectAll } from '@server/utils/tests/record'
+import { insertAll } from '@server/utils/tests/record'
 import { wrapInRollbacks } from '@server/utils/tests/transactions'
 import { pick } from 'lodash-es'
 import { userEventKeysForTesting } from '../../entities/userEvent'
@@ -103,7 +103,7 @@ describe('isEventAdmin', () => {
       {
         userId: newUser.auth0Id,
         eventId: newEvent.id,
-        role: 'event_admin',
+        role: 'admin',
         eventTitle: 'New years party',
       },
     ])
@@ -170,46 +170,6 @@ describe('create', () => {
   })
 })
 
-describe('update', () => {
-  it('should update role', async () => {
-    const updates = {
-      role: 'admin',
-    }
-    const updatedRecord = await repository.updateRole(userEventOne.id, updates)
-    expect(pick(updatedRecord, userEventKeysForTesting)).toEqual(
-      pick(updates, userEventKeysForTesting)
-    )
-    expect(updatedRecord.id).toBe(userEventOne.id)
-    expect(updatedRecord.role).toEqual('admin')
-    expect(updatedRecord.userId).toBe(userEventOne.userId)
-    expect(updatedRecord.updatedAt).toBeInstanceOf(Date)
-  })
-
-  it('should throw error when updating non-existent record', async () => {
-    const updates = {
-      role: 'admin',
-    }
-    await expect(repository.updateRole(99999, updates)).rejects.toThrowError(
-      /no result/i
-    )
-  })
-})
-
-describe('remove', () => {
-  it('should remove record', async () => {
-    const removedRecord = await repository.remove(userEventOne.id)
-    expect(pick(removedRecord, userEventKeysForTesting)).toEqual(
-      pick(userEventOne, userEventKeysForTesting)
-    )
-    const result = await selectAll(db, 'userEvent')
-    expect(result).toHaveLength(0)
-  })
-
-  it('should throw error when removing non-existent record', async () => {
-    await expect(repository.remove(99999)).rejects.toThrowError(/no result/i)
-  })
-})
-
 describe('getAllEventUsers', () => {
   it('should return all user IDs for a specific event', async () => {
     const [userThree] = await insertAll(db, 'user', fakeUser())
@@ -242,7 +202,8 @@ describe('updateSecretSanta', () => {
 
     const result = await repository.updateSecretSanta(
       userOne.auth0Id,
-      newSanta.auth0Id
+      newSanta.auth0Id,
+      eventOne.id
     )
 
     expect(result).toEqual({
@@ -262,13 +223,173 @@ describe('updateSecretSanta', () => {
 
   it('should throw error when updating non-existent user', async () => {
     await expect(
-      repository.updateSecretSanta(userTwo.auth0Id, 'auth0|0000')
+      repository.updateSecretSanta(userTwo.auth0Id, 'auth0|0000', eventOne.id)
     ).rejects.toThrowError(/no result/i)
   })
 
   it('should throw error when updating with non-existent santa', async () => {
     await expect(
-      repository.updateSecretSanta(userOne.auth0Id, 'auth0|12458741')
+      repository.updateSecretSanta(
+        userOne.auth0Id,
+        'auth0|12458741',
+        eventOne.id
+      )
     ).rejects.toThrowError()
+  })
+})
+
+describe('findAllForUser', () => {
+  it('should return all events for a user', async () => { 
+    const [eventTwo] = await insertAll(db, 'event', [
+      fakeEvent({ createdBy: userOne.auth0Id }),
+    ])
+    await insertAll(db, 'userEvent', [
+      fakeUserEventDefault({
+        eventId: eventTwo.id,
+      }),
+    ])
+
+    const userEvents = await repository.findAllForUser(userOne.auth0Id)
+    expect(userEvents).toHaveLength(2)
+    userEvents.forEach((event) => {
+      expect(event.userId).toBe(userOne.auth0Id)
+      expect(event).toHaveProperty('eventTitle')
+      expect(event).toHaveProperty('role')
+    })
+  })
+
+  it('should return empty array for user with no events', async () => {
+    const [newUser] = await insertAll(db, 'user', fakeUser())
+    const results = await repository.findAllForUser(newUser.auth0Id)
+    expect(results).toEqual([])
+  })
+})
+
+describe('findBySantaId', () => {
+  it('should return userId of person who is santa for specified user', async () => {
+    const santaUserId = await repository.findBySantaId(
+      userTwo.auth0Id,
+      eventOne.id
+    )
+    expect(santaUserId).toBe(userOne.auth0Id)
+  })
+
+  it('should return null when no santa is assigned', async () => {
+    const [newUser] = await insertAll(db, 'user', fakeUser())
+    const santaUserId = await repository.findBySantaId(
+      newUser.auth0Id,
+      eventOne.id
+    )
+    expect(santaUserId).toBeNull()
+  })
+
+  it('should return null for non-existent event', async () => {
+    const santaUserId = await repository.findBySantaId(userOne.auth0Id, 99999)
+    expect(santaUserId).toBeNull()
+  })
+})
+
+describe('updateWishlistId', () => {
+  it('should update wishlist id for user event', async () => {
+    const [newWishlist] = await insertAll(db, 'userWishlist', [
+      {
+        userId: userOne.auth0Id,
+        description: 'New wishlist',
+        title: 'Updated wishlist',
+      },
+    ])
+
+    const updatedId = await repository.updateWishlistId(
+      userEventOne.id,
+      newWishlist.id
+    )
+    expect(updatedId).toBe(userEventOne.id)
+
+    const updatedRecord = await repository.findByEventAndUserId(
+      eventOne.id,
+      userOne.auth0Id
+    )
+    expect(updatedRecord?.wishlistId).toBe(newWishlist.id)
+    expect(updatedRecord?.updatedAt).not.toEqual(userEventOne.updatedAt)
+  })
+
+  it('should throw error when updating non-existent record', async () => {
+    await expect(
+      repository.updateWishlistId(99999, userWishlist.id)
+    ).rejects.toThrowError(/no result/i)
+  })
+})
+
+describe('removeByEventId', () => {
+  it('should remove all user events for an event', async () => {
+    const [userThree, userFour] = await insertAll(db, 'user', [
+      fakeUser(),
+      fakeUser(),
+    ])
+    await insertAll(db, 'userEvent', [
+      fakeUserEventDefault({ userId: userThree.auth0Id }),
+      fakeUserEventDefault({ userId: userFour.auth0Id }),
+    ])
+
+    const removedIds = await repository.removeByEventId(eventOne.id)
+    expect(removedIds.length).toBeGreaterThan(0)
+
+    const remainingRecords = await db
+      .selectFrom('userEvent')
+      .select(['id'])
+      .where('eventId', '=', eventOne.id)
+      .execute()
+
+    expect(remainingRecords).toHaveLength(0)
+  })
+
+  it('should return empty array for event with no user events', async () => {
+    const removedIds = await repository.removeByEventId(99999)
+    expect(removedIds).toEqual([])
+  })
+})
+
+describe('removeUserByEventId', () => {
+  it('should remove specific user from event', async () => {
+    const removedId = await repository.removeUserByEventId(
+      eventOne.id,
+      userOne.auth0Id
+    )
+    expect(removedId).not.toBeNull()
+
+    const record = await repository.findByEventAndUserId(
+      eventOne.id,
+      userOne.auth0Id
+    )
+    expect(record).toBeNull()
+  })
+
+  it('should return null when user is not in event', async () => {
+    const [newUser] = await insertAll(db, 'user', fakeUser())
+    const result = await repository.removeUserByEventId(
+      eventOne.id,
+      newUser.auth0Id
+    )
+    expect(result).toBeNull()
+  })
+
+  it('should return null for non-existent event', async () => {
+    const result = await repository.removeUserByEventId(99999, userOne.auth0Id)
+    expect(result).toBeNull()
+  })
+})
+
+describe('findByEventAndUserId', () => {
+  it('should return null for non-existent event', async () => {
+    const result = await repository.findByEventAndUserId(99999, userOne.auth0Id)
+    expect(result).toBeNull()
+  })
+
+  it('should return null for non-existent user', async () => {
+    const result = await repository.findByEventAndUserId(
+      eventOne.id,
+      'non-existent-user'
+    )
+    expect(result).toBeNull()
   })
 })

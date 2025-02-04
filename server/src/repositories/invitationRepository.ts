@@ -43,13 +43,6 @@ export function invitationRepository(db: Database) {
 
       return results
     },
-    async findAllForUser(userId: string): Promise<InvitationRowSelect[]> {
-      return db
-        .selectFrom('eventInvitations')
-        .select(invitationKeysForMembers)
-        .where('userId', '=', userId)
-        .execute()
-    },
 
     async create(invitation: Insertable<EventInvitations>): Promise<number> {
       const result = await db

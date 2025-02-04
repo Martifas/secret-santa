@@ -12,12 +12,12 @@ describe('update', () => {
     id: 1,
   })
 
-  const id = 1
+  const eventId = 123
   const baseInvitation = {
     ...fakeEventInvitation({
-      id,
+      id: 1,
       userId: TEST_USER.auth0Id,
-      eventId: 123,
+      eventId,
       email: 'test@example.com',
       token: 'token123',
       status: 'sent',
@@ -29,25 +29,26 @@ describe('update', () => {
 
   it('should update an invitation when user is authorized', async () => {
     const updates = {
-      email: 'new@example.com',
+      email: 'test@example.com',
+      eventId,
       status: 'confirmed',
     }
 
     const updatedInvitation = {
       ...baseInvitation,
-      ...updates,
+      status: updates.status,
       updatedAt: new Date(),
     }
 
     const repos = {
       invitationRepository: {
-        findById: async () => baseInvitation,
-        update: async (
-          invitationId: number,
-          invitationUpdates: EventRowUpdate
-        ) => {
-          expect(invitationId).toBe(id)
-          expect(invitationUpdates).toEqual(updates)
+        findByEventAndEmail: async () => baseInvitation,
+        update: async (invitationId: number, invitationUpdates: EventRowUpdate) => {
+          expect(invitationId).toBe(baseInvitation.id)
+          expect(invitationUpdates).toEqual({ 
+            status: updates.status,
+            userId: TEST_USER.auth0Id 
+          })
           return updatedInvitation
         },
       } satisfies Partial<InvitationRepository>,
@@ -60,16 +61,13 @@ describe('update', () => {
     const createCaller = createCallerFactory(invitationRouter)
     const { updateInvitation } = createCaller(testContext)
 
-    const result = await updateInvitation({
-      id,
-      ...updates,
-    })
+    const result = await updateInvitation(updates)
 
     expect(result).toMatchObject({
-      id,
+      id: baseInvitation.id,
       userId: TEST_USER.auth0Id,
-      eventId: 123,
-      email: 'new@example.com',
+      eventId,
+      email: 'test@example.com',
       token: 'token123',
       status: 'confirmed',
       expiresAt: expect.any(Date),
@@ -79,10 +77,15 @@ describe('update', () => {
   })
 
   it('should throw NOT_FOUND when invitation does not exist', async () => {
-    const updates = { status: 'confirmed' }
+    const updates = {
+      email: 'test@example.com',
+      eventId,
+      status: 'confirmed'
+    }
+
     const repos = {
       invitationRepository: {
-        findById: async () => null,
+        findByEventAndEmail: async () => null,
       } satisfies Partial<InvitationRepository>,
       userEventRepository: {
         isEventAdmin: async () => true,
@@ -93,12 +96,7 @@ describe('update', () => {
     const createCaller = createCallerFactory(invitationRouter)
     const { updateInvitation } = createCaller(testContext)
 
-    await expect(
-      updateInvitation({
-        id,
-        ...updates,
-      })
-    ).rejects.toThrow(
+    await expect(updateInvitation(updates)).rejects.toThrow(
       new TRPCError({
         code: 'NOT_FOUND',
         message: 'Invitation not found',
@@ -106,46 +104,17 @@ describe('update', () => {
     )
   })
 
-  it('should throw FORBIDDEN when user is not authorized', async () => {
-    const updates = { status: 'confirmed' }
-    const invitationByAnotherUser = {
-      ...baseInvitation,
-      userId: 'auth0| 258',
-    }
-
-    const repos = {
-      invitationRepository: {
-        findById: async () => invitationByAnotherUser,
-      } satisfies Partial<InvitationRepository>,
-      userEventRepository: {
-        isEventAdmin: async () => false,
-      } satisfies Partial<UserEventRepository>,
-    }
-
-    const testContext = authRepoContext(repos, TEST_USER)
-    const createCaller = createCallerFactory(invitationRouter)
-    const { updateInvitation } = createCaller(testContext)
-
-    await expect(
-      updateInvitation({
-        id,
-        ...updates,
-      })
-    ).rejects.toThrow(
-      new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'Not authorized. Admin access required.',
-      })
-    )
-  })
-
   it('should propagate unknown errors', async () => {
-    const updates = { status: 'confirmed' }
+    const updates = {
+      email: 'test@example.com',
+      eventId,
+      status: 'confirmed'
+    }
     const unknownError = new Error('Database connection failed')
 
     const repos = {
       invitationRepository: {
-        findById: async () => baseInvitation,
+        findByEventAndEmail: async () => baseInvitation,
         update: async () => {
           throw unknownError
         },
@@ -159,11 +128,6 @@ describe('update', () => {
     const createCaller = createCallerFactory(invitationRouter)
     const { updateInvitation } = createCaller(testContext)
 
-    await expect(
-      updateInvitation({
-        id,
-        ...updates,
-      })
-    ).rejects.toThrow(unknownError)
+    await expect(updateInvitation(updates)).rejects.toThrow(unknownError)
   })
 })

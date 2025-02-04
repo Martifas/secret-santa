@@ -40,16 +40,6 @@ export function userEventRepository(db: Database) {
         .returning(['santaForUserId'])
         .executeTakeFirstOrThrow()
     },
-    async findSanta(eventId: number, userId: string): Promise<string | null> {
-      const result = await db
-        .selectFrom('userEvent')
-        .where('eventId', '=', eventId)
-        .where('userId', '=', userId)
-        .select('santaForUserId')
-        .executeTakeFirstOrThrow()
-
-      return result.santaForUserId
-    },
     async findByEventAndUserId(
       eventId: number,
       userId: string
@@ -61,13 +51,6 @@ export function userEventRepository(db: Database) {
         .where('userId', '=', userId)
         .executeTakeFirst()
       return result ?? null
-    },
-    async findByEventId(eventId: number): Promise<UserEventForMember[]> {
-      return db
-        .selectFrom('userEvent')
-        .where('eventId', '=', eventId)
-        .selectAll()
-        .execute()
     },
     async findBySantaId(userId: string, eventId: number): Promise<string | null> {
       const result = await db
