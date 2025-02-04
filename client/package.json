@@ -7,6 +7,7 @@
     "build": "run-p typecheck build-only",
     "dev": "vite",
     "build-only": "vite build",
+    "test:unit": "vitest",
     "typecheck": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "preview": "vite preview",
     "preview:prod": "vite preview --host 0.0.0.0 --port 80",
