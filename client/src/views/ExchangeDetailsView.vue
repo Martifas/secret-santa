@@ -531,7 +531,7 @@ onMounted(async () => {
                     <div class="flex justify-around space-x-4">
                       <ActionButton
                         variant="information"
-                        v-if="currentWishlistId"
+                        v-if="santeeWishlistId"
                         @click="
                           router.push({
                             name: 'WishlistDetailed',
@@ -543,7 +543,7 @@ onMounted(async () => {
                       >
                         View Selected Wishlist
                       </ActionButton>
-                      <ActionButton variant="primary" @click="openGiftPrompt"
+                      <ActionButton variant="primary" size="sm" @click="openGiftPrompt"
                         >Gift recommendation</ActionButton
                       >
                     </div>
@@ -612,7 +612,7 @@ onMounted(async () => {
             </p>
             <ul className="list-disc space-y-2 pl-5">
               <li><b>Participant Management:</b> Invite new members and manage the guest list.</li>
-              <li><b>Name Drawing:</b> Initiate the Secret Santa draw when ready.</li>            
+              <li><b>Name Drawing:</b> Initiate the Secret Santa draw when ready.</li>
               <li><b>Support:</b> Assist participants with any questions or concerns.</li>
             </ul>
           </div>

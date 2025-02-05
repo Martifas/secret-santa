@@ -7,6 +7,9 @@ import { sendSecretSantaDrawResult } from '@server/services/sendEmail'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import provideRepos from '@server/trpc/provideRepos'
 import { TRPCError } from '@trpc/server'
+import 'dotenv/config'
+
+const { env } = process
 
 export default authenticatedProcedure
   .use(
@@ -88,7 +91,7 @@ export default authenticatedProcedure
             })
           }
 
-          const eventLink = `/events/${input.eventId}`
+          const eventLink = `${env.HOST_URL}events/${input.eventId}`
 
           await sendSecretSantaDrawResult({
             emailReceiver: santaDetails.email,
