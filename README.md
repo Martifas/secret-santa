@@ -1,4 +1,7 @@
 # Secret Santa Website
+
+LIVE PAGE: https://giftmeister.eu/
+
 This is the server side of the Secret Santa program, providing the backend infrastructure for managing secret santa events, users, wishlists, and invitations.
 
 ## Features
