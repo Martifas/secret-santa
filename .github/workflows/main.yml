@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     # variables for front-end tests
     env:
-      VITE_API_ORIGIN: http://localhost:3000
+      VITE_API_ORIGIN: https://giftmeister.eu
       VITE_API_PATH: /api/v1/trpc
       VITE_AUTH0_DOMAIN: ${{ secrets.VITE_AUTH0_DOMAIN }}
       VITE_AUTH0_CLIENT_ID: ${{ secrets.VITE_AUTH0_CLIENT_ID }}
@@ -163,7 +163,7 @@ jobs:
                 "VITE_AUTH0_DOMAIN": "${{ secrets.VITE_AUTH0_DOMAIN }}",
                 "VITE_AUTH0_CLIENT_ID": "${{ secrets.VITE_AUTH0_CLIENT_ID }}",
                 "VITE_AUTH0_AUDIENCE": "${{ secrets.VITE_AUTH0_AUDIENCE }}",
-                "API_PROXY_PASS": "http://localhost:3000"
+                "API_PROXY_PASS": "http://server:3000"
 
 
               }
