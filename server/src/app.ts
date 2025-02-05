@@ -3,7 +3,6 @@ import {
   createExpressMiddleware,
   type CreateExpressContextOptions,
 } from '@trpc/server/adapters/express'
-import cors from 'cors'
 import { renderTrpcPanel } from 'trpc-panel'
 import type { Database } from './database'
 import { appRouter } from './controllers'
@@ -12,30 +11,6 @@ import config from './config'
 
 export default function createApp(db: Database) {
   const app = express()
-
-  // app.use(
-  //   cors({
-  //     origin: ['http://giftmeister.eu', 'https://giftmeister.eu'],
-  //     credentials: true,
-  //     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  //     allowedHeaders: [
-  //       'Authorization',
-  //       'Content-Type',
-  //       'Accept',
-  //       'Origin',
-  //       'User-Agent',
-  //       'DNT',
-  //       'Cache-Control',
-  //       'X-Mx-ReqToken',
-  //       'Keep-Alive',
-  //       'X-Requested-With',
-  //       'If-Modified-Since',
-  //       'trpc-batch',
-  //       'x-trpc-source',
-  //     ],
-  //   })
-  // )
-  app.use(cors())
 
   app.use(express.json())
 
