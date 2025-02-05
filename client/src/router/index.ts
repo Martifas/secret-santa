@@ -141,6 +141,10 @@ const routes = [
     name: 'health-check',
     component: HealthView,
   },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: { name: 'Home' },
+  },
 ]
 
 const router = createRouter({
