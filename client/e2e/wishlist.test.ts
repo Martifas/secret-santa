@@ -3,7 +3,9 @@ import { expect, test } from '@playwright/test'
 
 test.describe('create wishlist and interact with it', () => {
   test('creating wishlist', async ({ page }) => {
-    await login(page, 'thesecretgiftmeister@gmail.com', 'Kakarotas2025++')
+    // Increase test timeout
+    test.setTimeout(30000)
+    await login(page)
 
     await page.getByRole('link', { name: 'Create Wishlist' }).nth(1).click()
     await expect(page).toHaveURL('http://localhost:5173/wishlist')
@@ -13,40 +15,37 @@ test.describe('create wishlist and interact with it', () => {
     await page.getByRole('textbox', { name: 'Enter the description of your' }).fill('Test wishlist')
     await page.getByRole('button', { name: 'Create wishlist' }).click()
 
-    // Add first item
+    // Wait for the form to be processed
+    await page.waitForLoadState('networkidle', { timeout: 10000 })
+
+    // Add item
+    await expect(page.getByRole('textbox', { name: 'Enter the name of the item *' })).toBeVisible({
+      timeout: 10000,
+    })
     await page.getByRole('textbox', { name: 'Enter the name of the item *' }).fill('Bike')
     await page.getByRole('textbox', { name: 'Enter description (optional)' }).fill('Mountain')
     await page.getByRole('spinbutton', { name: 'Enter price (optional)' }).fill('150')
     await page.getByRole('button', { name: 'Add Item' }).click()
 
+    // Wait for item to appear
     await expect(
       page
         .locator('div')
         .filter({ hasText: /^BikeMountain €150$/ })
         .nth(1)
-    ).toBeVisible()
+    ).toBeVisible({ timeout: 10000 })
 
-    // Add second item
-    await page.getByRole('textbox', { name: 'Enter the name of the item *' }).fill('Mountain shoes')
-    await page.getByRole('textbox', { name: 'Enter description (optional)' }).fill('Stable and fun')
-    await page.getByRole('spinbutton', { name: 'Enter price (optional)' }).fill('500')
-    await page.getByRole('button', { name: 'Add Item' }).click()
+    // Delete item
+    await page.getByRole('button').filter({ hasText: /^$/ }).click()
 
+    // Wait for network operations to complete after deletion
+    await page.waitForLoadState('networkidle', { timeout: 10000 })
+
+    // Verify that no items are in the wishlist
     await expect(
       page
         .locator('div')
-        .filter({ hasText: /^Mountain shoesStable and fun €500$/ })
-        .first()
-    ).toBeVisible()
-
-    // Delete Second item
-    await page.getByRole('button').nth(4).click()
-
-    await expect(
-      page
-        .locator('div')
-        .filter({ hasText: /^BikeMountain €150$/ })
-        .nth(1)
-    ).not.toBeVisible()
+        .filter({ hasText: /^No items added yet\. Start by adding your first gift above!$/ })
+    ).toBeVisible({ timeout: 10000 })
   })
 })

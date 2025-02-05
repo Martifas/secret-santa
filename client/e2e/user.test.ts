@@ -1,7 +1,11 @@
 import { login, logout } from './utils/auth'
-import { test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
-test('login and logout flow', async ({ page }) => {
-  await login(page, 'thesecretgiftmeister@gmail.com', 'Kakarotas2025++')
+test('login flow', async ({ page }) => {
+  await login(page)
+  await expect(page.getByRole('button', { name: 'Open user menu' })).toBeVisible()
+})
+test('logout flow', async ({ page }) => {
+  await login(page)
   await logout(page)
 })

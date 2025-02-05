@@ -50,8 +50,8 @@ watch(
         await trpc.user.userSync.mutate({
           auth0Id: authUser.value.sub,
           email: authUser.value.email,
-          firstName: authUser.value.given_name || authUser.value.username.split('@')[0],
-          lastName: authUser.value.given_name || authUser.value.username.split('@')[0],
+          firstName: authUser.value.given_name || authUser.value.email.split('@')[0],
+          lastName: authUser.value.given_name || authUser.value.email.split('@')[0],
           picture: authUser.value.picture || '',
         })
       } catch (error) {

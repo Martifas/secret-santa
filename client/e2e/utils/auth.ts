@@ -1,11 +1,17 @@
 import { Page, expect } from '@playwright/test'
+import dotenv from 'dotenv'
 
-export async function login(page: Page, email: string, password: string) {
+dotenv.config()
+
+const email = process.env.VITE_TESTING_EMAIL as string
+const password = process.env.VITE_TESTING_PASSWORD as string
+
+export async function login(page: Page) {
   await page.goto('http://localhost:5173/')
   await page.getByRole('button', { name: 'Log in' }).click()
-  await page.getByRole('textbox', { name: 'Username or Email address' }).click()
-  await page.getByRole('textbox', { name: 'Username or Email address' }).fill(email)
-  await page.getByRole('textbox', { name: 'Username or Email address' }).press('Tab')
+  await page.getByRole('textbox', { name: 'Email address' }).click()
+  await page.getByRole('textbox', { name: 'Email address' }).fill(email)
+  await page.getByRole('textbox', { name: 'Email address' }).press('Tab')
   await page.getByRole('textbox', { name: 'Password' }).fill(password)
   await page.getByRole('button', { name: 'Continue', exact: true }).click()
 
