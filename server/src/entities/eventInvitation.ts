@@ -5,7 +5,7 @@ import { idSchema } from './shared'
 
 export const eventInvitationSchema = z.object({
   id: idSchema,
-  userId: idSchema,
+  userId: z.string(),
   eventId: idSchema,
   email: z.string().email(),
   status: z.string().min(1),
@@ -22,7 +22,4 @@ export type InvitationForMember = Pick<
   (typeof invitationKeysForMembers)[number]
 >
 
-export const invitationKeysForTesting = [
-  'email',  
-  'status'
-] as const
+export const invitationKeysForTesting = ['email', 'status'] as const

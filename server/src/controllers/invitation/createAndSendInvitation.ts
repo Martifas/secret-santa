@@ -2,10 +2,13 @@ import provideRepos from '@server/trpc/provideRepos'
 import { eventInvitationSchema } from '@server/entities/eventInvitation'
 import { invitationRepository } from '@server/repositories/invitationRepository'
 import { TRPCError } from '@trpc/server'
-import { sendGiftExchangeInvitation } from '@server/utils/sendEmail'
+import { sendGiftExchangeInvitation } from '@server/services/sendEmail'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import { logger } from '@server/logger'
 import { z } from 'zod'
+import 'dotenv/config'
+
+const { env } = process
 
 const emailDataSchema = z.object({
   eventOrganiser: z.string(),
@@ -57,10 +60,10 @@ export default authenticatedProcedure
 
       const emailResult = await sendGiftExchangeInvitation({
         emailReceiver: input.email,
-        eventOrganiser: input.eventOrganiser, // Fallback name
-        exchangeDate: input.eventDate, // Use event date if available
-        rsvpLinkYes: `http://localhost:5173/rsvp/${input.eventId}/${invitationId}/accept`,
-        rsvpLinkNo: `http://localhost:5173/rsvp/${input.eventId}/${invitationId}/refuse`,
+        eventOrganiser: input.eventOrganiser,
+        exchangeDate: input.eventDate,
+        rsvpLinkYes: `${env.HOST_URL}/rsvp/${input.eventId}/${invitationId}/accept`,
+        rsvpLinkNo: `${env.HOST_URL}/rsvp/${input.eventId}/${invitationId}/refuse`,
         budgetLimit: input.budgetLimit,
         title: input.title,
         description: input.description,

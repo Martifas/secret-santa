@@ -11,14 +11,14 @@ describe('userSync', () => {
     firstName: 'Test',
     lastName: 'User',
     auth0Id: 'auth0|123',
-    picture: 'https://example.com/avatar.jpg'
+    picture: 'https://example.com/avatar.jpg',
   }
 
   const existingUser: UserForMember = {
     id: 1,
     ...testUserInput,
     createdAt: new Date(),
-    lastLogin: new Date()
+    lastLogin: new Date(),
   }
 
   it('should create a new user when user does not exist', async () => {
@@ -33,7 +33,7 @@ describe('userSync', () => {
         },
         findById: async (id) => ({
           ...existingUser,
-          id
+          id,
         }),
       } satisfies Partial<UserRepository>,
     }
@@ -69,7 +69,9 @@ describe('userSync', () => {
   })
 
   it('should throw BAD_REQUEST when email already exists', async () => {
-    const duplicateKeyError = new Error('duplicate key value violates unique constraint')
+    const duplicateKeyError = new Error(
+      'duplicate key value violates unique constraint'
+    )
     const repos = {
       userRepository: {
         findByAuth0Id: async () => null,
@@ -122,6 +124,8 @@ describe('userSync', () => {
     const createCaller = createCallerFactory(userSyncRouter)
     const { userSync } = createCaller(testContext)
 
-    await expect(userSync(testUserInput)).rejects.toThrow('Failed to create user')
+    await expect(userSync(testUserInput)).rejects.toThrow(
+      'Failed to create user'
+    )
   })
 })

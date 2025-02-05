@@ -15,7 +15,7 @@ describe('findById', () => {
   const baseInvitation = {
     ...fakeEventInvitation({
       id,
-      userId: TEST_USER.id,
+      userId: TEST_USER.auth0Id,
       eventId: 123,
       email: 'test@example.com',
       token: 'token123',
@@ -30,6 +30,7 @@ describe('findById', () => {
     const repos = {
       invitationRepository: {
         findById: async () => baseInvitation,
+        findByEventAndEmail: async () => baseInvitation ,
       } satisfies Partial<InvitationRepository>,
       userEventRepository: {
         isEventAdmin: async () => true,
@@ -40,11 +41,14 @@ describe('findById', () => {
     const createCaller = createCallerFactory(invitationRouter)
     const { getInvitation } = createCaller(testContext)
 
-    const result = await getInvitation({ id })
+    const result = await getInvitation({
+      eventId: baseInvitation.eventId,
+      email: baseInvitation.email,
+    })
 
     expect(result).toMatchObject({
       id,
-      userId: TEST_USER.id,
+      userId: TEST_USER.auth0Id,
       eventId: 123,
       email: 'test@example.com',
       token: 'token123',
@@ -59,6 +63,7 @@ describe('findById', () => {
     const repos = {
       invitationRepository: {
         findById: async () => null,
+        findByEventAndEmail: async () => null,
       } satisfies Partial<InvitationRepository>,
       userEventRepository: {
         isEventAdmin: async () => true,
@@ -69,37 +74,15 @@ describe('findById', () => {
     const createCaller = createCallerFactory(invitationRouter)
     const { getInvitation } = createCaller(testContext)
 
-    await expect(getInvitation({ id })).rejects.toThrow(
+    await expect(
+      getInvitation({
+        eventId: baseInvitation.eventId,
+        email: baseInvitation.email,
+      })
+    ).rejects.toThrow(
       new TRPCError({
         code: 'NOT_FOUND',
         message: 'Invitation not found',
-      })
-    )
-  })
-
-  it('should throw FORBIDDEN when user is not authorized', async () => {
-    const invitationByAnotherUser = {
-      ...baseInvitation,
-      userId: TEST_USER.id + 1,
-    }
-
-    const repos = {
-      invitationRepository: {
-        findById: async () => invitationByAnotherUser,
-      } satisfies Partial<InvitationRepository>,
-      userEventRepository: {
-        isEventAdmin: async () => false,
-      } satisfies Partial<UserEventRepository>,
-    }
-
-    const testContext = authRepoContext(repos, TEST_USER)
-    const createCaller = createCallerFactory(invitationRouter)
-    const { getInvitation } = createCaller(testContext)
-
-    await expect(getInvitation({ id })).rejects.toThrow(
-      new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'Not authorized. Admin access required.',
       })
     )
   })

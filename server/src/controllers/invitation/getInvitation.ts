@@ -5,9 +5,9 @@ import {
   type InvitationForMember,
 } from '@server/entities/eventInvitation'
 import { TRPCError } from '@trpc/server'
-import { groupAdminProcedure } from '@server/trpc/groupAdminProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
-export default groupAdminProcedure
+export default authenticatedProcedure
   .use(
     provideRepos({
       invitationRepository,
@@ -15,15 +15,13 @@ export default groupAdminProcedure
   )
   .input(
     eventInvitationSchema.pick({
-      id: true,
+      eventId: true,
+      email: true
     })
   )
   .query(
-    async ({
-      input: { id },
-      ctx: { repos },
-    }): Promise<InvitationForMember> => {
-      const invitation = await repos.invitationRepository.findById(id)
+    async ({ input, ctx: { repos } }): Promise<InvitationForMember> => {
+      const invitation = await repos.invitationRepository.findByEventAndEmail(input.eventId, input.email)
 
       if (!invitation) {
         throw new TRPCError({

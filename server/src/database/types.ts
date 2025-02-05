@@ -10,18 +10,6 @@ export type Generated<T> =
     ? ColumnType<S, I | undefined, U>
     : ColumnType<T, T | undefined, T>
 
-export type Json = JsonValue
-
-export type JsonArray = JsonValue[]
-
-export type JsonObject = {
-  [x: string]: JsonValue | undefined
-}
-
-export type JsonPrimitive = boolean | number | string | null
-
-export type JsonValue = JsonArray | JsonObject | JsonPrimitive
-
 export type Timestamp = ColumnType<Date, Date | string, Date | string>
 
 export interface Event {
@@ -31,8 +19,8 @@ export interface Event {
   description: string
   eventDate: Timestamp
   id: Generated<number>
-  name: string
   status: string
+  title: string
   updatedAt: Generated<Timestamp>
 }
 
@@ -43,14 +31,7 @@ export interface EventInvitations {
   id: Generated<number>
   status: string
   updatedAt: Generated<Timestamp>
-  userId: number | null
-}
-
-export interface EventRule {
-  eventId: number
-  id: Generated<number>
-  ruleData: Json
-  ruleType: string
+  userId: string | null
 }
 
 export interface User {
@@ -67,11 +48,12 @@ export interface User {
 export interface UserEvent {
   createdAt: Generated<Timestamp>
   eventId: number
+  eventTitle: string
   id: Generated<number>
   role: string
-  santaForUserId: number | null
+  santaForUserId: string | null
   updatedAt: Generated<Timestamp>
-  userId: number
+  userId: string
   wishlistId: number | null
 }
 
@@ -82,7 +64,6 @@ export interface UserWishlist {
   title: string
   updatedAt: Generated<Timestamp>
   userId: string
-  wishlistId: number | null
 }
 
 export interface Wishlist {
@@ -93,12 +74,12 @@ export interface Wishlist {
   price: number | null
   updatedAt: Generated<Timestamp>
   userId: string
+  userWishlistId: number
 }
 
 export interface DB {
   event: Event
   eventInvitations: EventInvitations
-  eventRule: EventRule
   user: User
   userEvent: UserEvent
   userWishlist: UserWishlist

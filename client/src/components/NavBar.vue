@@ -14,15 +14,24 @@ import {
   SparklesIcon,
   GiftIcon,
   ChevronDownIcon,
+  ComputerDesktopIcon,
 } from '@heroicons/vue/24/outline'
 import { useAuth0 } from '@auth0/auth0-vue'
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 import { trpc } from '@/trpc'
+import { useRouter } from 'vue-router'
+import pic from '../assets/profile.png'
 
 const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0()
+const router = useRouter()
 
 const login = () => {
-  loginWithRedirect({})
+  const currentRoute = router.currentRoute.value
+  loginWithRedirect({
+    appState: {
+      target: currentRoute.name !== 'Home' ? currentRoute.fullPath : '/',
+    },
+  })
 }
 
 const logoutUser = () => {
@@ -41,8 +50,8 @@ watch(
         await trpc.user.userSync.mutate({
           auth0Id: authUser.value.sub,
           email: authUser.value.email,
-          firstName: authUser.value.given_name || '',
-          lastName: authUser.value.family_name || '',
+          firstName: authUser.value.given_name || authUser.value.email.split('@')[0],
+          lastName: authUser.value.given_name || authUser.value.email.split('@')[0],
           picture: authUser.value.picture || '',
         })
       } catch (error) {
@@ -53,10 +62,17 @@ watch(
   { immediate: true }
 )
 
-const navigation = [
-  { name: 'Gift Exchange', to: { name: 'Exchange' }, current: false },
-  { name: 'Create Wishlist', to: { name: 'Wishlist' }, current: false },
+const baseNavigation = [
+  { name: 'Gift Exchange', to: { name: 'Exchange' } },
+  { name: 'Create Wishlist', to: { name: 'Wishlist' } },
 ]
+
+const navigation = computed(() => {
+  if (isAuthenticated.value) {
+    return [{ name: 'Dashboard', to: { name: 'Dashboard' } }, ...baseNavigation]
+  }
+  return baseNavigation
+})
 </script>
 
 <template>
@@ -66,8 +82,13 @@ const navigation = [
     v-slot="{ open }"
   >
     <div class="container mx-auto max-w-7xl">
+      <div
+        v-if="!isLoading && isAuthenticated && user"
+        data-test="auth-ready"
+        style="display: none"
+      ></div>
       <div class="relative flex h-16 items-center justify-center">
-        <div class="absolute inset-y-0 left-0 flex items-center px-4 sm:hidden">
+        <div class="absolute inset-y-0 left-0 flex items-center px-4 md:hidden">
           <!-- Mobile menu button-->
           <DisclosureButton
             class="relative inline-flex items-center justify-center rounded-md border-1 p-1 text-black hover:bg-green-900 hover:text-white focus:outline-hidden focus:ring-inset"
@@ -78,9 +99,7 @@ const navigation = [
             <XMarkIcon v-else class="block size-6" aria-hidden="true" />
           </DisclosureButton>
         </div>
-        <div
-          class="sm:justify-endstart flex flex-1 items-center justify-center sm:items-stretch sm:justify-start!"
-        >
+        <div class="flex flex-1 items-center justify-center sm:items-stretch md:justify-start!">
           <router-link class="flex items-center" :to="{ name: 'Home' }">
             <img
               class="h-8 w-auto"
@@ -89,20 +108,20 @@ const navigation = [
             />
           </router-link>
 
-          <div class="hidden sm:ml-6 sm:block">
+          <div class="hidden sm:ml-6 md:block">
             <div class="flex space-x-4">
               <router-link
                 v-for="item in navigation"
                 :key="item.name"
                 :to="item.to"
                 :class="[
-                  item.current ? 'text-green-900 underline' : 'text-black hover:text-green-900',
+                  'text-black hover:text-green-900',
                   'rounded-md px-3 py-2 text-sm font-bold',
                 ]"
-                :aria-current="item.current ? 'page' : undefined"
               >
                 <GiftIcon v-if="item.name === 'Gift Exchange'" class="inline size-6" />
                 <SparklesIcon v-if="item.name === 'Create Wishlist'" class="inline size-6" />
+                <ComputerDesktopIcon v-if="item.name === 'Dashboard'" class="inline size-6" />
                 {{ item.name }}</router-link
               >
             </div>
@@ -124,8 +143,8 @@ const navigation = [
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">Open user menu</span>
                 <img
-                  :src="user?.picture"
-                  :alt="`${user?.name}'s profile picture`"
+                  :src="user?.picture || pic"
+                  @error="($event.target as HTMLImageElement).src = pic"
                   class="m-0.5 size-8 rounded-full"
                   crossorigin="anonymous"
                 />
@@ -185,12 +204,9 @@ const navigation = [
           as="a"
           :to="item.to"
           :class="[
-            item.current
-              ? 'text-green-900 underline'
-              : 'border-t-1 border-black text-black last:border-b-1 hover:text-green-900',
+            'border-t-1 border-black text-black last:border-b-1 hover:text-green-900',
             'block px-3 py-2 text-base font-bold',
           ]"
-          :aria-current="item.current ? 'page' : undefined"
         >
           {{ item.name }}
         </router-link>

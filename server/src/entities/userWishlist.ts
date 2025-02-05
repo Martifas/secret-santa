@@ -6,7 +6,6 @@ import { idSchema } from './shared'
 export const userWishlistSchema = z.object({
   id: idSchema,
   userId: z.string(),
-  wishlistId: idSchema,
   title: z.string(),
   description: z.string(),
   createdAt: z.date(),
@@ -22,4 +21,8 @@ export type UserWishlistForMember = Pick<
   (typeof userWishlistKeysForMembers)[number]
 >
 
-export const userWishlistKeysForTesting = ['title', 'userId', 'description'] as const
+export const userWishlistKeysForTesting = [
+  'title',
+  'userId',
+  'description',
+] as const

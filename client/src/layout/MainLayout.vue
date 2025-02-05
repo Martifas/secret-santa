@@ -8,4 +8,3 @@ import Footer from '@/components/Footer.vue'
   <router-view></router-view>
   <Footer></Footer>
 </template>
-

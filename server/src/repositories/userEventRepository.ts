@@ -1,9 +1,9 @@
 import type { Database } from '@server/database'
+
 import { userEventKeysForMembers } from '@server/entities/userEvent'
 import type {
   SantaUserIdSelect,
   UserEventRowSelect,
-  UserEventRowUpdate,
   UserIdRowSelect,
 } from '@server/types/userEvent'
 import type { Insertable } from 'kysely'
@@ -19,20 +19,30 @@ export function userEventRepository(db: Database) {
         .where('eventId', '=', eventId)
         .execute()
     },
+    async findAllForUser(userId: string): Promise<UserEventForMember[]> {
+      const result = await db
+        .selectFrom('userEvent')
+        .select(userEventKeysForMembers)
+        .where('userId', '=', userId)
+        .execute()
+      return result
+    },
     async updateSecretSanta(
-      userId: number,
-      santaForUserId: number
+      userId: string,
+      santaForUserId: string,
+      eventId: number
     ): Promise<SantaUserIdSelect> {
       return db
         .updateTable('userEvent')
         .set({ santaForUserId: santaForUserId, updatedAt: new Date() })
         .where('userId', '=', userId)
+        .where('eventId', '=', eventId)
         .returning(['santaForUserId'])
         .executeTakeFirstOrThrow()
     },
     async findByEventAndUserId(
       eventId: number,
-      userId: number
+      userId: string
     ): Promise<UserEventRowSelect | null> {
       const result = await db
         .selectFrom('userEvent')
@@ -42,57 +52,83 @@ export function userEventRepository(db: Database) {
         .executeTakeFirst()
       return result ?? null
     },
-    async create(record: Insertable<UserEvent>): Promise<UserEventForMember> {
-      return db
+    async findBySantaId(userId: string, eventId: number): Promise<string | null> {
+      const result = await db
+        .selectFrom('userEvent')
+        .select('userId')
+        .where('santaForUserId', '=', userId)
+        .where('eventId', '=', eventId)
+        .executeTakeFirst()
+      return result?.userId ?? null
+    },
+    async create(record: Insertable<UserEvent>): Promise<number> {
+      const result = await db
         .insertInto('userEvent')
         .values(record)
-        .returning(userEventKeysForMembers)
+        .returning('id')
         .executeTakeFirstOrThrow()
+      return result.id
     },
 
-    async updateRole(
+    async updateWishlistId(
       id: number,
-      updates: UserEventRowUpdate
-    ): Promise<UserEventForMember> {
-      return db
+      wishlistId: number
+    ): Promise<number | null> {
+      const result = await db
         .updateTable('userEvent')
         .set({
-          ...updates,
+          wishlistId: wishlistId,
           updatedAt: new Date(),
         })
         .where('id', '=', id)
-        .returning(userEventKeysForMembers)
+        .returning('id')
         .executeTakeFirstOrThrow()
+      return result.id
     },
 
-    async isEventAdmin(userId: number, eventId: number): Promise<boolean> {
+    async isEventAdmin(userId: string, eventId: number): Promise<boolean> {
       const result = await db
         .selectFrom('userEvent')
         .select('id')
-        .where('role', '=', 'event_admin')
+        .where('role', '=', 'admin')
         .where('eventId', '=', eventId)
         .where('userId', '=', userId)
         .executeTakeFirst()
       return result !== undefined
     },
 
-    async isMember(eventId: number, userId: number): Promise<boolean> {
+    async isMember(eventId: number, userId: string): Promise<boolean> {
       const result = await db
         .selectFrom('userEvent')
         .select('id')
         .where('eventId', '=', eventId)
         .where('userId', '=', userId)
+        .where('role', 'in', ['member', 'admin'])
         .executeTakeFirst()
-
       return result !== undefined
     },
 
-    async remove(id: number): Promise<UserEventForMember> {
-      return db
+    async removeByEventId(eventId: number): Promise<number[]> {
+      const result = await db
         .deleteFrom('userEvent')
-        .where('id', '=', id)
-        .returning(userEventKeysForMembers)
-        .executeTakeFirstOrThrow()
+        .where('eventId', '=', eventId)
+        .returning('id')
+        .execute()
+
+      return result.map((row) => row.id)
+    },
+    async removeUserByEventId(
+      eventId: number,
+      userId: string
+    ): Promise<number | null> {
+      const result = await db
+        .deleteFrom('userEvent')
+        .where('eventId', '=', eventId)
+        .where('userId', '=', userId)
+        .returning('id')
+        .execute()
+
+      return result[0]?.id ?? null
     },
   }
 }

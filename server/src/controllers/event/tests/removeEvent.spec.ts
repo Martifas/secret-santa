@@ -10,7 +10,6 @@ describe('remove', () => {
   const TEST_USER = fakeAuthUser({
     id: 1,
   })
-
   it('should remove an event when user is the creator', async () => {
     const id = 1
     const event = fakeEvent({
@@ -22,7 +21,6 @@ describe('remove', () => {
       status: 'draft',
       eventDate: new Date('2024-12-25'),
     })
-
     const repos = {
       eventRepository: {
         find: async () => ({
@@ -32,30 +30,28 @@ describe('remove', () => {
         }),
         remove: async (eventId: number) => {
           expect(eventId).toBe(id)
-          return { ...event, createdAt: new Date(), updatedAt: new Date() }
+          return eventId
         },
       } satisfies Partial<EventRepository>,
       userEventRepository: {
         isEventAdmin: async () => true,
+        removeByEventId: async (eventId: number) => {
+          expect(eventId).toBe(id)
+          return [eventId]
+        },
       } satisfies Partial<UserEventRepository>,
+      invitationRepository: {
+        removeByEventId: async (eventId: number) => {
+          expect(eventId).toBe(id)
+          return []
+        },
+      },
     }
-
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(eventRouter)
     const { removeEvent } = createCaller(testContext)
-
     const result = await removeEvent({ id })
-
-    expect(result).toMatchObject({
-      id,
-      name: 'Christmas Party',
-      description: 'Annual office party',
-      budgetLimit: 50,
-      status: 'draft',
-      eventDate: expect.any(Date),
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
-    })
+    expect(result).toEqual({ success: true })
   })
 
   it('should throw error when event not found', async () => {
@@ -66,12 +62,13 @@ describe('remove', () => {
       userEventRepository: {
         isEventAdmin: async () => true,
       } satisfies Partial<UserEventRepository>,
+      invitationRepository: {
+        removeByEventId: async () => [],
+      },
     }
-
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(eventRouter)
     const { removeEvent } = createCaller(testContext)
-
     await expect(removeEvent({ id: 1 })).rejects.toThrow(
       new TRPCError({
         code: 'NOT_FOUND',
@@ -83,7 +80,6 @@ describe('remove', () => {
   it('should throw error when user is not the creator', async () => {
     const id = 1
     const otherUserId = 'auth0|9512'
-
     const event = fakeEvent({
       id,
       createdBy: otherUserId,
@@ -93,7 +89,6 @@ describe('remove', () => {
       status: 'draft',
       eventDate: new Date('2024-12-25'),
     })
-
     const repos = {
       eventRepository: {
         find: async () => ({
@@ -105,12 +100,13 @@ describe('remove', () => {
       userEventRepository: {
         isEventAdmin: async () => false,
       } satisfies Partial<UserEventRepository>,
+      invitationRepository: {
+        removeByEventId: async () => [],
+      },
     }
-
     const testContext = authRepoContext(repos, TEST_USER)
     const createCaller = createCallerFactory(eventRouter)
     const { removeEvent } = createCaller(testContext)
-
     await expect(removeEvent({ id })).rejects.toThrow(
       new TRPCError({
         code: 'FORBIDDEN',

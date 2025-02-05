@@ -13,7 +13,7 @@ describe('create event', () => {
 
   it('should create a new event and return its id', async () => {
     const newEventInput = {
-      name: 'Christmas Party',
+      title: 'Christmas Party',
       description: 'Annual office party',
       budgetLimit: 50,
       status: 'active',
@@ -59,7 +59,7 @@ describe('create event', () => {
 
   it('should throw error when event creation fails', async () => {
     const newEventInput = {
-      name: 'Christmas Party',
+      title: 'Christmas Party',
       description: 'Annual office party',
       budgetLimit: 50,
       status: 'active',
@@ -83,7 +83,7 @@ describe('create event', () => {
 
   it('should throw error when created event cannot be found', async () => {
     const newEventInput = {
-      name: 'Christmas Party',
+      title: 'Christmas Party',
       description: 'Annual office party',
       budgetLimit: 50,
       status: 'active',

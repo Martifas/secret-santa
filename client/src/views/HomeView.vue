@@ -1,6 +1,11 @@
+<script setup lang="ts">
+import { useAuth0 } from '@auth0/auth0-vue'
+
+const { isAuthenticated } = useAuth0()
+</script>
 <template>
   <div
-    class="h-96 min-h-[400px] w-full bg-[url(https://images.unsplash.com/photo-1467810563316-b5476525c0f9?q=80&w=1469&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] bg-cover bg-center"
+    class="h-96 min-h-[450px] w-full bg-[url(https://images.unsplash.com/photo-1467810563316-b5476525c0f9?q=80&w=1469&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] bg-cover bg-center"
   >
     <div class="container mx-auto max-w-7xl flex-col items-center justify-between px-4 py-8">
       <div class="text-white">
@@ -14,14 +19,21 @@
       </div>
       <div class="text-md mx-auto mt-20 flex w-40 flex-col items-center">
         <router-link
+          v-if="isAuthenticated"
+          :to="{ name: 'Dashboard' }"
+          class="m-2 w-3xs rounded-sm bg-green-900  shadow-gray-800 p-2 text-center text-white shadow-md hover:bg-green-700"
+        >
+          Dashboard
+        </router-link>
+        <router-link
           :to="{ name: 'Wishlist' }"
-          class="m-2 w-3xs rounded-sm bg-green-900 p-2 text-center text-white hover:bg-green-700"
+          class="m-2 w-3xs rounded-sm bg-green-900 shadow-gray-800 p-2 text-center text-white shadow-md hover:bg-green-700"
         >
           Create Wishlist
         </router-link>
         <router-link
           :to="{ name: 'Exchange' }"
-          class="m-2 w-3xs rounded-sm bg-green-900 p-2 text-center text-white hover:bg-green-700"
+          class="m-2 w-3xs rounded-sm shadow-gray-900 bg-green-800 p-2 text-center text-white shadow-md hover:bg-green-700"
         >
           Create Exchange Event
         </router-link>

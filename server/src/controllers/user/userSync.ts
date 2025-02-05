@@ -13,7 +13,7 @@ export default publicProcedure
       firstName: true,
       lastName: true,
       auth0Id: true,
-      picture: true
+      picture: true,
     })
   )
   .mutation(async ({ input: userData, ctx: { repos } }) => {
@@ -32,7 +32,7 @@ export default publicProcedure
         await repos.userRepository.updateLastLogin(user.id)
       }
 
-      return { success: true, id:user.id }
+      return { success: true, id: user.id }
     } catch (error) {
       assertError(error)
       if (error.message.includes('duplicate key')) {

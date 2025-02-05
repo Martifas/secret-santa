@@ -1,31 +1,35 @@
 import type { Database, Wishlist } from '@server/database'
-import { wishlistKeys, type WishlistForMember } from '@server/entities/wishlist'
-import type {
-  WishlistRowSelect,
-  WishlistRowUpdate,
-} from '@server/types/wishlist'
+import {
+  wishlistKeys,
+  type WishlistForMember,
+} from '@server/entities/wishlistItem'
+import type { WishlistRowSelect } from '@server/types/wishlist'
 import type { Insertable } from 'kysely'
 
 export function wishlistRepository(db: Database) {
   return {
-    async findById(id: number): Promise<WishlistRowSelect | null> {
-      const result = await db
-        .selectFrom('wishlist')
-        .select(wishlistKeys)
-        .where('id', '=', id)
-        .executeTakeFirst()
-      return result ?? null
-    },
-
-    async findByUserIdAndItem(
+    async findAllByUserIdAndUserWishlistId(
       userId: string,
-      itemName: string
-    ): Promise<WishlistRowSelect | null> {
+      userWishlistId: number
+    ): Promise<WishlistRowSelect[]> {
       const result = await db
         .selectFrom('wishlist')
         .select(wishlistKeys)
         .where('userId', '=', userId)
+        .where('userWishlistId', '=', userWishlistId)
+        .execute()
+
+      return result
+    },
+    async findByItemAndUserWishlistId(
+      itemName: string,
+      userWishlistId: number
+    ): Promise<WishlistRowSelect | null> {
+      const result = await db
+        .selectFrom('wishlist')
+        .select(wishlistKeys)
         .where('itemName', '=', itemName)
+        .where('userWishlistId', '=', userWishlistId)
         .executeTakeFirst()
       return result ?? null
     },
@@ -34,21 +38,6 @@ export function wishlistRepository(db: Database) {
       return db
         .insertInto('wishlist')
         .values(wishlist)
-        .returning(wishlistKeys)
-        .executeTakeFirstOrThrow()
-    },
-
-    async update(
-      id: number,
-      updates: WishlistRowUpdate
-    ): Promise<WishlistForMember> {
-      return db
-        .updateTable('wishlist')
-        .set({
-          ...updates,
-          updatedAt: new Date(),
-        })
-        .where('id', '=', id)
         .returning(wishlistKeys)
         .executeTakeFirstOrThrow()
     },

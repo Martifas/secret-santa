@@ -1,9 +1,6 @@
 import type { Database, Event } from '@server/database'
-import {
-  eventKeysForMembers,
-  type EventForMember,
-} from '@server/entities/event'
-import type { EventRowSelect, EventRowUpdate } from '@server/types/event'
+import { eventKeysForMembers } from '@server/entities/event'
+import type { EventRowSelect } from '@server/types/event'
 import type { Insertable } from 'kysely'
 
 export function eventRepository(db: Database) {
@@ -25,53 +22,17 @@ export function eventRepository(db: Database) {
         .returning('id')
         .executeTakeFirstOrThrow()
 
-      return result.id 
+      return result.id
     },
 
-    async update(id: number, updates: EventRowUpdate): Promise<EventForMember> {
-      return db
-        .updateTable('event')
-        .set({
-          ...updates,
-          updatedAt: new Date(),
-        })
-        .where('id', '=', id)
-        .returning(eventKeysForMembers)
-        .executeTakeFirstOrThrow()
-    },
-
-    async remove(id: number): Promise<EventForMember> {
-      return db
+    async remove(id: number): Promise<number> {
+      const result = await db
         .deleteFrom('event')
         .where('id', '=', id)
-        .returning(eventKeysForMembers)
+        .returning('id')
         .executeTakeFirstOrThrow()
-    },
 
-    async findAllForUser(userAuth0Id: string): Promise<EventRowSelect[]> {
-      return db
-        .selectFrom('event')
-        .leftJoin('userEvent', 'event.id', 'userEvent.eventId')
-        .leftJoin('user', 'userEvent.userId', 'user.id')
-        .select([
-          'event.id',
-          'event.name',
-          'event.description',
-          'event.createdBy',
-          'event.eventDate',
-          'event.budgetLimit',
-          'event.status',
-          'event.createdAt',
-          'event.updatedAt',
-        ])
-        .distinct()
-        .where((eb) =>
-          eb.or([
-            eb('event.createdBy', '=', userAuth0Id),
-            eb('user.auth0Id', '=', userAuth0Id),
-          ])
-        )
-        .execute()
+      return result.id
     },
   }
 }

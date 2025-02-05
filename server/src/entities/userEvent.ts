@@ -5,11 +5,12 @@ import { idSchema } from './shared'
 
 export const userEventSchema = z.object({
   id: idSchema,
-  userId: idSchema,
+  userId: z.string(),
+  eventTitle: z.string(),
   eventId: idSchema,
   role: z.string().min(1),
   wishlistId: idSchema,
-  santaForUserId: idSchema,
+  santaForUserId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
 })

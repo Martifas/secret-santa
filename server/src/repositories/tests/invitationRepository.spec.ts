@@ -1,6 +1,6 @@
 import { createTestDatabase } from '@server/utils/tests/database'
 import { wrapInRollbacks } from '@server/utils/tests/transactions'
-import { insertAll, selectAll } from '@server/utils/tests/record'
+import { insertAll } from '@server/utils/tests/record'
 import {
   fakeEvent,
   fakeEventInvitation,
@@ -19,8 +19,9 @@ const [eventOne] = await insertAll(db, 'event', [
 const [invitationOne] = await insertAll(db, 'eventInvitations', [
   fakeEventInvitation({
     eventId: eventOne.id,
-    userId: userOne.id,
+    userId: userOne.auth0Id,
     email: userOne.email,
+    status: 'accepted',
   }),
 ])
 
@@ -28,7 +29,7 @@ const fakeInvitationDefault = (
   invitation: Parameters<typeof fakeEventInvitation>[0] = {}
 ) =>
   fakeEventInvitation({
-    userId: userOne.id,
+    userId: userOne.auth0Id,
     eventId: eventOne.id,
     ...invitation,
   })
@@ -64,33 +65,6 @@ describe('find by event and email', () => {
     expect(pick(foundInvitation, invitationKeysForTesting)).toEqual(
       pick(invitationOne, invitationKeysForTesting)
     )
-  })
-})
-
-describe('find all for user', () => {
-  it('should return all invitations for the user', async () => {
-    const [userTwo] = await insertAll(db, 'user', [fakeUser()])
-    const [eventTwo] = await insertAll(db, 'event', [
-      fakeEvent({ createdBy: userTwo.auth0Id }),
-    ])
-    const [invitationTwo] = await insertAll(db, 'eventInvitations', [
-      fakeEventInvitation({ eventId: eventTwo.id, userId: userTwo.id }),
-    ])
-
-    const invitations = await repository.findAllForUser(userTwo.id)
-
-    expect(invitations).toHaveLength(1)
-    expect(invitations).toEqual([
-      expect.objectContaining(pick(invitationTwo, invitationKeysForTesting)),
-    ])
-  })
-
-  it('should return empty array when no events exist', async () => {
-    await db.deleteFrom('eventInvitations').execute()
-
-    const invitations = await repository.findAllForUser(userOne.id)
-
-    expect(invitations).toEqual([])
   })
 })
 
@@ -134,26 +108,146 @@ describe('update', () => {
   })
 })
 
-describe('remove', () => {
-  it('should remove invitation', async () => {
-    await db.deleteFrom('eventInvitations').execute()
-    const [invitationOne] = await insertAll(db, 'eventInvitations', [
-      fakeEventInvitation({
-        eventId: eventOne.id,
-        userId: userOne.id,
-        email: userOne.email,
-      }),
-    ])
+describe('findPendingInvitationsForEvent', () => {
+  it('should return only pending invitations for an event', async () => {
+    const pendingInvitation1 = fakeInvitationDefault({ status: 'sent' })
+    const pendingInvitation2 = fakeInvitationDefault({
+      status: 'sent',
+      email: 'another@example.com',
+    })
+    const confirmedInvitation = fakeInvitationDefault({
+      status: 'confirmed',
+      email: 'confirmed@example.com',
+    })
 
-    const removedInvitation = await repository.remove(invitationOne.id)
-    expect(pick(removedInvitation, invitationKeysForTesting)).toEqual(
-      pick(invitationOne, invitationKeysForTesting)
+    await repository.create(pendingInvitation1)
+    await repository.create(pendingInvitation2)
+    await repository.create(confirmedInvitation)
+
+    const pendingInvitations = await repository.findPendingInvitationsForEvent(
+      eventOne.id
     )
-    const result = await selectAll(db, 'eventInvitations')
-    expect(result).toHaveLength(0)
+
+    expect(pendingInvitations).toHaveLength(2)
+    pendingInvitations.forEach((invitation) => {
+      expect(invitation.status).toBe('sent')
+      expect(invitation.eventId).toBe(eventOne.id)
+    })
   })
 
-  it('should throw error when removing non-existent invivation', async () => {
-    await expect(repository.remove(99999)).rejects.toThrowError(/no result/i)
+  it('should return empty array for event with no pending invitations', async () => {
+    const result = await repository.findPendingInvitationsForEvent(99999)
+    expect(result).toEqual([])
+  })
+})
+
+describe('updateStatus', () => {
+  it('should update only the status of an invitation', async () => {
+    const originalInvitation = await repository.findById(invitationOne.id)
+    expect(originalInvitation).not.toBeNull()
+
+    const updatedId = await repository.updateStatus(
+      invitationOne.id,
+      'confirmed'
+    )
+    expect(updatedId).toBe(invitationOne.id)
+
+    const updatedInvitation = await repository.findById(invitationOne.id)
+    expect(updatedInvitation?.status).toBe('confirmed')
+    expect(updatedInvitation?.email).toBe(originalInvitation?.email)
+    expect(updatedInvitation?.updatedAt).not.toEqual(
+      originalInvitation?.updatedAt
+    )
+  })
+
+  it('should throw error when updating non-existent invitation status', async () => {
+    await expect(
+      repository.updateStatus(99999, 'confirmed')
+    ).rejects.toThrowError(/no result/i)
+  })
+})
+
+describe('removeById', () => {
+  it('should remove a specific invitation', async () => {
+    const removedId = await repository.removeById(invitationOne.id)
+    expect(removedId).toBe(invitationOne.id)
+
+    const removedInvitation = await repository.findById(invitationOne.id)
+    expect(removedInvitation).toBeNull()
+  })
+})
+
+describe('removeByEventId', () => {
+  it('should remove all invitations for an event', async () => {
+    const invitation2 = fakeInvitationDefault({ email: 'test2@example.com' })
+    const invitation3 = fakeInvitationDefault({ email: 'test3@example.com' })
+
+    await repository.create(invitation2)
+    await repository.create(invitation3)
+
+    const removedIds = await repository.removeByEventId(eventOne.id)
+    expect(removedIds.length).toBeGreaterThan(0)
+
+    const remainingInvitations = await db
+      .selectFrom('eventInvitations')
+      .select(['id'])
+      .where('eventId', '=', eventOne.id)
+      .execute()
+
+    expect(remainingInvitations).toHaveLength(0)
+  })
+
+  it('should return empty array when no invitations exist for event', async () => {
+    const removedIds = await repository.removeByEventId(99999)
+    expect(removedIds).toEqual([])
+  })
+})
+
+describe('removeUserByEventId', () => {
+  it('should remove invitation for specific user and event', async () => {
+    const removedId = await repository.removeUserByEventId(
+      eventOne.id,
+      userOne.auth0Id
+    )
+    expect(removedId).toBe(invitationOne.id)
+
+    const removedInvitation = await repository.findById(invitationOne.id)
+    expect(removedInvitation).toBeNull()
+  })
+
+  it('should return null when no invitation exists for user and event', async () => {
+    const result = await repository.removeUserByEventId(
+      99999,
+      'non-existent-user'
+    )
+    expect(result).toBeNull()
+  })
+})
+
+describe('findByEventAndEmail', () => {
+  it('should return null when no invitation exists for event and email', async () => {
+    const result = await repository.findByEventAndEmail(
+      eventOne.id,
+      'nonexistent@example.com'
+    )
+    expect(result).toBeNull()
+  })
+})
+
+describe('create', () => {
+  it('should handle creation with minimal required fields', async () => {
+    const minimalInvitation = {
+      eventId: eventOne.id,
+      userId: userOne.auth0Id,
+      email: 'minimal@example.com',
+      status: 'pending',
+    }
+
+    const createdId = await repository.create(minimalInvitation)
+    const createdInvitation = await repository.findById(createdId)
+
+    expect(createdInvitation).toMatchObject(minimalInvitation)
+    expect(createdInvitation?.createdAt).toBeInstanceOf(Date)
+    expect(createdInvitation?.updatedAt).toBeInstanceOf(Date)
   })
 })

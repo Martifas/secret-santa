@@ -31,13 +31,19 @@ export function invitationRepository(db: Database) {
         .executeTakeFirst()
       return result ?? null
     },
-    async findAllForUser(userId: number): Promise<InvitationRowSelect[]> {
-      return db
+    async findPendingInvitationsForEvent(
+      eventId: number
+    ): Promise<InvitationForMember[]> {
+      const results = await db
         .selectFrom('eventInvitations')
         .select(invitationKeysForMembers)
-        .where('userId', '=', userId)
+        .where('eventId', '=', eventId)
+        .where('status', '=', 'sent')
         .execute()
+
+      return results
     },
+
     async create(invitation: Insertable<EventInvitations>): Promise<number> {
       const result = await db
         .insertInto('eventInvitations')
@@ -61,13 +67,51 @@ export function invitationRepository(db: Database) {
         .returning(invitationKeysForMembers)
         .executeTakeFirstOrThrow()
     },
+    async updateStatus(id: number, status: string): Promise<number> {
+      const result = await db
+        .updateTable('eventInvitations')
+        .set({
+          status,
+          updatedAt: new Date(),
+        })
+        .where('id', '=', id)
+        .returning(['id'])
+        .executeTakeFirstOrThrow()
 
-    async remove(id: number): Promise<InvitationForMember> {
-      return db
+      return result.id
+    },
+
+    async removeById(id: number): Promise<number> {
+      const [result] = await db
         .deleteFrom('eventInvitations')
         .where('id', '=', id)
-        .returning(invitationKeysForMembers)
-        .executeTakeFirstOrThrow()
+        .returning('id')
+        .execute()
+
+      return result.id
+    },
+
+    async removeByEventId(eventId: number): Promise<number[]> {
+      const result = await db
+        .deleteFrom('eventInvitations')
+        .where('eventId', '=', eventId)
+        .returning('id')
+        .execute()
+
+      return result.map((row) => row.id)
+    },
+    async removeUserByEventId(
+      eventId: number,
+      userId: string
+    ): Promise<number | null> {
+      const result = await db
+        .deleteFrom('eventInvitations')
+        .where('eventId', '=', eventId)
+        .where('userId', '=', userId)
+        .returning('id')
+        .execute()
+
+      return result[0]?.id ?? null
     },
   }
 }

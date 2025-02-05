@@ -7,8 +7,8 @@ export async function up(db: Kysely<any>) {
       c.primaryKey().generatedAlwaysAsIdentity()
     )
     .addColumn('event_id', 'integer', (c) => c.references('event.id').notNull())
-    .addColumn('user_id', 'integer', (c) => c.references('user.id'))
-    .addColumn('email', 'text', (c) => c.notNull()) 
+    .addColumn('user_id', 'text', (c) => c.references('user.auth0_id'))
+    .addColumn('email', 'text', (c) => c.notNull())
     .addColumn('status', 'text', (c) => c.notNull())
     .addColumn('created_at', 'timestamptz', (c) =>
       c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
