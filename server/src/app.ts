@@ -3,6 +3,7 @@ import {
   createExpressMiddleware,
   type CreateExpressContextOptions,
 } from '@trpc/server/adapters/express'
+import cors from 'cors'
 import { renderTrpcPanel } from 'trpc-panel'
 import type { Database } from './database'
 import { appRouter } from './controllers'
@@ -11,6 +12,8 @@ import config from './config'
 
 export default function createApp(db: Database) {
   const app = express()
+
+  app.use(cors())
 
   app.use(express.json())
 

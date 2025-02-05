@@ -88,8 +88,8 @@ describe('createAndSendInvitation', () => {
       title: newInvitationInput.title,
       budgetLimit: newInvitationInput.budgetLimit,
       description: newInvitationInput.description,
-      rsvpLinkYes: `${env.HOST_URL}/rsvp/${newInvitationInput.eventId}/${createdInvitation.id}/accept`,
-      rsvpLinkNo: `${env.HOST_URL}/rsvp/${newInvitationInput.eventId}/${createdInvitation.id}/refuse`,
+      rsvpLinkYes: `${env.HOST_URL}rsvp/${newInvitationInput.eventId}/${createdInvitation.id}/accept`,
+      rsvpLinkNo: `${env.HOST_URL}rsvp/${newInvitationInput.eventId}/${createdInvitation.id}/refuse`,
     })
   })
 
