@@ -91,7 +91,7 @@ export default authenticatedProcedure
             })
           }
 
-          const eventLink = `${env.HOST_URL}events/${input.eventId}`
+          const eventLink = `${env.HOST_URL}event/${input.eventId}`
 
           await sendSecretSantaDrawResult({
             emailReceiver: santaDetails.email,

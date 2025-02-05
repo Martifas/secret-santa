@@ -2,7 +2,7 @@
 
 LIVE PAGE: https://giftmeister.eu/
 
-This is the server side of the Secret Santa program, providing the backend infrastructure for managing secret santa events, users, wishlists, and invitations.
+A full-stack application for organizing and managing Secret Santa events. Users can create events, invite participants, manage wishlists, and participate in gift exchanges.
 
 ## Features
 - **Event Management**
@@ -11,53 +11,91 @@ This is the server side of the Secret Santa program, providing the backend infra
   - Track event status and updates
 
 - **User System**
-  - JWT authentication for secure user management
-  - User profile management with optional avatar support
+  - Authentication via Auth0 integration with Google login
+  - User profile management with basic information
   - Track user participation across multiple events
 
 - **Invitation System**
-  - Email-based invitations with secure tokens
-  - Expiration dates for invitations
+  - Email-based invitations
+  - Email bodies with all essential information
   - Track invitation status
 
 - **Wishlist Management**
   - Create and manage personal wishlists
-  - Add items with names, descriptions, prices, and URLs
-  - Set item priorities
-  - Track purchased status
+  - Add items with names, descriptions, and prices
+  - Delete unwanted items
 
 ## Installation
 Required dependencies can be installed using:
 ```bash
-cd packages/server
 npm install
 ```
 
 ## Environment Setup
-Create a `.env` file in the root directory based on `.env.example`:
-
-
-## Database Configuration
-```bash
-DATABASE_URL= # PostgreSQL connection string (e.g., postgresql://user:password@localhost:5432/database)
-```
-
-## Configuration
-```bash
-TOKEN_EXPIRES_IN=  #default 7 days
-NODE_ENV= #default 'development'
-TOKEN_KEY= #create secure one with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
+Create a .env file inside the server/ directory based on the .env.example:
 
 ## Server Configuration
 ```bash
-PORT=3000 # Port number for the server to listen on
+NODE_ENV=development                 # Environment mode (default: 'development')
+PORT=3000                            # Port number for the server to listen on
+```
+
+# Database Configuration
+```bash
+DATABASE_URL=postgres://postgres:password@localhost:5432/database_name  # PostgreSQL connection string
+```
+
+# Auth0 Configuration
+```bash
+AUTH0_ISSUER_BASE_URL=https://your-auth0-domain.us.auth0.com           # Auth0 issuer base URL
+AUTH0_CLIENT_ID=your_auth0_client_id                                   # Auth0 client ID
+AUTH0_CLIENT_SECRET=your_auth0_client_secret                           # Auth0 client secret
+AUTH0_SECRET=your_random_secret                                        # Secure secret for Auth0 sessions
+```
+
+# Application URLs
+```bash
+BASE_URL=http://localhost:3000                                         # Base URL for the server
+HOST_URL=http://localhost:5173/                                        # URL for the client app
+```
+
+# Email Configuration
+```bash
+EMAIL_SENDER=your_email@gmail.com                                      # Sender email address
+EMAIL_PASSWORD=your_email_password                                    # Email password (use app-specific password if needed)
+```
+
+## Client configuration
+Create a .env file inside the client/ directory based on the .env.example:
+
+# API Configuration
+```bash
+VITE_API_ORIGIN=http://localhost:3000                                  # Origin URL of the API
+VITE_API_PATH=/api/v1/trpc                                            # API path for tRPC
+```
+
+# Auth0 Configuration
+```bash
+VITE_AUTH0_DOMAIN=https://your-auth0-domain.us.auth0.com              # Auth0 domain
+VITE_AUTH0_CLIENT_ID=your_auth0_client_id                             # Auth0 client ID
+VITE_AUTH0_AUDIENCE=https://your-auth0-audience/                      # Auth0 audience for API access
+```
+
+# Gift Recommendation Service
+```bash
+VITE_GIFT_RECOMMMENDATION_PUBLIC_KEY=your_public_key                  # Public key for gift recommendation service
+```
+
+# Testing Credentials
+```bash
+VITE_TESTING_EMAIL=your_testing_email@gmail.com                       # Test email for development/testing
+VITE_TESTING_PASSWORD=your_testing_password                           # Test password for development/testing
 ```
 
 ## Development
 To start the development server with hot-reload:
 ```bash
-npm run dev
+npm run dev -w=server
 ```
 
 ## Database
@@ -66,35 +104,65 @@ The application uses Kysely for type-safe database operations with PostgreSQL.
 ## Database Migrations
 ```bash
 # Create a new migration
-npm run migrate:new
+npm run migrate:new -w=server
 
 # Run migrations to latest version
-npm run migrate:latest
+npm run migrate:latest -w=server
 
 # Generate TypeScript types from database schema
-npm run gen:types
+npm run gen:types -w=server
 ```
 
 ## Testing
-The project uses Vitest for testing:
+The project uses Vitest for testing.
+
+Server tests:
 ```bash
 # Run tests in watch mode
-npm run test
+npm run test -w=server
 
 # Generate test coverage report
-npm run coverage
+npm run coverage -w=server
+```
+Client tests:
+```bash
+# Run unit tests in watch mode
+npm run test:unit -w=client
+
+# Run e2e tests:
+npm run test:e2e -w=server
 ```
 
+Be aware that e2e tests require VITE_TESTING_EMAIL and VITE_TESTING_PASSWORD set. You can get these by registering to the app using Auth0.
+
+
 ## Tech Stack
+### Backend:
 
-- **Runtime:** Node.js
+- Node.js, TypeScript, Express
+- tRPC with Panel for API
+- PostgreSQL with Kysely ORM
+- Pino logging
+- Nodemailer for emails
+- Vitest testing
 
-- **Language & Framework:** TypeScript, Express.js
+### Frontend:
 
-- **API & Documentation:** tRPC, tRPC Panel
+- Vue 3, TypeScript
+- Vite
+- TailwindCSS, Flowbite
+- Auth0 with Google login
+- Vue Router, Pinia
 
-- **Database:** PostgreSQL, Kysely (Type-safe ORM)
+### Development:
 
-- **Authentication & Validation:** JWT authentication with jsonwebtoken, Zod for schema validation
+- ESLint, Prettier
+- Playwright E2E tests
+- GitHub Actions CI/CD
 
-- **Testing:** Vitest
+## Planned features
+Future features involve additional functionalies, options:
+- Delete wishlist
+- Options to change user picture, name
+- More explicit errors UI
+  
