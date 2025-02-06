@@ -17,14 +17,7 @@ const { isAuthenticated } = useAuth0()
           Quickly add and reserve gifts with convenience!
         </p>
       </div>
-      <div class="text-md mx-auto mt-20 flex w-40 flex-col items-center">
-        <router-link
-          v-if="isAuthenticated"
-          :to="{ name: 'Dashboard' }"
-          class="m-2 w-3xs rounded-sm bg-green-900  shadow-gray-800 p-2 text-center text-white shadow-md hover:bg-green-700"
-        >
-          Dashboard
-        </router-link>
+      <div class="text-md mx-auto mt-20 flex w-40 flex-col items-center">    
         <router-link
           :to="{ name: 'Wishlist' }"
           class="m-2 w-3xs rounded-sm bg-green-900 shadow-gray-800 p-2 text-center text-white shadow-md hover:bg-green-700"
