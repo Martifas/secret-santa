@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { trpc } from '@/trpc'
 import { PlusIcon, TrashIcon, EnvelopeIcon } from '@heroicons/vue/24/outline'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useInvitationStore } from '@/stores/invitationStore'
 import { useAuth0 } from '@auth0/auth0-vue'
@@ -14,13 +14,14 @@ const errorMessage = ref('')
 const typeEventOwner = ref('')
 const { user } = useAuth0()
 
-const creatorEmail = user.value.email
+const creatorEmail = computed(() => user.value?.email ?? '')
 
 const validateEmails = () => {
   const filledEmails = participants.value.filter((p) => p.email.trim() !== '')
 
   const participantEmails = filledEmails.map((p) => p.email.toLowerCase().trim())
-  if (participantEmails.includes(creatorEmail.toLowerCase())) {
+
+  if (creatorEmail.value && participantEmails.includes(creatorEmail.value.toLowerCase())) {
     errorMessage.value = 'You cannot invite yourself to the event'
     return false
   }
