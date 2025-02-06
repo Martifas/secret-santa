@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useGiftRecommendation } from '../useGiftRecommendation'
 
-const API_KEY = import.meta.env.VITE_GIFT_RECOMMMENDATION_PUBLIC_KEY
+const API_KEY = import.meta.env.VITE_GIFT_RECOMMENDATION_PUBLIC_KEY
 
 describe('useGiftRecommendation', () => {
   const mockRecommendation = {
