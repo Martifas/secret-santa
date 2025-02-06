@@ -7,7 +7,7 @@ interface GiftRecommendation {
 
 export function useGiftRecommendation() {
 
-  const API_KEY = import.meta.env.VITE_GIFT_RECOMMMENDATION_PUBLIC_KEY
+  const API_KEY = import.meta.env.VITE_GIFT_RECOMMENDATION_PUBLIC_KEY
   const showGiftPrompt = ref(false)
   const interest = ref('')
   const errorMessage = ref('')
