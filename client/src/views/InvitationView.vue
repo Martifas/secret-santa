@@ -14,6 +14,12 @@ const typeEventOwner = ref('')
 
 const validateEmails = () => {
   const filledEmails = participants.value.filter((p) => p.email.trim() !== '')
+  
+  const uniqueEmails = new Set(filledEmails.map(p => p.email.toLowerCase().trim()))
+  if (uniqueEmails.size !== filledEmails.length) {
+    errorMessage.value = 'Duplicate email addresses are not allowed'
+    return false
+  }
 
   if (typeEventOwner.value === 'participating') {
     if (filledEmails.length < 2) {
